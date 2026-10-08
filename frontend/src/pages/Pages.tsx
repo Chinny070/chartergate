@@ -24,7 +24,7 @@ export function Home() {
           on GenLayer.
         </p>
         <div className="row">
-          <Badge tone="warning">Stage 1 · charter + proposals only</Badge>
+          <Badge tone="warning">Stage 2 · charter, proposals + evidence vault</Badge>
         </div>
       </section>
 
@@ -36,6 +36,7 @@ export function Home() {
               <Badge tone="final">Charter v{m.charter_version}</Badge>
               <Badge>{m.section_count} sections</Badge>
               <Badge>{m.proposal_count} proposals</Badge>
+              <Badge>{m.evidence_count} evidence</Badge>
             </div>
           </Docket>
         )}
@@ -77,7 +78,7 @@ export function Planned({ title, stage }: { title: string; stage: string }) {
       <h1 style={{ fontSize: "clamp(2rem, 6vw, 4rem)" }}>{title}</h1>
       {id && <p className="hash">ref: {id}</p>}
       <Docket label="Not implemented">
-        This page is planned for {stage}. Stage 1 implements only the charter and proposal submission.
+        This page is planned for {stage}. So far CharterGate implements the charter, proposals and the evidence vault.
       </Docket>
       <Link to="/" className="label">
         ← back to court

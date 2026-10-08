@@ -172,6 +172,42 @@
       "readonly": true,
       "ret": "dict"
     },
+    "get_evidence": {
+      "params": [
+        [
+          "evidence_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_evidence_count": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_evidence_page": {
+      "params": [
+        [
+          "offset",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "dict"
+        }
+      ]
+    },
     "get_proposal": {
       "params": [
         [
@@ -188,6 +224,63 @@
       "kwparams": {},
       "readonly": true,
       "ret": "int"
+    },
+    "get_proposal_evidence_count": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_proposal_evidence_ids_page": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ],
+        [
+          "offset",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "int"
+        }
+      ]
+    },
+    "get_proposal_evidence_page": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ],
+        [
+          "offset",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "dict"
+        }
+      ]
     },
     "get_proposals_page": {
       "params": [
@@ -207,6 +300,34 @@
           "$rep": "dict"
         }
       ]
+    },
+    "submit_evidence": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ],
+        [
+          "source_url",
+          "string"
+        ],
+        [
+          "source_kind",
+          "string"
+        ],
+        [
+          "claim",
+          "string"
+        ],
+        [
+          "related_section_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
     },
     "submit_proposal": {
       "params": [

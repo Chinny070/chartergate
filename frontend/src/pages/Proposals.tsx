@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Badge, Button, Docket, EmptyState, ErrorBanner } from "../components/primitives";
 import { ChainTime, Field, ReadBoundary } from "../components/common";
+import { EvidenceList, SubmitEvidenceForm } from "../components/Evidence";
 import { shortAddress } from "../lib/format";
 import { TransactionTimeline } from "../components/TransactionTimeline";
 import {
   getCharterSectionsAtVersionPage,
   getProposal,
+  getProposalEvidencePage,
   getProposalsPage,
   LIMITS,
   submitProposal,
@@ -74,9 +76,10 @@ export function ProposalDetailPage() {
                   <p style={{ whiteSpace: "pre-wrap" }}>{p.requested_action}</p>
                 </Docket>
                 <CharterAtSubmission version={p.charter_version_at_submission} />
+                <ProposalEvidence proposal={p} />
                 <Docket label="Constitutional review">
-                  Not implemented. Review, evidence, precedent and appeals arrive in later stages; this proposal is only
-                  stored as submitted.
+                  Not implemented. Judgment, precedent and appeals arrive in later stages. Evidence can be attached above,
+                  but nothing yet decides whether this proposal complies with the charter.
                 </Docket>
               </div>
               <Docket label="Status">
@@ -100,6 +103,24 @@ export function ProposalDetailPage() {
       <Link to="/proposals" className="label">
         ← all proposals
       </Link>
+    </div>
+  );
+}
+
+/** Evidence attached to this proposal, plus the form to add more (proposer only). */
+function ProposalEvidence({ proposal }: { proposal: Proposal }) {
+  const read = useRead(() => getProposalEvidencePage(proposal.proposal_id), [proposal.proposal_id]);
+  return (
+    <div className="stack">
+      <h2 style={{ fontSize: "1.8rem" }}>Evidence</h2>
+      <ReadBoundary read={read}>
+        {(records) => (
+          <>
+            <EvidenceList records={[...records].reverse()} empty="No evidence has been attached to this proposal yet." />
+            <SubmitEvidenceForm proposal={proposal} evidenceCount={records.length} onFinalized={read.reload} />
+          </>
+        )}
+      </ReadBoundary>
     </div>
   );
 }

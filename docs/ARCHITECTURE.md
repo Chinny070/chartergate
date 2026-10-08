@@ -384,3 +384,63 @@ StudioNet, used unmodified for the success and rollback cases. Statuses that cou
 (PENDING, ACCEPTED, CANCELED, UNDETERMINED, timeouts, non-Studio fields) are derived from a real fixture and marked
 DERIVED in the tests. `live.test.ts` is an opt-in network check (`CHARTERGATE_LIVE=1`) that runs known live
 transactions through the real transaction layer; it sends nothing and is skipped by default.
+
+---
+
+# Stage 2: evidence vault and live web provenance
+
+Design: `docs/STAGE_2_EQUIVALENCE.md`. Data model, hash and limits: `docs/EVIDENCE_MODEL.md`. This section records what was
+verified and what was learned while building it.
+
+## Verified APIs (pinned runner v0.2.16)
+
+Verified in the pinned SDK source (extracted by genvm-linter / genlayer-test), the official `write-contract` skill, and the
+official docs and SDK reference.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| static / API fetch | `gl.nondet.web.get(url, headers=)` -> `Response(status, headers, body)` | the pinned SDK says `.status`; main-branch docs say `.status_code` |
+| JS rendering | `gl.nondet.web.render(url, mode=, wait_after_loaded=)` -> `str` for `text`/`html`, `Image` for `screenshot` | only `text` is used |
+| LLM | `gl.nondet.exec_prompt(prompt, response_format='json')` | |
+| consensus | `gl.vm.run_nondet(leader_fn, validator_fn)` | validator runs in a sandbox; closures are pickled with cloudpickle, so they capture plain values only |
+| failed fetch / LLM call | `gl.nondet.NondetException` | |
+| hashing | `Keccak256` (exported by `genlayer`) | `hashlib` is not verified inside GenVM, so it is not used |
+| time | `gl.message_raw["datetime"]` | `gl.vm.get_timestamp()` does not exist in v0.2.16 |
+
+There are no timeout, size or redirect parameters on `web.get` or `web.render`, so the contract bounds what it
+*processes* itself. Only `re` and `json` from the standard library are used (both appear in the official skill).
+
+## What was learned
+
+- **Floats cannot cross the GenVM calldata boundary.** A JSON float from the LLM reaches the contract as `None`. The
+  contract treats that as `LLM_ERROR:NOT_AN_OBJECT` (fail closed). Integers are accepted and coerced.
+- **A rule is only tested if a test fails without it.** Mutation checks on the validator showed that "the leader's quote
+  must appear in the validator's own fetch" was initially untested (every fabricated-quote test was also caught by
+  another rule). A test was added that only that rule can fail; with the rule removed it now fails.
+- **Closures must be picklable.** The direct tests turn on `direct_vm.check_pickling` for a submission, so a closure that
+  captured storage or a compiled-object problem would warn.
+
+## Testing
+
+- Direct tests mock `web.get`, `web.render` and `exec_prompt`; no real network is used. `direct_vm.run_validator` replays the
+  real validator against changed mocks to test the equivalence rules.
+- `tests/integration/test_evidence_live.py` uses real network access through GLSim, with five validators that re-fetch
+  independently. Four tests run (real 404, real HTML sent as an API, protocol time and provenance, an invalid-input revert).
+  Four more need **real GenVM** and are gated behind `CHARTERGATE_REAL_GENVM=1` (the StudioNet smoke cases).
+
+### GLSim limitations found (verified against the frozen Stage 1.2 contract as a control)
+
+1. GLSim returns an **empty schema** for this contract, so `gltest` hands back a contract object with no methods. The
+   fixture binds the deployed address to the official schema from `genvm-lint` instead.
+2. Deploying the same contract class **a second time in one GLSim process fails** ("class is not marked for usage within
+   storage"). The frozen Stage 1.2 contract behaves identically. Start a fresh GLSim for each run.
+3. GLSim has **no LLM** here (its providers need `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`) and **no browser** (no Playwright), so
+   it renders with a plain HTTP GET and returns text even for an unreachable host. Real GenVM raises on a failed render.
+   `VERIFIED` / `UNVERIFIABLE` records and real `web.render` therefore cannot be proven locally and are StudioNet smoke cases.
+
+## Frontend
+
+The Evidence Vault is in `/evidence`, `/evidence/:id` and the proposal page. It reuses the Stage 1.3 transaction layer, so
+FINALIZED alone is never shown as success. `lib/evidence.ts` holds the wording ("JAVASCRIPT RENDER" is always shown for a
+render), the status explanations, and a client-side URL pre-check that mirrors the contract (tested against the same
+cases). `charterGate.ts` decodes `evidence_count` as optional so the UI still works against a pre-Stage-2 contract.

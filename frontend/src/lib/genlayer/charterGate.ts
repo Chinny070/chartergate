@@ -4,7 +4,7 @@ import { readView, submitWrite } from "./contract";
 import type { TxState } from "./tx";
 
 /**
- * Typed wrappers for the Stage 1 CharterGate contract. Every method name and argument below
+ * Typed wrappers for the CharterGate contract (Stages 1 and 2). Every method name and argument below
  * comes from `docs/charter_gate.schema.json` (generated with `genvm-lint schema`); nothing is
  * assumed. Field names stay snake_case to match the contract's `to_dict()` output exactly.
  */
@@ -18,6 +18,8 @@ export interface DaoMetadata {
   updated_at: string;
   section_count: number;
   proposal_count: number;
+  /** 0 when talking to a pre-Stage-2 contract, which has no such field. */
+  evidence_count: number;
 }
 
 export interface CharterSection {
@@ -51,6 +53,36 @@ export interface Proposal {
   status: string;
 }
 
+/** Evidence verification outcomes. These are NOT constitutional verdicts (that is a later stage). */
+export type EvidenceStatus = "VERIFIED" | "UNVERIFIABLE" | "SOURCE_UNAVAILABLE" | "INVALID_SOURCE";
+export type SourceKind = "STATIC_WEB" | "DYNAMIC_WEB" | "API";
+export type RetrievalMethod = "GET" | "RENDER_TEXT";
+
+/**
+ * One Evidence Vault record, exactly as the contract stored it. Everything except `submitter`,
+ * `source_url`, `source_kind`, `claim` and `related_section_id` was produced by the contract and
+ * agreed by validators; the submitter cannot supply the status, fact, value or hash.
+ */
+export interface EvidenceRecord {
+  evidence_id: number;
+  proposal_id: number;
+  submitter: string;
+  source_url: string;
+  source_kind: SourceKind;
+  retrieval_method: RetrievalMethod;
+  claim: string;
+  status: EvidenceStatus;
+  status_reason: string;
+  normalized_fact: string;
+  normalized_value: string;
+  excerpt: string;
+  content_hash: string;
+  retrieved_at: string;
+  created_at: string;
+  related_section_id: string;
+  related_revision_version: number;
+}
+
 /**
  * Every contract method this wrapper can call, with its argument count. `charterGate.schema.test.ts`
  * compares this table to `docs/charter_gate.schema.json`, so a rename or signature change in the
@@ -68,6 +100,13 @@ export const CONTRACT_METHODS = {
   update_charter_section: { args: 3, write: true },
   deactivate_charter_section: { args: 1, write: true },
   submit_proposal: { args: 3, write: true },
+  get_evidence: { args: 1, write: false },
+  get_evidence_count: { args: 0, write: false },
+  get_evidence_page: { args: 2, write: false },
+  get_proposal_evidence_count: { args: 1, write: false },
+  get_proposal_evidence_ids_page: { args: 3, write: false },
+  get_proposal_evidence_page: { args: 3, write: false },
+  submit_evidence: { args: 5, write: true },
 } as const;
 
 type ViewName = { [K in keyof typeof CONTRACT_METHODS]: (typeof CONTRACT_METHODS)[K]["write"] extends false ? K : never }[keyof typeof CONTRACT_METHODS];
@@ -81,10 +120,17 @@ export const LIMITS = {
   proposalTitle: 200,
   proposalDescription: 10000,
   proposalAction: 2000,
+  sourceUrl: 500,
+  claim: 500,
+  evidencePerProposal: 25,
   pageSize: 50,
 } as const;
 
 export const SECTION_ID_PATTERN = /^[A-Za-z0-9._-]+$/;
+
+export const SOURCE_KINDS: readonly SourceKind[] = ["STATIC_WEB", "DYNAMIC_WEB", "API"];
+export const EVIDENCE_STATUSES: readonly EvidenceStatus[] = ["VERIFIED", "UNVERIFIABLE", "SOURCE_UNAVAILABLE", "INVALID_SOURCE"];
+export const RETRIEVAL_METHODS: readonly RetrievalMethod[] = ["GET", "RENDER_TEXT"];
 
 // ---- decoding ---------------------------------------------------------------------------
 
@@ -108,6 +154,17 @@ const int = (r: Record<string, unknown>, k: string): number => {
   return Number(v);
 };
 
+/** An integer field that an older contract may not have. A present-but-wrong value still fails loudly. */
+const optionalInt = (r: Record<string, unknown>, k: string, fallback: number): number =>
+  r[k] === undefined ? fallback : int(r, k);
+
+/** A string that must be one of the contract's known values; anything else is a decoding error. */
+function oneOf<T extends string>(r: Record<string, unknown>, k: string, allowed: readonly T[]): T {
+  const v = str(r, k);
+  if (!(allowed as readonly string[]).includes(v)) throw new Error(`Contract field "${k}" has unknown value "${v}"`);
+  return v as T;
+}
+
 const bool = (r: Record<string, unknown>, k: string): boolean => {
   const v = r[k];
   if (typeof v !== "boolean") throw new Error(`Contract field "${k}" is not a boolean`);
@@ -125,6 +182,7 @@ export function decodeDaoMetadata(raw: unknown): DaoMetadata {
     updated_at: str(r, "updated_at"),
     section_count: int(r, "section_count"),
     proposal_count: int(r, "proposal_count"),
+    evidence_count: optionalInt(r, "evidence_count", 0),
   };
 }
 
@@ -166,6 +224,29 @@ export function decodeProposal(raw: unknown): Proposal {
   };
 }
 
+export function decodeEvidence(raw: unknown): EvidenceRecord {
+  const r = asRecord(raw);
+  return {
+    evidence_id: int(r, "evidence_id"),
+    proposal_id: int(r, "proposal_id"),
+    submitter: str(r, "submitter"),
+    source_url: str(r, "source_url"),
+    source_kind: oneOf(r, "source_kind", SOURCE_KINDS),
+    retrieval_method: oneOf(r, "retrieval_method", RETRIEVAL_METHODS),
+    claim: str(r, "claim"),
+    status: oneOf(r, "status", EVIDENCE_STATUSES),
+    status_reason: str(r, "status_reason"),
+    normalized_fact: str(r, "normalized_fact"),
+    normalized_value: str(r, "normalized_value"),
+    excerpt: str(r, "excerpt"),
+    content_hash: str(r, "content_hash"),
+    retrieved_at: str(r, "retrieved_at"),
+    created_at: str(r, "created_at"),
+    related_section_id: str(r, "related_section_id"),
+    related_revision_version: int(r, "related_revision_version"),
+  };
+}
+
 function asList(raw: unknown): unknown[] {
   if (!Array.isArray(raw)) throw new Error("Expected a list from the contract");
   return raw;
@@ -199,6 +280,20 @@ export const getProposal = async (proposalId: number) =>
 export const getProposalsPage = async (offset = 0, limit: number = LIMITS.pageSize) =>
   asList(await view("get_proposals_page", [offset, limit])).map(decodeProposal);
 
+export const getEvidence = async (evidenceId: number) => decodeEvidence(await view("get_evidence", [evidenceId]));
+
+export const getEvidenceCount = async () => {
+  const n = await view("get_evidence_count");
+  if (typeof n !== "number" && typeof n !== "bigint") throw new Error("get_evidence_count did not return an integer");
+  return Number(n);
+};
+
+export const getEvidencePage = async (offset = 0, limit: number = LIMITS.pageSize) =>
+  asList(await view("get_evidence_page", [offset, limit])).map(decodeEvidence);
+
+export const getProposalEvidencePage = async (proposalId: number, offset = 0, limit: number = LIMITS.pageSize) =>
+  asList(await view("get_proposal_evidence_page", [proposalId, offset, limit])).map(decodeEvidence);
+
 // ---- writes -----------------------------------------------------------------------------
 
 type OnState = (s: TxState) => void;
@@ -218,3 +313,19 @@ export const deactivateCharterSection = (c: ChainClient, id: string, on: OnState
 /** Any connected wallet. Creates a SUBMITTED proposal; nothing reviews it in Stage 1. */
 export const submitProposal = (c: ChainClient, title: string, description: string, action: string, on: OnState) =>
   write(c, "submit_proposal", [title, description, action], on);
+
+/**
+ * Proposer only. The caller supplies ONLY what they legitimately control: which proposal, the source
+ * URL, the kind of source, the claim to check and (optionally) the charter section it relates to.
+ * The retrieval method, the extracted fact and value, the status and the hash are produced by the
+ * contract and agreed by validators; this app never sends them and cannot override them.
+ */
+export const submitEvidence = (
+  c: ChainClient,
+  proposalId: number,
+  sourceUrl: string,
+  sourceKind: SourceKind,
+  claim: string,
+  relatedSectionId: string,
+  on: OnState,
+) => write(c, "submit_evidence", [proposalId, sourceUrl, sourceKind, claim, relatedSectionId], on);
