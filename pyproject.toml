@@ -1,0 +1,8 @@
+[project]
+name = "chartergate"
+version = "0.0.0"
+description = "CharterGate: constitutional review layer for DAOs on GenLayer (Stage 0 foundation)"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests/direct"]

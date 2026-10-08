@@ -1,0 +1,66 @@
+/* CharterGate design tokens. Palette is from the design spec (section 13); components
+   must use the semantic aliases below, never raw hex values. */
+@import "@fontsource/instrument-serif/400.css";
+@import "@fontsource/instrument-serif/400-italic.css";
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+
+:root {
+  /* spec palette */
+  --void-ink: #09070f;
+  --deep-plum: #170a1f;
+  --ultraviolet: #6e2bff;
+  --plasma-orchid: #d94cff;
+  --toxic-citron: #e8ff3a;
+  --signal-coral: #ff5b4d;
+  --electric-ice: #8efff3;
+  --court-paper: #fff7e8;
+  --oxidized-gold: #c89b3c;
+  --ghost-lilac: #d7c8ff;
+  --ink-shadow: #0e0b16;
+
+  /* surfaces */
+  --bg: var(--void-ink);
+  --surface-dark: var(--ink-shadow);
+  --surface-paper: var(--court-paper);
+  --text: var(--court-paper);
+  --text-muted: var(--ghost-lilac);
+  --text-on-paper: var(--void-ink);
+  --rule: color-mix(in srgb, var(--ghost-lilac) 28%, transparent);
+  --rule-on-paper: color-mix(in srgb, var(--void-ink) 30%, transparent);
+
+  /* semantics (spec 13.2) */
+  --state-eligible: var(--electric-ice);
+  --state-warning: var(--toxic-citron);
+  --state-ineligible: var(--signal-coral);
+  --state-active: var(--plasma-orchid);
+  --state-final: var(--oxidized-gold);
+  --state-precedent: var(--ghost-lilac);
+  --focus: var(--toxic-citron);
+
+  --atmosphere:
+    radial-gradient(circle at 20% 10%, var(--plasma-orchid) 0%, transparent 28%),
+    radial-gradient(circle at 80% 30%, var(--toxic-citron) 0%, transparent 24%),
+    radial-gradient(circle at 70% 90%, var(--signal-coral) 0%, transparent 30%),
+    linear-gradient(135deg, var(--void-ink) 0%, var(--deep-plum) 55%, var(--ink-shadow) 100%);
+
+  /* type */
+  --font-serif: "Instrument Serif", "Times New Roman", serif;
+  --font-sans: "Space Grotesk Variable", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* shape: sharp radii and clipped corners, not pills */
+  --radius: 3px;
+  --clip: 14px;
+  --clip-path: polygon(0 0, calc(100% - var(--clip)) 0, 100% var(--clip), 100% 100%, var(--clip) 100%, 0 calc(100% - var(--clip)));
+
+  --gutter: 16px;
+  --content-max: 1240px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 32px;
+  }
+}
