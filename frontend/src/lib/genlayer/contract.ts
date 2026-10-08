@@ -1,14 +1,10 @@
-import { TransactionHashVariant, TransactionStatus } from "genlayer-js/types";
+import { TransactionHashVariant } from "genlayer-js/types";
 import type { CalldataEncodable, TransactionHash } from "genlayer-js/types";
 import { CHARTERGATE_ADDRESS } from "../../config/chain";
 import type { ChainClient } from "./client";
 import { readClient } from "./client";
-import {
-  classifyError,
-  failureFromNetworkStatus,
-  phaseFromNetworkStatus,
-  type TxState,
-} from "./tx";
+import { classifyError, type TxState } from "./tx";
+import { watchTransaction } from "./watch";
 
 /**
  * TYPED BOUNDARY, NOT A SCHEMA.
@@ -44,45 +40,50 @@ export async function readView(
 }
 
 /**
- * Write call with a real lifecycle. A hash is NOT success: we report `finalized` only once
- * the network reports FINALIZED, and map UNDETERMINED/CANCELED/timeouts to `failed`.
+ * Write call with a real lifecycle:
+ *   awaiting_wallet -> submitted (hash returned) -> pending (network knows it) -> finalized | failed
+ *
+ * A hash is NOT success, and neither is consensus FINALIZED: a finalized transaction can still have
+ * been rolled back by the contract. `watchTransaction` -> `classifyTransaction` reports `finalized`
+ * only for FINALIZED + successful execution; see tx.ts for the verified SDK fields it relies on.
  */
 export async function submitWrite(
   client: ChainClient,
   call: { functionName: string; args?: CalldataEncodable[]; value?: bigint },
   onState: (s: TxState) => void,
 ): Promise<TxState> {
-  let state: TxState = { phase: "awaiting_wallet" };
-  onState(state);
+  onState({ phase: "awaiting_wallet" });
+
+  let hash: `0x${string}`;
   try {
-    const hash = (await client.writeContract({
+    const sent: unknown = await client.writeContract({
       address: requireAddress(),
       functionName: call.functionName,
       args: call.args ?? [],
       value: call.value ?? 0n,
-    })) as TransactionHash;
-    state = { phase: "submitted", hash };
-    onState(state);
-    state = { phase: "pending", hash };
-    onState(state);
-
-    const receipt = await client.waitForTransactionReceipt({
-      hash,
-      status: TransactionStatus.FINALIZED,
-      interval: 3000,
-      retries: 200,
     });
-    const status = receipt.status as unknown as TransactionStatus;
-    const phase = phaseFromNetworkStatus(status);
-    state = {
-      phase,
-      hash,
-      networkStatus: status,
-      failure: phase === "failed" ? failureFromNetworkStatus(status) : undefined,
-    };
+    if (typeof sent !== "string" || !/^0x[0-9a-fA-F]{64}$/.test(sent)) {
+      const bad: TxState = {
+        phase: "failed",
+        failure: { category: "unrecognized", message: "The wallet did not return a valid transaction hash." },
+      };
+      onState(bad);
+      return bad;
+    }
+    hash = sent as `0x${string}`;
   } catch (err) {
-    state = { ...state, phase: "failed", failure: classifyError(err) };
+    const failed: TxState = { phase: "failed", failure: classifyError(err) };
+    onState(failed);
+    return failed;
   }
-  onState(state);
-  return state;
+
+  onState({ phase: "submitted", hash });
+  return watchTransaction(
+    hash,
+    {
+      getTransaction: (h) => client.getTransaction({ hash: h as TransactionHash }),
+      sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+    },
+    onState,
+  );
 }

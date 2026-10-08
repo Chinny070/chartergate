@@ -309,3 +309,78 @@ before and after. See `deployments/studionet.json`.
 - On-chain timestamps vary in sub-second precision (`...19:47:10.102Z` vs `...19:48:13.090065Z`). Both parse with
   `new Date()`, but code must not assume a fixed fractional-second width.
 - `my-studionet-wallet` owns both verification deployments permanently. Neither is canonical.
+
+---
+
+# Stage 1.3: finality is not success
+
+## The bug
+
+The Stage 1.2 UI showed `finalized` whenever the network status was `FINALIZED`. In GenLayer that is only
+**consensus** finality. A transaction can be `FINALIZED` while the contract **rolled back**: live example,
+`offset-bob` calling an owner-only method is FINALIZED with a rollback payload `EXPECTED:NOT_OWNER`, and no state
+changes. The UI would have shown a green success.
+
+## Two separate facts
+
+| Question | Where it comes from | Examples |
+| --- | --- | --- |
+| Consensus: did validators finalize it? | `statusName`, and `result` (number, named by `transactionResultNumberToName`) | PENDING, ACCEPTED, FINALIZED; MAJORITY_AGREE |
+| Execution: did the contract succeed? | the leader's receipt (StudioNet) or `txExecutionResultName` (other chains) | SUCCESS / rollback / contract error |
+
+`TxState` keeps both (`networkStatus`, `consensusResult`, `execution`). The UI shows them side by side, for
+example `network FINALIZED · consensus MAJORITY_AGREE · execution ROLLED BACK (EXPECTED:NOT_OWNER)`.
+
+## Rule
+
+`classifyTransaction` (in `tx.ts`) is the only place that decides the user-facing outcome:
+
+| Input | Result |
+| --- | --- |
+| not final (PENDING, PROPOSING, COMMITTING, REVEALING, ACCEPTED, READY_TO_FINALIZE, APPEAL_*) | `pending`. ACCEPTED is pending: it is still inside the appeal window |
+| UNDETERMINED, CANCELED, LEADER_TIMEOUT, VALIDATORS_TIMEOUT | `failed` (consensus), immediately |
+| FINALIZED, validators did not agree (result not AGREE or MAJORITY_AGREE) | `failed` (consensus) |
+| FINALIZED + execution success | **`finalized`, the only success** |
+| FINALIZED + rollback | `failed` (`rolled_back`), shows the contract's `EXPECTED:` code |
+| FINALIZED + contract crash (e.g. raw TypeError) | `failed` (`contract_error`); stack trace kept in `failure.debug`, not shown |
+| anything unrecognised or malformed | `failed` (`unrecognized`): fail closed |
+
+## Verified genlayer-js 1.1.8 facts
+
+- `client.getTransaction({hash})` returns a `GenLayerTransaction`; use it, not `waitForTransactionReceipt`.
+  `waitForTransactionReceipt` returns a *simplified* receipt that renames and drops fields (for example
+  `statusName` becomes `status_name`); its `fullTransaction` option exists in the code but not in the 1.1.8 types.
+- On **StudioNet** the typed `txExecutionResult` / `txExecutionResultName` fields are `undefined`; the SDK fills
+  them only on non-Studio chains. `resultName` is also `undefined` on Studio, so the numeric `result` is mapped.
+- On StudioNet the execution outcome is in `consensus_data.leader_receipt[]`, the entry with `mode === "leader"`:
+  `execution_result` is `"SUCCESS"` or `"ERROR"`; `result.status` is `"return"`, `"rollback"` or
+  `"contract_error"`; `result.payload` is the contract's message (for example `EXPECTED:NOT_OWNER`) or, for a crash,
+  `exit_code 1` with the traceback in `genvm_result.stderr`.
+- The SDK's own types are wrong for StudioNet: `LeaderReceipt.result` is typed `string` but is an object, and
+  `execution_result` is typed `string`, not an enum. Every field is therefore read as `unknown` and validated.
+- `consensus_data.final` is `undefined` on StudioNet and is not used.
+- Validators' receipts may show `ERROR` / `Validator execution cancelled after quorum`; these are benign and ignored.
+  Only the leader's receipt decides.
+
+## Polling
+
+`watchTransaction` (`watch.ts`) polls `getTransaction` every 3 s, up to about 15 minutes. It waits one interval
+before the first read, so SUBMITTED stays visible until the network reports the transaction (then PENDING). It
+stops at once on CANCELED / UNDETERMINED / timeouts instead of polling to a retry limit, tolerates transient read
+errors (5 in a row ends it with the error surfaced), and on timeout reports a failure that says the transaction
+"may still complete".
+
+## Failure messages
+
+Rollback codes are mapped to short text (`EXPECTED:NOT_OWNER` becomes "Only the contract owner can do this.",
+`EXPECTED:INVALID_TYPE:body` becomes `The value for "body" has the wrong type.`); unknown codes are shown verbatim,
+truncated. Stack traces are never shown in the normal UI. This relies on the leader receipt exposing the payload,
+which StudioNet does; it is not guaranteed on other chains, where the code is empty and a generic message is shown.
+
+## Tests
+
+`txOutcome.test.ts` and `watch.test.ts` use `__fixtures__/live-txs.json`: real `getTransaction()` results from
+StudioNet, used unmodified for the success and rollback cases. Statuses that could not be captured on demand
+(PENDING, ACCEPTED, CANCELED, UNDETERMINED, timeouts, non-Studio fields) are derived from a real fixture and marked
+DERIVED in the tests. `live.test.ts` is an opt-in network check (`CHARTERGATE_LIVE=1`) that runs known live
+transactions through the real transaction layer; it sends nothing and is skipped by default.
