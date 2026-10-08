@@ -63,10 +63,12 @@ describe("EvidenceCard", () => {
   });
 
   it("shows failures without inventing a fact", () => {
-    const html = render(rec({ status: "SOURCE_UNAVAILABLE", status_reason: "HTTP_404", normalized_fact: "", normalized_value: "", excerpt: "" }));
+    const html = render(rec({ status: "SOURCE_UNAVAILABLE", status_reason: "HTTP_404", normalized_value: "", excerpt: "" }));
     expect(html).toContain("SOURCE UNAVAILABLE");
     expect(html).toContain("The server answered HTTP 404.");
-    expect(html).toContain("Nothing was recorded from this source.");
+    expect(html).toContain("Fact checked");
+    expect(html).toContain("team_token_allocation: nothing was recorded from this source.");  // the asked fact is kept
+    expect(html).not.toContain("Verified fact");
     expect(html).not.toContain("<blockquote");
   });
 

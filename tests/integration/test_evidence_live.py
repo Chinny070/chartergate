@@ -66,8 +66,8 @@ def charter():
     return contract
 
 
-def submit(charter, url, kind, claim="The page states an allocation of 46%.", section="s2"):
-    receipt = charter.submit_evidence(args=[1, url, kind, claim, section]).transact()
+def submit(charter, url, kind, claim="The page states an allocation of 46%.", section="s2", fact_key="team_token_allocation"):
+    receipt = charter.submit_evidence(args=[1, url, kind, claim, fact_key, section]).transact()
     assert tx_execution_succeeded(receipt), receipt
     count = charter.get_evidence_count(args=[]).call()
     return charter.get_evidence(args=[count]).call()
@@ -119,7 +119,7 @@ def test_record_carries_protocol_time_and_provenance(charter):
 
 def test_invalid_input_reverts_without_consuming_an_evidence_id(charter):
     before = charter.get_evidence_count(args=[]).call()
-    receipt = charter.submit_evidence(args=[1, "http://localhost/admin", "STATIC_WEB", "claim", ""]).transact()
+    receipt = charter.submit_evidence(args=[1, "http://localhost/admin", "STATIC_WEB", "claim", "some_fact", ""]).transact()
     assert not tx_execution_succeeded(receipt)
     assert charter.get_evidence_count(args=[]).call() == before
 

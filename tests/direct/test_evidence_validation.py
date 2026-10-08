@@ -103,7 +103,7 @@ BAD_INT = ["1", True, False, None, ["1"], {"a": 1}, b"1"]
 
 
 @pytest.mark.parametrize("bad", BAD_STR, ids=[repr(b) for b in BAD_STR])
-@pytest.mark.parametrize("param", ["source_url", "source_kind", "claim", "related_section_id"])
+@pytest.mark.parametrize("param", ["source_url", "source_kind", "claim", "fact_key", "related_section_id"])
 def test_wrong_typed_string_arguments_are_rejected_cleanly(atlas, direct_vm, param, bad):
     before = snapshot(atlas)
     with direct_vm.expect_revert(f"EXPECTED:INVALID_TYPE:{param}"):

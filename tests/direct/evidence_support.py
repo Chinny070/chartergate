@@ -2,6 +2,7 @@
 harness mocks `gl.nondet.web.get`, `gl.nondet.web.render` and `gl.nondet.exec_prompt`."""
 
 import json
+import re
 
 import pytest
 
@@ -15,6 +16,7 @@ PROPOSAL = (
 
 URL = "https://atlas.example.org/tokenomics"
 URL_PATTERN = r"atlas\.example\.org"
+FACT = "team_token_allocation"
 CLAIM_NUMBERED = "Atlas team token allocation is 46%."
 CLAIM_PLAIN = "Atlas discloses its team token allocation."
 
@@ -36,10 +38,22 @@ def mock_page(vm, html=None, *, status=200, body=None, pattern=URL_PATTERN):
     vm.mock_web(pattern, {"status": status, "body": html if body is None else body})
 
 
-def mock_answer(vm, *, supported=True, fact="team_token_allocation", value="46%", excerpt="Team: 46%", raw=None):
-    """What the (mocked) LLM returns for the extraction prompt."""
-    payload = raw if raw is not None else {"supported": supported, "fact": fact, "value": value, "excerpt": excerpt}
+def mock_binding(vm, quote, states=True):
+    """What the (mocked) LLM answers when asked whether THIS exact quote states the fact."""
+    vm.mock_llm(
+        r"BINDING CHECK[\s\S]*<<<QUOTE\n" + re.escape(quote) + r"\nQUOTE>>>",
+        json.dumps({"states_fact": states}),
+    )
+
+
+def mock_answer(vm, *, supported=True, fact=None, value="46%", excerpt="Team: 46%", raw=None, binds=True):
+    """What the (mocked) LLM returns for the extraction prompt, plus its answer to the binding check on
+    the quote it chose. `fact` is accepted and ignored: the LLM no longer names facts, the submitted
+    fact key is the fact identity."""
+    payload = raw if raw is not None else {"supported": supported, "value": value, "excerpt": excerpt}
     vm.mock_llm(r"CLAIM TO CHECK", payload if isinstance(payload, str) else json.dumps(payload))
+    if raw is None and excerpt != "":
+        mock_binding(vm, excerpt, binds)
 
 
 def reset(vm):
@@ -67,9 +81,11 @@ def web(direct_vm):
 
 
 def submit(c, **overrides):
-    args = dict(proposal_id=1, source_url=URL, source_kind="STATIC_WEB", claim=CLAIM_NUMBERED, related_section_id="2")
+    args = dict(proposal_id=1, source_url=URL, source_kind="STATIC_WEB", claim=CLAIM_NUMBERED, fact_key=FACT, related_section_id="2")
     args.update(overrides)
-    return c.submit_evidence(args["proposal_id"], args["source_url"], args["source_kind"], args["claim"], args["related_section_id"])
+    return c.submit_evidence(
+        args["proposal_id"], args["source_url"], args["source_kind"], args["claim"], args["fact_key"], args["related_section_id"]
+    )
 
 
 def snapshot(c):

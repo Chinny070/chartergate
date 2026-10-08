@@ -16,6 +16,7 @@ from evidence_support import (
     URL,
     atlas,  # noqa: F401  (fixture)
     mock_answer,
+    mock_binding,
     mock_page,
     page,
     reset,
@@ -23,20 +24,26 @@ from evidence_support import (
 )
 
 
-def leader_ran(c, vm, *, html=None, answer=None, claim=CLAIM_NUMBERED, kind="STATIC_WEB"):
+def leader_ran(c, vm, *, html=None, answer=None, claim=CLAIM_NUMBERED, kind="STATIC_WEB", **submit_kw):
     """Run the leader against the given page/answer and return the result it produced."""
     reset(vm)
     mock_page(vm, html if html is not None else page())
     mock_answer(vm, **(answer or {}))
-    submit(c, claim=claim, source_kind=kind)
+    submit(c, claim=claim, source_kind=kind, **submit_kw)
     return copy.deepcopy(vm._captured_validators[-1][0])
 
 
-def validator_sees(vm, *, html=None, status=200, body=None, answer=None, raw=None, **kw):
-    """Change what the validator's own fetch and LLM will return, then run the validator."""
+def validator_sees(vm, *, html=None, status=200, body=None, answer=None, raw=None, leader_binds=True, **kw):
+    """Change what the validator's own fetch and LLM will return, then run the validator.
+
+    `leader_binds` is the validator's own LLM answer to "does the LEADER's quote state this fact?", which a
+    validator asks in addition to re-running the extraction itself."""
+    leader_result = kw["leader_result"] if "leader_result" in kw else vm._captured_validators[-1][0]
     reset(vm)
     mock_page(vm, html if html is not None else page(), status=status, body=body)
     mock_answer(vm, raw=raw, **(answer or {}))
+    if isinstance(leader_result, dict) and isinstance(leader_result.get("excerpt"), str) and leader_result["excerpt"] != "":
+        mock_binding(vm, leader_result["excerpt"], leader_binds)
     return vm.run_validator(**kw)
 
 
@@ -55,8 +62,9 @@ def test_irrelevant_page_noise_is_ignored(atlas, direct_vm):
     assert validator_sees(direct_vm, html=noisy) is True
 
 
-def test_a_different_fact_label_and_excerpt_wording_do_not_matter(atlas, direct_vm):
+def test_excerpt_wording_and_any_llm_fact_label_do_not_matter(atlas, direct_vm):
     leader_ran(atlas, direct_vm)
+    # An LLM-volunteered fact label is ignored (fact identity is the submitted key); only the value and quote matter.
     assert validator_sees(direct_vm, answer=dict(fact="team_allocation", value="46%", excerpt="Team: 46% Community: 30%")) is True
 
 
@@ -133,7 +141,7 @@ def test_a_boolean_proposal_id_echo_is_rejected(atlas, direct_vm):
 
 def test_a_fabricated_verified_result_is_rejected(atlas, direct_vm):
     stored = leader_ran(atlas, direct_vm)
-    stored.update(fact="team_token_allocation", value="99%", excerpt="Team: 99%")
+    stored.update(value="99%", excerpt="Team: 99%")
     assert validator_sees(direct_vm, leader_result=stored) is False
 
 

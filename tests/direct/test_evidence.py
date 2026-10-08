@@ -7,6 +7,8 @@ import pytest
 
 from conftest import hex_of
 from evidence_support import (
+    FACT,
+    mock_binding,
     CLAIM_NUMBERED,
     CLAIM_PLAIN,
     T_EVIDENCE,
@@ -109,7 +111,7 @@ def test_api_source_is_canonicalised_json(atlas, direct_vm):
 def test_page_noise_is_ignored_when_extracting_text(atlas, direct_vm):
     seen = []
     mock_page(direct_vm, page(footer="visit our sponsor &amp; win"))
-    direct_vm.mock_llm(r"CLAIM TO CHECK", json.dumps({"supported": True, "fact": "team_token_allocation", "value": "46%", "excerpt": "Team: 46%"}))
+    mock_answer(direct_vm)
     from genlayer import gl
 
     original = gl.nondet.exec_prompt
@@ -141,7 +143,7 @@ def test_http_errors_record_source_unavailable_never_verified(atlas, direct_vm, 
     submit(atlas)
     r = only_record(atlas)
     assert r["status"] == "SOURCE_UNAVAILABLE" and r["status_reason"] == reason
-    assert (r["normalized_fact"], r["normalized_value"], r["excerpt"]) == ("", "", "")
+    assert (r["normalized_fact"], r["normalized_value"], r["excerpt"]) == (FACT, "", "")  # the fact asked is kept, nothing found
 
 
 def test_fetch_exception_records_source_unavailable(atlas, direct_vm, monkeypatch):
@@ -202,7 +204,7 @@ def test_hallucinated_excerpt_is_never_verified(atlas, direct_vm):
     submit(atlas)
     r = only_record(atlas)
     assert (r["status"], r["status_reason"]) == ("UNVERIFIABLE", "NOT_GROUNDED")
-    assert (r["normalized_fact"], r["normalized_value"], r["excerpt"]) == ("", "", "")  # nothing ungrounded is stored
+    assert (r["normalized_fact"], r["normalized_value"], r["excerpt"]) == (FACT, "", "")  # nothing ungrounded is stored
 
 
 def test_value_not_inside_its_own_excerpt_is_not_grounded(atlas, direct_vm):
@@ -218,7 +220,7 @@ def test_source_that_does_not_mention_the_claim_is_unverifiable(atlas, direct_vm
     submit(atlas, claim=CLAIM_PLAIN)
     r = only_record(atlas)
     assert (r["status"], r["status_reason"]) == ("UNVERIFIABLE", "NOT_SUPPORTED")
-    assert (r["normalized_fact"], r["normalized_value"]) == ("", "")
+    assert (r["normalized_fact"], r["normalized_value"]) == (FACT, "")
 
 
 def test_failed_retrieval_never_stores_a_verified_result(atlas, direct_vm):
@@ -242,16 +244,14 @@ def test_failed_retrieval_never_stores_a_verified_result(atlas, direct_vm):
         ({"fact": "x", "value": "1", "excerpt": "e"}, "BAD_SUPPORTED"),
         ({"supported": "maybe", "fact": "x", "value": "1", "excerpt": "e"}, "BAD_SUPPORTED"),
         ({"supported": 1, "fact": "x", "value": "1", "excerpt": "e"}, "BAD_SUPPORTED"),
-        ({"supported": True, "fact": ["a"], "value": "1", "excerpt": "e"}, "BAD_FACT"),
-        ({"supported": True, "fact": "Not A Valid/Key!", "value": "1", "excerpt": "e"}, "BAD_FACT"),
         ({"supported": True, "fact": "ok_key", "value": {"x": 1}, "excerpt": "e"}, "BAD_VALUE"),
         ({"supported": True, "fact": "ok_key", "value": "v" * 201, "excerpt": "e"}, "BAD_VALUE"),
         # GenVM calldata cannot represent floats, so the node hands the contract None: fail closed.
         ({"supported": True, "fact": "ok_key", "value": "1", "excerpt": 5.5}, "NOT_AN_OBJECT"),
         ({"supported": True, "fact": "ok_key", "value": "1", "excerpt": 5}, None),  # int is coerced to text, then fails grounding
     ],
-    ids=["prose", "broken_json", "json_array", "missing_supported", "supported_maybe", "supported_int", "fact_list",
-         "fact_bad_chars", "value_object", "value_too_long", "excerpt_float", "excerpt_int"],
+    ids=["prose", "broken_json", "json_array", "missing_supported", "supported_maybe", "supported_int",
+         "value_object", "value_too_long", "excerpt_float", "excerpt_int"],
 )
 def test_malformed_llm_output_fails_closed(atlas, direct_vm, raw, code):
     mock_page(direct_vm, page())
@@ -283,7 +283,9 @@ def test_documented_aliases_and_wrapped_json_are_accepted(atlas, direct_vm):
     mock_page(direct_vm, page())
     wrapped = 'Sure! Here you go: {"is_supported": "TRUE", "fact_name": "Team Token-Allocation", "extracted_value": 46, "quote": "Team: 46%"} Hope that helps.'
     mock_answer(direct_vm, raw=wrapped)
-    submit(atlas, claim=CLAIM_PLAIN)
+    mock_binding(direct_vm, "Team: 46%")
+    # The fact identity comes from the submitted key (canonicalised); the LLM's "fact_name" is ignored.
+    submit(atlas, claim=CLAIM_PLAIN, fact_key="Team Token-Allocation")
     r = only_record(atlas)
     assert r["status"] == "VERIFIED"
     assert r["normalized_fact"] == "team_token_allocation"  # lower-cased, spaces and hyphens become underscores
@@ -295,6 +297,7 @@ def test_long_excerpt_is_truncated_and_a_truncated_quote_can_still_be_grounded(a
     mock_page(direct_vm, long_page)
     quote = "Team: 46% of the supply is held by the team. " * 20
     mock_answer(direct_vm, value="46%", excerpt=quote.strip())
+    mock_binding(direct_vm, quote.strip()[:300])  # the contract truncates the quote to 300 chars before the binding check
     submit(atlas)
     r = only_record(atlas)
     assert len(r["excerpt"]) <= 300
@@ -320,11 +323,12 @@ def test_hash_matches_the_documented_canonical_form(atlas, web):
     r = only_record(atlas)
     canonical = "\n".join(
         [
-            "chartergate.evidence.v1",
+            "chartergate.evidence.v2",
             "proposal_id=1",
             f"source_url={URL}",
             "source_kind=STATIC_WEB",
             "retrieval_method=GET",
+            f"claim={CLAIM_NUMBERED}",
             "status=VERIFIED",
             "fact=team_token_allocation",
             "value=46%",
@@ -368,7 +372,7 @@ def test_hash_formats_46_and_46_point_0_percent_identically(atlas, direct_vm):
         dict(url="https://atlas.example.org/other"),  # different source
         dict(section="1"),  # different charter relationship
         dict(value="45%"),  # different fact value
-        dict(fact="community_allocation"),  # different fact
+        dict(fact="community_token_allocation"),  # different fact asked
     ],
     ids=["method", "url", "section", "value", "fact"],
 )
@@ -379,9 +383,10 @@ def test_any_change_to_the_canonical_evidence_changes_the_hash(atlas, direct_vm,
     reset(direct_vm)
     value = change.get("value", "46%")
     mock_page(direct_vm, page(team=value), pattern=r"atlas\.example\.org")
-    mock_answer(direct_vm, value=value, fact=change.get("fact", "team_token_allocation"), excerpt=f"Team: {value}")
+    mock_answer(direct_vm, value=value, excerpt=f"Team: {value}")
     submit(
         atlas,
+        fact_key=change.get("fact", FACT),
         source_kind=change.get("kind", "STATIC_WEB"),
         source_url=change.get("url", URL),
         related_section_id=change.get("section", "2"),

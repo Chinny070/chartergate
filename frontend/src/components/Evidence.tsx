@@ -4,6 +4,8 @@ import { Badge, Button, Docket, ErrorBanner } from "./primitives";
 import { ChainTime, Field } from "./common";
 import { TransactionTimeline } from "./TransactionTimeline";
 import {
+  canonFactKey,
+  checkFactKey,
   checkSourceUrl,
   describeRetrieval,
   displayHost,
@@ -39,7 +41,9 @@ export function RetrievalBadge({ record }: { record: Pick<EvidenceRecord, "sourc
 
 /** What the source actually says, labelled by whether it was verified. */
 function factLine(r: EvidenceRecord): { label: string; text: string } {
-  if (r.normalized_fact === "") return { label: "Extracted fact", text: "Nothing was recorded from this source." };
+  if (r.normalized_value === "") {
+    return { label: "Fact checked", text: `${r.normalized_fact}: nothing was recorded from this source.` };
+  }
   const label = r.status === "VERIFIED" ? "Verified fact" : "What the source says";
   return { label, text: `${r.normalized_fact} = ${r.normalized_value}` };
 }
@@ -196,6 +200,7 @@ export function SubmitEvidenceForm({ proposal, evidenceCount, onFinalized }: { p
   const [url, setUrl] = useState("");
   const [kind, setKind] = useState<SourceKind>("STATIC_WEB");
   const [claim, setClaim] = useState("");
+  const [factKey, setFactKey] = useState("");
   const [section, setSection] = useState("");
   const [done, setDone] = useState(false);
 
@@ -208,6 +213,8 @@ export function SubmitEvidenceForm({ proposal, evidenceCount, onFinalized }: { p
 
   const urlProblem = url.trim() === "" ? null : checkSourceUrl(url);
   const claimOk = claim.trim().length > 0 && claim.trim().length <= LIMITS.claim;
+  const factProblem = factKey.trim() === "" ? null : checkFactKey(factKey);
+  const factOk = factKey.trim() !== "" && factProblem === null;
   const isProposer = sameAddress(wallet.address, proposal.proposer);
   const full = evidenceCount >= LIMITS.evidencePerProposal;
 
@@ -222,19 +229,20 @@ export function SubmitEvidenceForm({ proposal, evidenceCount, onFinalized }: { p
             ? `This proposal already has the maximum of ${LIMITS.evidencePerProposal} evidence records.`
             : null;
 
-  const canSubmit = !busy && blocker === null && url.trim() !== "" && urlProblem === null && claimOk;
+  const canSubmit = !busy && blocker === null && url.trim() !== "" && urlProblem === null && claimOk && factOk;
 
   async function submit() {
     if (!wallet.client) return;
     setDone(false);
     const final = await run(
-      (c, on) => submitEvidence(c, proposal.proposal_id, url.trim(), kind, claim.trim(), section, on),
+      (c, on) => submitEvidence(c, proposal.proposal_id, url.trim(), kind, claim.trim(), canonFactKey(factKey), section, on),
       wallet.client,
     );
     if (final.phase === "finalized") {
       setDone(true);
       setUrl("");
       setClaim("");
+      setFactKey("");
       onFinalized();
     }
   }
@@ -269,6 +277,19 @@ export function SubmitEvidenceForm({ proposal, evidenceCount, onFinalized }: { p
         </fieldset>
 
         <Field label="Claim to check" value={claim} onChange={setClaim} max={LIMITS.claim} multiline hint="what the source should show" disabled={busy} />
+
+        <Field label="Fact being checked" value={factKey} onChange={setFactKey} max={LIMITS.factKey} hint="e.g. team_token_allocation" disabled={busy} />
+        {factKey.trim() !== "" &&
+          (factProblem ? (
+            <p role="alert" className="label" style={{ color: "var(--state-ineligible)" }}>
+              {factProblem.message}
+            </p>
+          ) : (
+            <p className="label">
+              Recorded as <span className="hash">{canonFactKey(factKey)}</span>. Validators must agree the source states <em>this</em> fact,
+              not another subject with the same number. Different keys are different facts.
+            </p>
+          ))}
 
         <label className="field">
           <span className="label">Related charter rule (optional)</span>

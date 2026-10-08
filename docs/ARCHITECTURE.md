@@ -444,3 +444,40 @@ The Evidence Vault is in `/evidence`, `/evidence/:id` and the proposal page. It 
 FINALIZED alone is never shown as success. `lib/evidence.ts` holds the wording ("JAVASCRIPT RENDER" is always shown for a
 render), the status explanations, and a client-side URL pre-check that mirrors the contract (tested against the same
 cases). `charterGate.ts` decodes `evidence_count` as optional so the UI still works against a pre-Stage-2 contract.
+
+---
+
+# Stage 2.1: fact binding and a claim-bound hash
+
+Two invariants were tightened before any live deployment of Stage 2. Details: `docs/STAGE_2_EQUIVALENCE.md` (sections 4a, 5, 7, 10, 12)
+and `docs/EVIDENCE_MODEL.md`.
+
+## The problem
+
+In Stage 2 the `fact` label was whatever the leader's LLM chose, and validators only had to agree on the **value**. A page that says
+`Team: 46%` and `Community: 46%` could therefore have produced two extractions that agreed on `46%` while describing different facts.
+
+## The fix (smallest mechanism that closes it)
+
+1. **Fact identity is the submitted, canonicalised fact key** (`submit_evidence` gained a `fact_key` argument; the schema now has 6 parameters).
+   One explicit normalisation (case, whitespace, hyphens), no aliases, no fuzzy matching, no ontology. The LLM no longer names facts.
+2. **A focused binding check**: "does this exact quote state the value of this fact (and not another subject)?". It runs in the leader's pipeline,
+   in every validator's own pipeline, and **a validator also runs it on the leader's quote**. A quote about the wrong subject is `UNVERIFIABLE`
+   (`NOT_BOUND`) and nothing is stored.
+3. **A result about any fact other than the submitted one is rejected**, by validators and again by the contract after consensus.
+4. **The claim joined the canonical hash** and the format became `chartergate.evidence.v2`.
+
+## Testing
+
+Each rule was removed from the contract on its own (mutation testing) and the tests that fail are the ones written for it. See the Stage 2.1
+report. The hash tests recompute the expected hash independently from the documented string with the SDK's keccak, pin a golden byte-for-byte
+vector, and check the keccak primitive against known Ethereum test vectors. A test also recomputes every stored record's hash from the record alone.
+
+## Things learned
+
+- The `genlayer` package is importable in a test only after the direct harness has loaded a contract, so any test that uses the SDK directly must
+  depend on a contract fixture.
+- A mock-based LLM test must register an answer for **every** prompt the contract can send; the binding check is a second prompt, so the replay helper
+  also answers "does the leader's quote state the fact?".
+- Residual risk is documented, not hidden: the binding check is an LLM judgment (a single model error is not enough to verify, but a coordinated one
+  could be), and the fact key and claim are both the submitter's words.

@@ -59,9 +59,10 @@ export type SourceKind = "STATIC_WEB" | "DYNAMIC_WEB" | "API";
 export type RetrievalMethod = "GET" | "RENDER_TEXT";
 
 /**
- * One Evidence Vault record, exactly as the contract stored it. Everything except `submitter`,
- * `source_url`, `source_kind`, `claim` and `related_section_id` was produced by the contract and
- * agreed by validators; the submitter cannot supply the status, fact, value or hash.
+ * One Evidence Vault record, exactly as the contract stored it. The submitter chose `source_url`,
+ * `source_kind`, `claim`, `related_section_id` and which fact is being asked about (`normalized_fact`,
+ * the canonicalised fact key). The status, value, quote, hash and times were produced by the contract
+ * and agreed by validators; the submitter cannot supply them.
  */
 export interface EvidenceRecord {
   evidence_id: number;
@@ -106,7 +107,7 @@ export const CONTRACT_METHODS = {
   get_proposal_evidence_count: { args: 1, write: false },
   get_proposal_evidence_ids_page: { args: 3, write: false },
   get_proposal_evidence_page: { args: 3, write: false },
-  submit_evidence: { args: 5, write: true },
+  submit_evidence: { args: 6, write: true },
 } as const;
 
 type ViewName = { [K in keyof typeof CONTRACT_METHODS]: (typeof CONTRACT_METHODS)[K]["write"] extends false ? K : never }[keyof typeof CONTRACT_METHODS];
@@ -122,6 +123,7 @@ export const LIMITS = {
   proposalAction: 2000,
   sourceUrl: 500,
   claim: 500,
+  factKey: 64,
   evidencePerProposal: 25,
   pageSize: 50,
 } as const;
@@ -316,9 +318,10 @@ export const submitProposal = (c: ChainClient, title: string, description: strin
 
 /**
  * Proposer only. The caller supplies ONLY what they legitimately control: which proposal, the source
- * URL, the kind of source, the claim to check and (optionally) the charter section it relates to.
- * The retrieval method, the extracted fact and value, the status and the hash are produced by the
- * contract and agreed by validators; this app never sends them and cannot override them.
+ * URL, the kind of source, the claim to check, WHICH FACT is being asked about (a constrained key such
+ * as `team_token_allocation`) and, optionally, the charter section it relates to. The retrieval method,
+ * the extracted value, the status and the hash are produced by the contract and agreed by validators;
+ * this app never sends them and cannot override them.
  */
 export const submitEvidence = (
   c: ChainClient,
@@ -326,6 +329,7 @@ export const submitEvidence = (
   sourceUrl: string,
   sourceKind: SourceKind,
   claim: string,
+  factKey: string,
   relatedSectionId: string,
   on: OnState,
-) => write(c, "submit_evidence", [proposalId, sourceUrl, sourceKind, claim, relatedSectionId], on);
+) => write(c, "submit_evidence", [proposalId, sourceUrl, sourceKind, claim, factKey, relatedSectionId], on);

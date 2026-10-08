@@ -320,6 +320,10 @@
           "string"
         ],
         [
+          "fact_key",
+          "string"
+        ],
+        [
           "related_section_id",
           "string"
         ]

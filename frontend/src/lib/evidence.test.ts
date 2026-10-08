@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { decodeDaoMetadata, decodeEvidence } from "./genlayer/charterGate";
-import { checkSourceUrl, describeRetrieval, displayHost, evidenceLabel, reasonText, shortHash, STATUS_INFO } from "./evidence";
+import {
+  canonFactKey,
+  checkFactKey,
+  checkSourceUrl,
+  describeRetrieval,
+  displayHost,
+  evidenceLabel,
+  reasonText,
+  shortHash,
+  STATUS_INFO,
+} from "./evidence";
 
 /** The same cases as tests/direct/test_evidence_validation.py, so the pre-check cannot drift from the contract. */
 const REJECTED: [string, string][] = [
@@ -159,5 +169,48 @@ describe("provenance wording", () => {
     expect(evidenceLabel(1234)).toBe("EVIDENCE #1234");
     expect(shortHash("0x" + "ab".repeat(32))).toBe("0xabababab…ababab");
     expect(displayHost("https://atlas.example.org/tokenomics/")).toBe("atlas.example.org/tokenomics");
+  });
+});
+
+/** The same cases as tests/direct/test_evidence_binding.py, so the preview cannot drift from the contract. */
+describe("fact keys mirror the contract (one normalisation rule, no aliases)", () => {
+  it.each([
+    "team_token_allocation",
+    "Team_Token_Allocation",
+    "  TEAM_TOKEN_ALLOCATION  ",
+    "team token allocation",
+    "Team Token-Allocation",
+    "team-token-allocation",
+    "team   token 	 allocation",
+  ])("canonicalises %j to team_token_allocation", (given) => {
+    expect(canonFactKey(given)).toBe("team_token_allocation");
+    expect(checkFactKey(given)).toBeNull();
+  });
+
+  it.each(["team_allocation", "team_tokens", "token_allocation_team", "team_token_allocations"])(
+    "does not alias %j to team_token_allocation",
+    (given) => {
+      expect(canonFactKey(given)).toBe(given);
+      expect(canonFactKey(given)).not.toBe("team_token_allocation");
+    },
+  );
+
+  it.each([
+    ["", "FACT_KEY_EMPTY"],
+    ["   \n ", "FACT_KEY_EMPTY"],
+    ["team/allocation", "FACT_KEY_INVALID"],
+    ["team:allocation", "FACT_KEY_INVALID"],
+    ["team.token.allocation", "FACT_KEY_INVALID"],
+    ["équipe", "FACT_KEY_INVALID"],
+    ["team%allocation", "FACT_KEY_INVALID"],
+    ["___", "FACT_KEY_INVALID"],
+    ["---", "FACT_KEY_INVALID"],
+    ["a".repeat(65), "FACT_KEY_TOO_LONG"],
+  ])("rejects %j with %s", (given, code) => {
+    expect(checkFactKey(given)?.code).toBe(code);
+  });
+
+  it("accepts a 64-character key", () => {
+    expect(checkFactKey("k".repeat(64))).toBeNull();
   });
 });

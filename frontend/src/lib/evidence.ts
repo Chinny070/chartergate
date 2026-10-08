@@ -88,10 +88,32 @@ export function displayHost(url: string): string {
   return url.replace(/^https?:\/\//i, "").replace(/\/$/, "");
 }
 
+// ---- fact key ------------------------------------------------------------------------------------
+
+/**
+ * The ONE normalisation the contract applies to a fact key: case, whitespace and hyphens. There are no
+ * synonym aliases and no fuzzy matching, so `team_allocation` and `team_token_allocation` are different
+ * facts. Mirrors the contract's `_canon_fact_key`.
+ */
+export function canonFactKey(raw: string): string {
+  return raw.replace(/\s+/g, " ").trim().toLowerCase().replace(/[ -]/g, "_");
+}
+
+/** Mirrors the contract's `_validate_fact_key`. Returns null when the key passes. */
+export function checkFactKey(raw: string): UrlProblem | null {
+  const key = canonFactKey(raw);
+  if (key === "") return { code: "FACT_KEY_EMPTY", message: "Say which fact you are asking about, e.g. team_token_allocation." };
+  if (key.length > 64) return { code: "FACT_KEY_TOO_LONG", message: "The fact key is longer than 64 characters." };
+  if (!/^[a-z0-9_]{1,64}$/.test(key) || !/[a-z0-9]/.test(key)) {
+    return { code: "FACT_KEY_INVALID", message: "Use only letters, digits, spaces, hyphens and underscores." };
+  }
+  return null;
+}
+
 // ---- client-side URL pre-check ------------------------------------------------------------------
 
 export interface UrlProblem {
-  /** The contract's stable code (the `EXPECTED:` suffix) that this check mirrors. */
+  /** The contract's stable code (the `EXPECTED:` suffix) that this check mirrors. Also used for fact keys. */
   code: string;
   message: string;
 }
