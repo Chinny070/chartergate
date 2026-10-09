@@ -105,7 +105,12 @@ export function EvidenceCard({ record, detail = false, charterText }: { record: 
           <dt>{fact.label}</dt>
           <dd>
             <span className="hash">{fact.text}</span>
-            {record.excerpt && <blockquote className="quote">“{record.excerpt}”</blockquote>}
+            {record.excerpt && (
+              <blockquote className="quote">
+                {/* the page's own quotation marks are kept; only add ours when the excerpt has none */}
+                {/^[“"‘']/.test(record.excerpt) ? record.excerpt : `“${record.excerpt}”`}
+              </blockquote>
+            )}
           </dd>
         </div>
         <div>
@@ -132,6 +137,10 @@ export function EvidenceCard({ record, detail = false, charterText }: { record: 
             <strong>{status.label}</strong>
             <div className="muted">
               {status.explain} {reasonText(record.status_reason)}
+              {record.status === "UNVERIFIABLE" &&
+                (record.normalized_value !== ""
+                  ? " What the source does say about this fact is shown above."
+                  : " Nothing about this fact was recorded.")}
             </div>
           </dd>
         </div>
@@ -168,9 +177,9 @@ export function EvidenceNotes() {
           and the page may have been published earlier.
         </li>
         <li>
-          <strong>The evidence hash is a hash of the normalised evidence</strong> (source, retrieval method, status, fact, value and
-          charter relationship). It is <strong>not</strong> a hash of the web page, and the page itself is not archived. It does not
-          prove what the page contained, only what the validators agreed they read.
+          <strong>The evidence hash is a hash of the normalised evidence</strong> (proposal, the submitted claim, source, retrieval
+          method, status, the fact asked, the value and the charter relationship). It is <strong>not</strong> a hash of the web page,
+          and the page itself is not archived. It does not prove what the page contained, only what the validators agreed they read.
         </li>
         <li>This is evidence, not a ruling. Nothing here decides whether a proposal complies with the charter.</li>
       </ul>

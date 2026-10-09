@@ -46,7 +46,7 @@ export const STATUS_INFO: Record<EvidenceStatus, { label: string; tone: Tone; ex
   UNVERIFIABLE: {
     label: "UNVERIFIABLE",
     tone: "warning",
-    explain: "The source was read, but it does not support the claim as stated. What it does say is shown below.",
+    explain: "The source was read, but it does not support the claim as stated.",
   },
   SOURCE_UNAVAILABLE: {
     label: "SOURCE UNAVAILABLE",

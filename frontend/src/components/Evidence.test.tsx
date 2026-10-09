@@ -104,10 +104,28 @@ describe("EvidenceCard", () => {
   });
 });
 
+describe("wording that must match what is stored", () => {
+  it("does not promise a value 'below' when nothing was recorded", () => {
+    const none = render(rec({ status: "UNVERIFIABLE", status_reason: "NOT_SUPPORTED", normalized_value: "", excerpt: "" }));
+    expect(none).toContain("Nothing about this fact was recorded.");
+    expect(none).not.toContain("shown above");
+    const some = render(rec({ status: "UNVERIFIABLE", status_reason: "NOT_SUPPORTED", normalized_value: "£51.77", excerpt: "Price (excl. tax) £51.77" }));
+    expect(some).toContain("What the source does say about this fact is shown above.");
+  });
+
+  it("does not double the quotation marks when the page's own excerpt already begins with one", () => {
+    const quoted = render(rec({ excerpt: "“The world as we have created it” by Albert Einstein" }));
+    expect(quoted).not.toContain("““");
+    expect(quoted).toContain("“The world as we have created it");
+    expect(render(rec({ excerpt: "Team: 46%" }))).toContain("“Team: 46%”");
+  });
+});
+
 describe("EvidenceNotes", () => {
   const html = renderToStaticMarkup(<EvidenceNotes />);
   it("states exactly what the hash is not", () => {
     expect(html).toContain("hash of the normalised evidence");
+    expect(html).toContain("the submitted claim");  // Stage 2.1 put the claim into the hash
     expect(html).toContain("not</strong> a hash of the web page");
     expect(html).toContain("page itself is not archived");
   });

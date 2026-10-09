@@ -22,7 +22,10 @@
         "address": "0xaffe15eec45b68835cc9e5b4ab85dd5deae8e70b"
       },
       "owner": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
-      "constructorArgs": ["Atlas DAO", "A DAO that funds open-source infrastructure."],
+      "constructorArgs": [
+        "Atlas DAO",
+        "A DAO that funds open-source infrastructure."
+      ],
       "deployedAtOnChain": "2026-10-07T16:57:36.412855Z",
       "source": {
         "file": "contracts/charter_gate.py",
@@ -39,15 +42,69 @@
         "deployedCodeComparisonNote": "identical after normalizing CRLF to LF"
       },
       "transactions": [
-        { "label": "deploy", "hash": "0xe820c7f0b4be34b6ca57ce04780c94960f890ab0544b52fce4edecc70ffda2c7", "finalStatus": "FINALIZED", "executionResult": "SUCCESS" },
-        { "label": "add_charter_section id=1 (CLI sent int 1)", "hash": "0xe886a76b9fac3105ca8b43b49de9caa5242695271d83410bca7cf2af53305faa", "finalStatus": "FINALIZED", "executionResult": "ERROR", "cause": "CLI coerced '1' to an int; contract raised TypeError at len(int). No state change." },
-        { "label": "add_charter_section id=2 (CLI sent int 2)", "hash": "0x51d60a63824e4780ec596f5c7457de8322af38613ad624136b14531d3b4d598e", "finalStatus": "FINALIZED", "executionResult": "ERROR", "cause": "same as above. No state change." },
-        { "label": "add_charter_section id='\"1\"' (quotes sent literally)", "hash": "0xc9319fc88adeee57b35226848fc67e79ca741136331d31d58857dd19515949bd", "finalStatus": "FINALIZED", "executionResult": "ERROR", "cause": "id contained quote characters, rejected by the contract's id validation. No state change." },
-        { "label": "add_charter_section s1", "hash": "0xf09d6caa8b7e0ab33f6a304a80859c8541c9166ecbb57cdee3e49458802d3b82", "finalStatus": "FINALIZED", "executionResult": "SUCCESS", "resultingCharterVersion": 2 },
-        { "label": "add_charter_section s2", "hash": "0x6b94b9057dd4fba6480a6accf204f4cff17b0b268b10c0a269119fd9ec81277b", "finalStatus": "FINALIZED", "executionResult": "SUCCESS", "resultingCharterVersion": 3 },
-        { "label": "submit_proposal (proposal A)", "hash": "0x776735407b902ca3c35ff248932468f64ed7feef8e38b53b0c7f675d3d456b69", "finalStatus": "FINALIZED", "executionResult": "SUCCESS", "proposalId": 1, "charterVersionAtSubmission": 3 },
-        { "label": "update_charter_section s1", "hash": "0x5fe28332ffd64ad07fe71239e11e8920054bb96d7467abd495f25263a2cd41aa", "finalStatus": "FINALIZED", "executionResult": "SUCCESS", "resultingCharterVersion": 4 },
-        { "label": "update_charter_section s1 by offset-bob (unauthorized)", "hash": "0xb4f98ff9987e2169a261d90cacb87abb3200bb345eee0f3c601940ce684f793d", "finalStatus": "FINALIZED", "executionResult": "ERROR", "cause": "rollback: EXPECTED:NOT_OWNER. Sender 0x10b091a7b19d3f0da511a06985a8636fa58a0377. No state change." }
+        {
+          "label": "deploy",
+          "hash": "0xe820c7f0b4be34b6ca57ce04780c94960f890ab0544b52fce4edecc70ffda2c7",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS"
+        },
+        {
+          "label": "add_charter_section id=1 (CLI sent int 1)",
+          "hash": "0xe886a76b9fac3105ca8b43b49de9caa5242695271d83410bca7cf2af53305faa",
+          "finalStatus": "FINALIZED",
+          "executionResult": "ERROR",
+          "cause": "CLI coerced '1' to an int; contract raised TypeError at len(int). No state change."
+        },
+        {
+          "label": "add_charter_section id=2 (CLI sent int 2)",
+          "hash": "0x51d60a63824e4780ec596f5c7457de8322af38613ad624136b14531d3b4d598e",
+          "finalStatus": "FINALIZED",
+          "executionResult": "ERROR",
+          "cause": "same as above. No state change."
+        },
+        {
+          "label": "add_charter_section id='\"1\"' (quotes sent literally)",
+          "hash": "0xc9319fc88adeee57b35226848fc67e79ca741136331d31d58857dd19515949bd",
+          "finalStatus": "FINALIZED",
+          "executionResult": "ERROR",
+          "cause": "id contained quote characters, rejected by the contract's id validation. No state change."
+        },
+        {
+          "label": "add_charter_section s1",
+          "hash": "0xf09d6caa8b7e0ab33f6a304a80859c8541c9166ecbb57cdee3e49458802d3b82",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS",
+          "resultingCharterVersion": 2
+        },
+        {
+          "label": "add_charter_section s2",
+          "hash": "0x6b94b9057dd4fba6480a6accf204f4cff17b0b268b10c0a269119fd9ec81277b",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS",
+          "resultingCharterVersion": 3
+        },
+        {
+          "label": "submit_proposal (proposal A)",
+          "hash": "0x776735407b902ca3c35ff248932468f64ed7feef8e38b53b0c7f675d3d456b69",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS",
+          "proposalId": 1,
+          "charterVersionAtSubmission": 3
+        },
+        {
+          "label": "update_charter_section s1",
+          "hash": "0x5fe28332ffd64ad07fe71239e11e8920054bb96d7467abd495f25263a2cd41aa",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS",
+          "resultingCharterVersion": 4
+        },
+        {
+          "label": "update_charter_section s1 by offset-bob (unauthorized)",
+          "hash": "0xb4f98ff9987e2169a261d90cacb87abb3200bb345eee0f3c601940ce684f793d",
+          "finalStatus": "FINALIZED",
+          "executionResult": "ERROR",
+          "cause": "rollback: EXPECTED:NOT_OWNER. Sender 0x10b091a7b19d3f0da511a06985a8636fa58a0377. No state change."
+        }
       ],
       "liveState": {
         "asOf": "after the last transaction above",
@@ -58,7 +115,7 @@
     },
     "stage_1_2_hardened_verification": {
       "status": "VERIFICATION_DEPLOYMENT",
-      "active": true,
+      "active": false,
       "note": "Stage 1.2 hardened verification deployment. Adds argument-type validation. NOT the final or canonical CharterGate deployment; the owner is permanent.",
       "network": "studionet",
       "chainId": 61999,
@@ -73,7 +130,10 @@
         "address": "0xaffe15eec45b68835cc9e5b4ab85dd5deae8e70b"
       },
       "owner": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
-      "constructorArgs": ["Atlas DAO", "A DAO that funds open-source infrastructure."],
+      "constructorArgs": [
+        "Atlas DAO",
+        "A DAO that funds open-source infrastructure."
+      ],
       "deployedAtOnChain": "2026-10-08T19:39:25.928645Z",
       "source": {
         "file": "contracts/charter_gate.py",
@@ -91,20 +151,244 @@
         "malformedIntegerSectionId": "fails with EXPECTED:INVALID_TYPE:section_id (rollback), no TypeError, state unchanged"
       },
       "transactions": [
-        { "label": "deploy", "hash": "0x9e385374fd5ed11a933e086e61b87fa98715e29ccc7ce41b403a98c4faef6180", "signer": "my-studionet-wallet", "finalStatus": "FINALIZED", "executionResult": "SUCCESS" },
-        { "label": "add_charter_section with integer section_id 1 (malformed, CLI sent int)", "hash": "0x16989973c853844b341b5438100376bc37491ca534179dc4b19a9e8b31747843", "signer": "my-studionet-wallet", "finalStatus": "FINALIZED", "executionResult": "ERROR", "outcome": "rollback: EXPECTED:INVALID_TYPE:section_id", "stateChanged": false },
-        { "label": "add_charter_section s1", "hash": "0x886e3c0a0aadda20d20a93940eae773d02a7c60605f2a7e29b8f7840301a2cea", "signer": "my-studionet-wallet", "finalStatus": "FINALIZED", "executionResult": "SUCCESS", "resultingCharterVersion": 2 },
-        { "label": "add_charter_section s2", "hash": "0xeee6bc0f6cee6f9f07b8b38cac70742b4912c40b93ebda3c1dfd944d0d8a8dfe", "signer": "my-studionet-wallet", "finalStatus": "FINALIZED", "executionResult": "SUCCESS", "resultingCharterVersion": 3 },
-        { "label": "submit_proposal (proposal A)", "hash": "0x905f73878759878728dee2221763211664f09569e79e776aea277b45cd975d56", "signer": "my-studionet-wallet", "finalStatus": "FINALIZED", "executionResult": "SUCCESS", "proposalId": 1, "charterVersionAtSubmission": 3 },
-        { "label": "update_charter_section s1", "hash": "0x40b196e5e613456045df7e1e123846c30fb5abcfb05ce17d383b17828ec7ab43", "signer": "my-studionet-wallet", "finalStatus": "FINALIZED", "executionResult": "SUCCESS", "resultingCharterVersion": 4 },
-        { "label": "update_charter_section s1 by offset-bob (unauthorized)", "hash": "0xdb623df42cd7ee951284ab4ed78356afde31d1aa5c48322b1d115274d942cd5b", "signer": "offset-bob (0x10b091a7b19d3f0da511a06985a8636fa58a0377)", "finalStatus": "FINALIZED", "executionResult": "ERROR", "outcome": "rollback: EXPECTED:NOT_OWNER", "stateChanged": false }
+        {
+          "label": "deploy",
+          "hash": "0x9e385374fd5ed11a933e086e61b87fa98715e29ccc7ce41b403a98c4faef6180",
+          "signer": "my-studionet-wallet",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS"
+        },
+        {
+          "label": "add_charter_section with integer section_id 1 (malformed, CLI sent int)",
+          "hash": "0x16989973c853844b341b5438100376bc37491ca534179dc4b19a9e8b31747843",
+          "signer": "my-studionet-wallet",
+          "finalStatus": "FINALIZED",
+          "executionResult": "ERROR",
+          "outcome": "rollback: EXPECTED:INVALID_TYPE:section_id",
+          "stateChanged": false
+        },
+        {
+          "label": "add_charter_section s1",
+          "hash": "0x886e3c0a0aadda20d20a93940eae773d02a7c60605f2a7e29b8f7840301a2cea",
+          "signer": "my-studionet-wallet",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS",
+          "resultingCharterVersion": 2
+        },
+        {
+          "label": "add_charter_section s2",
+          "hash": "0xeee6bc0f6cee6f9f07b8b38cac70742b4912c40b93ebda3c1dfd944d0d8a8dfe",
+          "signer": "my-studionet-wallet",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS",
+          "resultingCharterVersion": 3
+        },
+        {
+          "label": "submit_proposal (proposal A)",
+          "hash": "0x905f73878759878728dee2221763211664f09569e79e776aea277b45cd975d56",
+          "signer": "my-studionet-wallet",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS",
+          "proposalId": 1,
+          "charterVersionAtSubmission": 3
+        },
+        {
+          "label": "update_charter_section s1",
+          "hash": "0x40b196e5e613456045df7e1e123846c30fb5abcfb05ce17d383b17828ec7ab43",
+          "signer": "my-studionet-wallet",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS",
+          "resultingCharterVersion": 4
+        },
+        {
+          "label": "update_charter_section s1 by offset-bob (unauthorized)",
+          "hash": "0xdb623df42cd7ee951284ab4ed78356afde31d1aa5c48322b1d115274d942cd5b",
+          "signer": "offset-bob (0x10b091a7b19d3f0da511a06985a8636fa58a0377)",
+          "finalStatus": "FINALIZED",
+          "executionResult": "ERROR",
+          "outcome": "rollback: EXPECTED:NOT_OWNER",
+          "stateChanged": false
+        }
       ],
       "liveState": {
         "asOf": "after the last transaction above, before any browser-wallet test",
         "charterVersion": 4,
         "sectionCount": 2,
         "proposalCount": 1
-      }
+      },
+      "supersededBy": "stage_2_evidence_vault_verification"
+    },
+    "stage_2_evidence_vault_verification": {
+      "status": "VERIFICATION_DEPLOYMENT",
+      "active": true,
+      "note": "Stage 2 verification deployment, not the canonical production deployment. Owner is permanent; a canonical deployment will be a new contract.",
+      "network": "studionet",
+      "chainId": 61999,
+      "rpc": "https://studio.genlayer.com/api",
+      "contractAddress": "0xfcbAc33a0b9627e33b9c6E7Acad7C34aB5059032",
+      "deployTxHash": "0xeda2ff19abced58a3074410a63d05433864c9181cc778fbd3e0aebfd10a397d4",
+      "deployTxFinalStatus": "FINALIZED",
+      "deployTxExecutionResult": "SUCCESS",
+      "deployTxConsensus": "MAJORITY_AGREE",
+      "deployer": {
+        "cliAccountName": "my-studionet-wallet",
+        "address": "0xaffe15eec45b68835cc9e5b4ab85dd5deae8e70b"
+      },
+      "owner": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+      "constructorArgs": [
+        "Atlas DAO",
+        "A DAO that funds open-source infrastructure."
+      ],
+      "source": {
+        "file": "contracts/charter_gate.py",
+        "versionHeader": "v0.2.16",
+        "sha256_lfNormalized": "8600b33b8481e7005c676fb948ba501c48c1b7e04a6d25aacda506614789b4a4",
+        "gitCommit": "2727846",
+        "gitCommitNote": "Source frozen at commit 2727846 (fix: harden evidence equivalence and canonical hash)."
+      },
+      "verification": {
+        "deployedSchemaIdenticalToLocal": true,
+        "schemaMethodCount": 24,
+        "deployedCodeIdenticalToLocal": true,
+        "evidenceHashesRecomputedIndependently": "8 of 8"
+      },
+      "transactions": [
+        {
+          "label": "deploy",
+          "hash": "0xeda2ff19abced58a3074410a63d05433864c9181cc778fbd3e0aebfd10a397d4",
+          "signer": "my-studionet-wallet",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS"
+        },
+        {
+          "label": "FIXTURE add s1",
+          "method": "add_charter_section",
+          "hash": "0x8d3950470a8f962d6cc733364820ee857476dc8314b9604733d0891473312f6a",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcome": "return"
+        },
+        {
+          "label": "FIXTURE add s2",
+          "method": "add_charter_section",
+          "hash": "0x928ebb2b1593fec9f6422fa52803bbd2503364bb23e9f8c43a2550e74235e50f",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcome": "return"
+        },
+        {
+          "label": "FIXTURE submit proposal 1",
+          "method": "submit_proposal",
+          "hash": "0x0b3061278ae8606cb244d3a452f0aa2570c525524bde1396aa4697b4cb2f7541",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcome": "return"
+        },
+        {
+          "label": "TEST A  real web.get + real LLM",
+          "method": "submit_evidence",
+          "hash": "0xf14a52438c10c77f91204f071448e7a97da86e94b83884444f7740fef405eb1d",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcome": "return"
+        },
+        {
+          "label": "TEST B  claim contradicts a reachable source",
+          "method": "submit_evidence",
+          "hash": "0xae093f0e195976f3ec62be7b567b07c90d0f6bf3a366641f8109eb7f18ebdba7",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcome": "return"
+        },
+        {
+          "label": "TEST C  real web.render (JavaScript page)",
+          "method": "submit_evidence",
+          "hash": "0x4060f8ed177742515f527e3470fa5b533c2468e3f8dc4b9fa4ccf798c1b22247",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcome": "return"
+        },
+        {
+          "label": "CONTROL  same JS page via plain GET",
+          "method": "submit_evidence",
+          "hash": "0x5125271e54f27c8c8855bb8216b596752d951a2bf1765bf53989e42b96fba53d",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcome": "return"
+        },
+        {
+          "label": "TEST D1 render of an unresolvable host",
+          "method": "submit_evidence",
+          "hash": "0x58e0462b83a4d2678317fcd541344f264a76084f068a1cbfedf04741267f45df",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcome": "contract_error:idle"
+        },
+        {
+          "label": "TEST D2 GET of a missing page (404)",
+          "method": "submit_evidence",
+          "hash": "0xe0e92d0785400557052b64bfefbe1682f71b42b1ada9972a97c81018ca52afb2",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcome": "contract_error:idle"
+        },
+        {
+          "label": "ADVERSARIAL 1 number 22 asked as page count",
+          "method": "submit_evidence",
+          "hash": "0x02bb44ceb6fa7cfdbe9b9ef43d7daa7c4354989399949b42fa3dd22eb7b2d728",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcome": "return"
+        },
+        {
+          "label": "ADVERSARIAL 2 reviews (0) next to tax (0.00)",
+          "method": "submit_evidence",
+          "hash": "0xe34bb63b6d8da1f39bade1c975f7eb831228426808abcb2c297e661a6b36670b",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcome": "return"
+        },
+        {
+          "label": "REJECT 1 invalid fact key",
+          "method": "submit_evidence",
+          "hash": "0xeb7a13f8cdd2c5d923c60e09219551687bd6e1d0880d2eb82e39c13b17feb7f1",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "ERROR",
+          "outcome": "rollback:EXPECTED:FACT_KEY_INVALID"
+        },
+        {
+          "label": "REJECT 2 loopback URL",
+          "method": "submit_evidence",
+          "hash": "0x453006afb0eeb270790616428356c9992566339dac60c3e1fdd88301bfdfd710",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "ERROR",
+          "outcome": "return"
+        }
+      ],
+      "liveState": {
+        "charterVersion": 3,
+        "sectionCount": 2,
+        "proposalCount": 1,
+        "evidenceCount": 8,
+        "asOf": "after the last transaction above, before any browser-wallet test"
+      },
+      "findings": [
+        "2 of 8 LLM submissions needed leader rotation (validators disagreed before agreeing); no LLM errors; cause unconfirmed because debug trace is unavailable on StudioNet.",
+        "Browser-wallet Stage 2 E2E not yet performed."
+      ]
     }
   }
 }
