@@ -244,7 +244,9 @@
         "versionHeader": "v0.2.16",
         "sha256_lfNormalized": "8600b33b8481e7005c676fb948ba501c48c1b7e04a6d25aacda506614789b4a4",
         "gitCommit": "2727846",
-        "gitCommitNote": "Source frozen at commit 2727846 (fix: harden evidence equivalence and canonical hash)."
+        "gitCommitNote": "Source frozen at commit 2727846 (fix: harden evidence equivalence and canonical hash).",
+        "sha256_lfNormalized_method": "CRLF converted to LF, then leading/trailing whitespace trimmed (the method used for the approved hash). Without the trim, the LF hash is eac0dfde634dc8d762d0e29a6610d3e70b69ea2a8c78b7c59958ea325124b6c6.",
+        "sha256_fileAsStored_CRLF": "2a6d6d2e65f717783d6c4dbb27bfd441cc934107ee167e0b2014ac3c83c46405"
       },
       "verification": {
         "deployedSchemaIdenticalToLocal": true,
