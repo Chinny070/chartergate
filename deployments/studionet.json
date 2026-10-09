@@ -1979,9 +1979,48 @@
         "sectionCount": 5,
         "proposalCount": 3,
         "evidenceCount": 3,
-        "reviewCount": 6,
-        "revisionCount": 3,
-        "asOf": "after the CLI/SDK live tests, before the browser-wallet E2E"
+        "reviewCount": 7,
+        "revisionCount": 4,
+        "asOf": "after the browser-wallet E2E (revision 4, review 7)"
+      },
+      "browserWalletE2E": {
+        "note": "Browser-wallet repair flow performed by the user from the frontend on proposal 2; not part of the CLI/SDK run.",
+        "proposalId": 2,
+        "requestedBy": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+        "repair": {
+          "revisionId": 4,
+          "revisionNumber": 2,
+          "parentRevisionId": 0,
+          "sourceReviewId": 2,
+          "charterVersion": 5,
+          "addressed": [
+            "s3"
+          ],
+          "revisionHash": "0x7a199cf9f6fa844e0afde82f4dae6699e5899cdd433ae0484f937df9fe2449fa",
+          "createdAt": "2026-10-09T22:49:23.920430Z",
+          "txHash": null,
+          "txHashNote": "not captured: the hash read from the screenshot did not exist on-chain (misread); the revision was verified from contract state and its hash recomputed independently",
+          "userObserved": "all five timeline phases to Finalized · Success; 'Repair assessment: admissible' shown separately; revision 2 REVISED awaiting review",
+          "note": "The user's revised description was ONLY the budget line (the original description text was replaced, not appended); the repair was still judged admissible because the title and action were unchanged."
+        },
+        "reReview": {
+          "reviewId": 7,
+          "txHash": "0x9784d1573d08bb45cb772009942e70a4a85922ab772ee473c139be6013889756",
+          "rounds": 4,
+          "rotations": 3,
+          "llmErrorsInRounds": [
+            "LLM_ERROR:BAD_MISSING_FACT",
+            "LLM_ERROR:BAD_MISSING_FACT"
+          ],
+          "verdict": "REPAIRABLE",
+          "judgedRevisionId": 4,
+          "charterVersion": 5,
+          "findings": "s1 UNCLEAR, s2 VIOLATED (repairable), s3 SATISFIED, s4 VIOLATED (repairable); the revised text no longer described the product or a timeline",
+          "evidenceSnapshot": [],
+          "independentHashRecomputation": "revision hash, evidence_set_hash, review_context_hash and review_hash all exact",
+          "observation": "the model wrote this review's rationales and missing_fact in Chinese; rationale is not hashed or compared, so equivalence is unaffected",
+          "userObserved": "the revision review timeline showed all five phases to Finalized · Success; the constitutional verdict appeared separately; revision 1 stayed REPAIRABLE; status returned to REPAIRABLE"
+        }
       }
     }
   }
