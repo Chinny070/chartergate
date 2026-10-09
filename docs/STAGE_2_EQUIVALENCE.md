@@ -253,3 +253,16 @@ validators agreed they read. Every input is a stored field, so any record's hash
 4. The record's `normalized_fact` now always holds the fact that was asked, including when retrieval failed, so the hash is recomputable from the
    stored record. `normalized_value` and `excerpt` stay empty unless something grounded and bound was found.
 
+
+## 13. Live verification notes (Stage 2.2)
+
+- **Leader rotation.** On the StudioNet verification deployment, 2 of 8 earlier live LLM submissions required leader rotation: the
+  `STATIC_WEB` live test took 2 rounds and the `DYNAMIC_WEB` render test took 3. No root cause is confirmed (`debugTraceTransaction`
+  is unavailable on StudioNet), and no `LLM_ERROR` was observed. The consensus and equivalence rules were not changed or weakened.
+  This is an operational observation about liveness, not a blocker.
+- **Loopback URL.** `http://localhost/admin` was rejected by CharterGate's own `_validate_source_url` with
+  `EXPECTED:SOURCE_URL_HOST_NOT_PUBLIC` (leader and validator both rolled back, no nondeterministic block ran). No evidence id was
+  consumed and no record was created. This is a syntactic screen only; it makes no claim about network-level SSRF protection, which
+  belongs to GenVM's web layer and is not verified here.
+- **Browser E2E.** Evidence #9 and #10 were submitted from the browser wallet. #9 exposed a frontend bug (the transaction result was
+  unmounted by the list reload); #10 verified the fixed flow end to end.

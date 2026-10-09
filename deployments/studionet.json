@@ -375,20 +375,62 @@
           "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
           "finalStatus": "FINALIZED",
           "leaderExecution": "ERROR",
-          "outcome": "return"
+          "outcome": "rollback:EXPECTED:SOURCE_URL_HOST_NOT_PUBLIC",
+          "correction": "The smoke helper first logged this as 'return'. The receipt shows leader and validator both rollback with payload EXPECTED:SOURCE_URL_HOST_NOT_PUBLIC; corrected in Stage 2.2.",
+          "submittedUrl": "http://localhost/admin",
+          "handlingLayer": "CharterGate contract URL validation (_validate_source_url), before any web access: no nondeterministic block ran (eq_outputs empty). No GenVM web-layer claim is made.",
+          "evidenceIdConsumed": false,
+          "evidenceRecordCreated": false
         }
       ],
       "liveState": {
         "charterVersion": 3,
         "sectionCount": 2,
         "proposalCount": 1,
-        "evidenceCount": 8,
-        "asOf": "after the last transaction above, before any browser-wallet test"
+        "evidenceCount": 10,
+        "asOf": "after browser-wallet E2E (evidence #9 and #10)"
       },
       "findings": [
-        "2 of 8 LLM submissions needed leader rotation (validators disagreed before agreeing); no LLM errors; cause unconfirmed because debug trace is unavailable on StudioNet.",
-        "Browser-wallet Stage 2 E2E not yet performed."
-      ]
+        "Leader rotation: 2 of 8 earlier live LLM submissions required leader rotation (TEST A took 2 rounds, TEST C took 3). Root cause not confirmed (debugTraceTransaction unavailable on StudioNet). No LLM_ERROR observed. Validation was not weakened. Operational observation, not a blocker.",
+        "Browser-wallet Stage 2 E2E passed with evidence #9 and #10 (see browserWalletE2E)."
+      ],
+      "transactionsScope": "The 'transactions' list is the CLI/SDK live smoke run (before the browser E2E).",
+      "browserWalletE2E": {
+        "note": "Browser-wallet submissions made by the owner/proposer through the frontend after the CLI smoke run. Not part of the original CLI run.",
+        "purpose": "Verify the full browser flow: wallet signature, submitted, pending consensus, FINALIZED, execution SUCCESS, EvidenceRecord VERIFIED.",
+        "records": [
+          {
+            "evidenceId": 9,
+            "txHash": null,
+            "txHashNote": "Not captured; the UI lost the result panel (frontend unmount bug, fixed in a70ae7a). Record read from the contract.",
+            "status": "VERIFIED",
+            "statusReason": "SUPPORTED",
+            "retrievalMethod": "GET",
+            "fact": "price_excluding_tax",
+            "value": "£51.77",
+            "relatedSection": "s2",
+            "sectionRevision": 3,
+            "retrievedAt": "2026-10-09T12:55:49.178812Z",
+            "contentHash": "0x22ee94b4ff82aec73d2c04ebbd83f6ef4ef4c23fbbedc54abaeae94369a2e11e",
+            "e2ePurpose": "First browser submission; exposed the missing-transaction-feedback UI bug."
+          },
+          {
+            "evidenceId": 10,
+            "txHash": "0xbf5396c625ea58d0cdeedf371cd5632a1e57207641b1a14b302aa64ced701864",
+            "txHashNote": "Read from the UI and confirmed on-chain (FINALIZED, return, matching created_at).",
+            "status": "VERIFIED",
+            "statusReason": "SUPPORTED",
+            "retrievalMethod": "GET",
+            "fact": "price_including_tax",
+            "value": "£51.77",
+            "relatedSection": "s2",
+            "sectionRevision": 3,
+            "retrievedAt": "2026-10-09T13:19:03.218797Z",
+            "contentHash": "0xa9cdc84ec2fc9398fddf138980c768e87c69fa0d20204bfa05dca653c9fd4d0d",
+            "e2ePurpose": "Complete browser flow with the transaction timeline and Finalized message visible after the fix."
+          }
+        ]
+      }
     }
   }
 }
