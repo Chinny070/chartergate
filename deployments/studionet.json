@@ -934,8 +934,8 @@
         "sectionCount": 3,
         "proposalCount": 8,
         "evidenceCount": 5,
-        "reviewCount": 4,
-        "asOf": "after the CLI/SDK live tests, before the browser-wallet E2E"
+        "reviewCount": 5,
+        "asOf": "after the browser-wallet E2E (review 5, proposal 4)"
       },
       "reviewTransactionRounds": [
         {
@@ -1059,6 +1059,23 @@
           "reviewCountStill": 4,
           "stateIdentical": true
         }
+      },
+      "browserWalletE2E": {
+        "note": "Browser-wallet review requested by the user from the frontend; not part of the CLI/SDK run.",
+        "proposalId": 4,
+        "reviewId": 5,
+        "requestedBy": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+        "txHash": null,
+        "txHashNote": "not captured; the review is read from the contract",
+        "charterVersionApplied": 3,
+        "evidenceCountAtReview": 0,
+        "verdict": "INSUFFICIENT_EVIDENCE",
+        "evidenceSetHash": "0x970b8ace297e77c51f4fe6035bf9d4a470cf7e2b5ff534d335a25b24c1d0fc00",
+        "reviewContextHash": "0x49d3f72db2f9681f6d23897de842c6a07c8dbde94caa06231ff8238ffa0fd653",
+        "reviewHash": "0xfbc737ad36ff65e1b4c532670d0f19279175e95ae2b30bf9e3a10a2b4b4c6c15",
+        "createdAt": "2026-10-09T19:12:26.191320Z",
+        "userReported": "timeline showed all 5 phases (Ready, Signature requested, Submitted, Pending consensus, Finalized · Success) and stayed visible; verdict panel rendered separately",
+        "notReported": "whether the 'Finalized. That is the transaction' line showed, and the elapsed time"
       }
     }
   }
