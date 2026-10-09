@@ -202,7 +202,7 @@ function StoredReview({ reviewId, sections, onVerdict }: { reviewId: number; sec
  * Constitutional review area of the proposal page. The transaction state lives here, above every read, so the
  * timeline and the result of a request survive the reloads that follow it (the Stage 2 unmount bug).
  */
-export function ConstitutionalReviewPanel({ proposal, onVerdict }: { proposal: Proposal; onVerdict?: (v: string) => void }) {
+export function ConstitutionalReviewPanel({ proposal, onVerdict, onFinalized }: { proposal: Proposal; onVerdict?: (v: string) => void; onFinalized?: () => void }) {
   const wallet = useWallet();
   const { tx, busy, run, reset } = useTx();
   const [done, setDone] = useState(false);
@@ -239,6 +239,7 @@ export function ConstitutionalReviewPanel({ proposal, onVerdict }: { proposal: P
       setDone(true);
       reviewId.reload();
       evidence.reload();
+      onFinalized?.();
     }
   }
 

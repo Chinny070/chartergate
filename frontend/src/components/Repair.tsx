@@ -152,7 +152,7 @@ function RevisionReview({ review, sections }: { review: ConstitutionalReview; se
  * Repair workspace + revision history for a proposal. The transaction state lives here, above every read, so the
  * timeline and the repair assessment survive the reloads that follow a transaction (the Stage 2 unmount bug).
  */
-export function LineagePanel({ proposal, onStatus }: { proposal: Proposal; onStatus?: (status: string) => void }) {
+export function LineagePanel({ proposal, onStatus, refreshKey = 0 }: { proposal: Proposal; onStatus?: (status: string) => void; refreshKey?: number }) {
   const wallet = useWallet();
   const repairTx = useTx();
   const reviewTx = useTx();
@@ -161,11 +161,11 @@ export function LineagePanel({ proposal, onStatus }: { proposal: Proposal; onSta
   const [draft, setDraft] = useState<ProposalText | null>(null);
   const [outcome, setOutcome] = useState<null | { kind: "accepted"; revision: number } | { kind: "rejected"; reason: string; code: string }>(null);
 
-  const effective = useRead(() => getEffectiveProposal(proposal.proposal_id), [proposal.proposal_id, tick]);
-  const revisions = useRead(() => getProposalRevisionsPage(proposal.proposal_id), [proposal.proposal_id, tick]);
-  const reviews = useRead(() => getProposalReviewsPage(proposal.proposal_id), [proposal.proposal_id, tick]);
+  const effective = useRead(() => getEffectiveProposal(proposal.proposal_id), [proposal.proposal_id, tick, refreshKey]);
+  const revisions = useRead(() => getProposalRevisionsPage(proposal.proposal_id), [proposal.proposal_id, tick, refreshKey]);
+  const reviews = useRead(() => getProposalReviewsPage(proposal.proposal_id), [proposal.proposal_id, tick, refreshKey]);
   const status = effective.data?.status ?? proposal.status;
-  const targets = useRead(() => (status === "REPAIRABLE" ? getRepairTargets(proposal.proposal_id) : Promise.resolve([])), [proposal.proposal_id, tick, status]);
+  const targets = useRead(() => (status === "REPAIRABLE" ? getRepairTargets(proposal.proposal_id) : Promise.resolve([])), [proposal.proposal_id, tick, status, refreshKey]);
   const sections = useRead(
     () => getCharterSectionsAtVersionPage(proposal.charter_version_at_submission),
     [proposal.charter_version_at_submission],
@@ -342,9 +342,32 @@ export function LineagePanel({ proposal, onStatus }: { proposal: Proposal; onSta
       )}
 
       {ready && entries.length > 1 && (
+        <Docket label={`Current revision ${entries[entries.length - 1].revisionNumber}`}>
+          <div className="stack">
+            <p className="muted">
+              The effective text of this proposal is its latest revision. The original (revision 1) above is unchanged and stays readable.
+            </p>
+            <strong>{entries[entries.length - 1].text.title}</strong>
+            <p style={{ whiteSpace: "pre-wrap" }}>{entries[entries.length - 1].text.description}</p>
+            <p style={{ whiteSpace: "pre-wrap" }}>{entries[entries.length - 1].text.requested_action}</p>
+            <div className="label">Revision hash</div>
+            <div className="hash">{entries[entries.length - 1].revisionHash}</div>
+          </div>
+        </Docket>
+      )}
+
+      {ready && entries.length > 1 && (
         <Docket label="Revision history">
           <RevisionTimeline entries={entries} sections={sections.data ?? []} />
           <div className="stack">
+            {entries
+              .filter((e) => e.revisionId > 0)
+              .map((e, i) => (
+                <details key={`diff-${e.revisionNumber}`}>
+                  <summary>Revision {e.revisionNumber}: what changed from revision {e.revisionNumber - 1}</summary>
+                  <DiffView diffs={diffRevision(entries[i].text, e.text)} />
+                </details>
+              ))}
             {entries
               .filter((e) => e.revisionId > 0 && e.review)
               .map((e) => (

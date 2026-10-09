@@ -64,6 +64,7 @@ export function ProposalDetailPage() {
   const valid = Number.isInteger(num) && num >= 1;
   // Set by the review panel once a finalized review is read, so the status shown never lags the verdict.
   const [verdict, setVerdict] = useState<string | null>(null);
+  const [refresh, setRefresh] = useState(0);
   const read = useRead(() => (valid ? getProposal(num) : Promise.reject(new Error("Invalid proposal id"))), [num]);
 
   return (
@@ -83,8 +84,10 @@ export function ProposalDetailPage() {
                 </Docket>
                 <CharterAtSubmission version={p.charter_version_at_submission} />
                 <ProposalEvidence proposal={p} />
-                <ConstitutionalReviewPanel proposal={p} onVerdict={setVerdict} />
-                <LineagePanel proposal={p} onStatus={setVerdict} />
+                {/* The lineage panel owns the displayed status: it reads the CURRENT effective status, which after a repair is
+                    not the verdict of the original review that the review panel shows. */}
+                <ConstitutionalReviewPanel proposal={p} onFinalized={() => setRefresh((n) => n + 1)} />
+                <LineagePanel proposal={p} onStatus={setVerdict} refreshKey={refresh} />
               </div>
               <Docket label="Status">
                 <div className="stack">
