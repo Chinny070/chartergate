@@ -112,3 +112,24 @@ That is a liveness and cost trade-off, not a safety weakening, and the rules abo
 
 The direct tests mock the LLM. They prove these rules and the contract's handling of any structured answer. They do not prove a
 real model reaches sensible findings, nor how often real validators agree. That requires the StudioNet adjudication run.
+
+## 10. Frozen: live verification status and reliability backlog
+
+Stage 3 is complete and frozen. Verification contract: `0x49990Cb776469F1363e1F06bD2870e0a5eCB374b` (`canonicalDeployment` is
+`null`). All four verdicts were produced live on StudioNet, and the browser-wallet review (review 5) passed; see
+`deployments/studionet.json`.
+
+Accepted, non-blocking known limitations:
+
+* `SATISFIED` vs `NOT_APPLICABLE` was not exercised live (no natural case arose). It is covered by the direct and equivalence tests.
+* Some live reviews needed leader rotation, or a fresh transaction after `MAJORITY_DISAGREE`. `LLM_ERROR:BAD_EVIDENCE_REF` and
+  `LLM_ERROR:BAD_MISSING_FACT` occurred in some leader rounds with no confirmed root cause. These are operational reliability
+  observations, not correctness failures.
+* Review latency and consensus reliability have not been characterized at scale.
+
+Reliability backlog (not scheduled; no prompt, equivalence, validator or contract change is implied):
+
+* **R1** measure leader-rotation frequency over a larger sample
+* **R2** investigate safe normalization for benign model-output variance
+* **R3** exercise `SATISFIED` vs `NOT_APPLICABLE` live when a natural case exists
+* **R4** characterize latency versus charter/evidence size
