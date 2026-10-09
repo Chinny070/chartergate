@@ -86,3 +86,23 @@ not a relaxation of the rules (see the Stage 3 reliability backlog).
 
 The direct tests mock the LLM. They prove these rules and how the contract handles any structured answer. They do not prove that a
 real model separates a repair from a replacement, nor how often validators agree. That needs StudioNet.
+
+## 10. Frozen: live verification status and backlog
+
+Stage 4 is complete and frozen. Verification contract: `0xF7370b75a34D23F715E936317C3f4793188cB59d` (`canonicalDeployment` is `null`).
+Proven live on StudioNet and in the browser (see `deployments/studionet.json`): valid full repair then ELIGIBLE; an unrelated replacement
+rejected with `REPAIR_REJECTED:PURPOSE_CHANGED` and no revision created; a partial repair admitted then REPAIRABLE; a further repair then
+ELIGIBLE; and a browser repair admitted then REPAIRABLE. Transaction success, repair admissibility and constitutional compliance are three
+different results, and all three were observed to differ.
+
+The missing browser repair transaction hash is accepted as a documentation gap: the revision exists on-chain, its hash recomputes
+independently, and review #7 judged it.
+
+Backlog (non-blocking; no prompt, equivalence, validator or contract change is implied):
+
+* **S4-R1** Re-review consensus can require multiple rotations or retries, including `BAD_EVIDENCE_REF`, `BAD_MISSING_FACT` and `BAD_FINDINGS`.
+* **S4-R2** Revision-limit enforcement is directly tested but was not exercised live on StudioNet.
+* **S4-R3** LLM rationale and `missing_fact` language is not guaranteed to match the UI language; one live review returned Chinese text. These
+  prose fields stay outside consensus and hash identity.
+* **S4-R4** The repair-editor UX should keep making it obvious that users are editing the current proposal and not accidentally replacing
+  important existing context (a live browser repair replaced the description with only the budget line).
