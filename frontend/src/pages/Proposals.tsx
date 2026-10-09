@@ -12,6 +12,7 @@ import {
   getProposalsPage,
   LIMITS,
   submitProposal,
+  type EvidenceRecord,
   type Proposal,
 } from "../lib/genlayer/charterGate";
 import { useRead, useTx } from "../lib/genlayer/hooks";
@@ -49,7 +50,7 @@ export function ProposalsPage() {
           )
         }
       </ReadBoundary>
-      <p className="label">Review, evidence, verdicts and appeals are not implemented yet (later stages).</p>
+      <p className="label">Open a case to submit evidence. Eligibility verdicts, precedent and appeals are not implemented yet (later stages).</p>
     </div>
   );
 }
@@ -110,17 +111,23 @@ export function ProposalDetailPage() {
 /** Evidence attached to this proposal, plus the form to add more (proposer only). */
 function ProposalEvidence({ proposal }: { proposal: Proposal }) {
   const read = useRead(() => getProposalEvidencePage(proposal.proposal_id), [proposal.proposal_id]);
+  // Keep showing the last records while a reload is in flight. Otherwise the loading state unmounts the
+  // form right after a transaction finalizes and the submitter never sees the "Finalized" result.
+  const [shown, setShown] = useState<{ id: number; records: EvidenceRecord[] } | null>(null);
+  if (read.data !== null && shown?.records !== read.data) setShown({ id: proposal.proposal_id, records: read.data });
+  const stale = shown?.id === proposal.proposal_id ? shown.records : null;
+  const records = read.data ?? stale;
   return (
     <div className="stack">
       <h2 style={{ fontSize: "1.8rem" }}>Evidence</h2>
-      <ReadBoundary read={read}>
-        {(records) => (
-          <>
-            <EvidenceList records={[...records].reverse()} empty="No evidence has been attached to this proposal yet." />
-            <SubmitEvidenceForm proposal={proposal} evidenceCount={records.length} onFinalized={read.reload} />
-          </>
-        )}
-      </ReadBoundary>
+      {records === null ? (
+        <ReadBoundary read={read}>{() => null}</ReadBoundary>
+      ) : (
+        <>
+          <EvidenceList records={[...records].reverse()} empty="No evidence has been attached to this proposal yet." />
+          <SubmitEvidenceForm proposal={proposal} evidenceCount={records.length} onFinalized={read.reload} />
+        </>
+      )}
     </div>
   );
 }
