@@ -85,7 +85,7 @@ describe("ReviewResultView", () => {
     const html = render("INSUFFICIENT_EVIDENCE", [fnd("1", "SATISFIED"), fnd("2", "UNCLEAR", { evidence_ids: [3] })]);
     expect(html).toContain("INSUFFICIENT EVIDENCE");
     expect(html).toContain("Undetermined for lack of VERIFIED evidence: §2 Transparency (conflict_disclosure)");
-    expect(html).toContain("Verified evidence is missing for");
+    expect(html).toContain("Undetermined for lack of verified evidence:");
   });
 
   it("offers no repair, appeal or voting action in Stage 3", () => {

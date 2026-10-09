@@ -220,7 +220,7 @@
     },
     "stage_2_evidence_vault_verification": {
       "status": "VERIFICATION_DEPLOYMENT",
-      "active": true,
+      "active": false,
       "note": "Stage 2 verification deployment, not the canonical production deployment. Owner is permanent; a canonical deployment will be a new contract.",
       "network": "studionet",
       "chainId": 61999,
@@ -432,6 +432,633 @@
             "e2ePurpose": "Complete browser flow with the transaction timeline and Finalized message visible after the fix."
           }
         ]
+      },
+      "supersededBy": "stage_3_constitutional_adjudication_verification"
+    },
+    "stage_3_constitutional_adjudication_verification": {
+      "status": "VERIFICATION_DEPLOYMENT",
+      "active": true,
+      "note": "Stage 3 verification deployment, not the canonical production deployment. Owner is permanent; a canonical deployment will be a new contract.",
+      "network": "studionet",
+      "chainId": 61999,
+      "rpc": "https://studio.genlayer.com/api",
+      "contractAddress": "0x49990Cb776469F1363e1F06bD2870e0a5eCB374b",
+      "deployTxHash": "0xb640faef5b65002cdff95d83fa3263311182833ca696f81648120358660ac57f",
+      "deployTxFinalStatus": "FINALIZED",
+      "deployTxExecutionResult": "SUCCESS",
+      "deployTxConsensus": "MAJORITY_AGREE",
+      "deployedAtOnChain": "2026-10-09T18:14:36.489978Z",
+      "deployer": {
+        "cliAccountName": "my-studionet-wallet",
+        "address": "0xaffe15eec45b68835cc9e5b4ab85dd5deae8e70b"
+      },
+      "owner": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+      "constructorArgs": [
+        "Atlas DAO",
+        "A DAO that funds open-source infrastructure."
+      ],
+      "source": {
+        "file": "contracts/charter_gate.py",
+        "versionHeader": "v0.2.16",
+        "sha256_lfNormalizedTrimmed": "fb6cd0742a0237f215f9df8eb774ff79ea94bdcf17ea1ee0285d58fd1fa9a0c2",
+        "gitCommit": "d638570",
+        "gitCommitNote": "Source frozen at d638570 (fix: harden constitutional interpretation equivalence)."
+      },
+      "verification": {
+        "deployedSourceIdenticalToApproved": true,
+        "deployedSchemaIdenticalToLocal": true,
+        "schemaMethodCount": 31,
+        "stage1And2PublicApiUnchanged": "the schema diff against the Stage 2 schema is additions only"
+      },
+      "liveCharter": {
+        "note": "s3 was first sent while the RPC dropped the request (nothing was sent), so proposals 1-4 were created under charter v3 (s1, s2 only). The designed fixtures are proposals 5-8 under v4. s3 was then amended to v5 after those proposals were submitted, to prove the historical charter feeds the adjudication.",
+        "v2": "s1 Mission",
+        "v3": "s2 Transparency",
+        "v4": "s3 Budget (every proposal needs a specific budget breakdown; missing breakdown is curable)",
+        "v5": "s3 amended to 'Budget breakdowns are optional.' (after proposals 5-8 were submitted)"
+      },
+      "fixtures": {
+        "A_ELIGIBLE": {
+          "proposalId": 5,
+          "reviewId": 3
+        },
+        "B_INELIGIBLE": {
+          "proposalId": 6,
+          "reviewId": 4
+        },
+        "C_REPAIRABLE": {
+          "proposalId": 7,
+          "reviewId": 1
+        },
+        "D_INSUFFICIENT_EVIDENCE": {
+          "proposalId": 8,
+          "reviewId": 2
+        },
+        "browserE2ECandidate": {
+          "proposalId": 4,
+          "note": "unreviewed, submitted under charter v3 by my-studionet-wallet"
+        }
+      },
+      "evidenceFixturePage": "https://httpbin.org/base64/<base64 of: Atlas Protocol tokenomics (test fixture page). Team token allocation: 18%. Community allocation: 52%. Treasury allocation: 30%.>",
+      "reviews": [
+        {
+          "reviewId": 1,
+          "proposalId": 7,
+          "verdict": "REPAIRABLE",
+          "requestedBy": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "charterVersionApplied": 4,
+          "evidenceCountAtReview": 1,
+          "evidenceSnapshotIds": [
+            3
+          ],
+          "evidenceSetHash": "0xa275a034884fdd73163c662c9224cf3d53fcae55f87b13abd03520c9e5863c39",
+          "reviewContextHash": "0x0826e38527906271467402ff6a73defaa01a3b2862cc76d7ed3f9956086944e8",
+          "reviewHash": "0x4dacb1f82d3874a3dfc765ff26b47f4678f20ab8a1423da4d9bb55fad4d93e25",
+          "createdAt": "2026-10-09T18:38:26.809030Z",
+          "findings": [
+            {
+              "evidence_ids": [],
+              "finding": "SATISFIED",
+              "missing_fact": "",
+              "rationale": "The proposal states the product is open-source and supports developer infrastructure.",
+              "repairable": false,
+              "section_id": "s1"
+            },
+            {
+              "evidence_ids": [
+                3
+              ],
+              "finding": "SATISFIED",
+              "missing_fact": "",
+              "rationale": "The team token allocation is disclosed and supported by VERIFIED evidence.",
+              "repairable": false,
+              "section_id": "s2"
+            },
+            {
+              "evidence_ids": [],
+              "finding": "VIOLATED",
+              "missing_fact": "",
+              "rationale": "The proposal gives only a total funding amount and lacks a specific budget breakdown by cost category.",
+              "repairable": true,
+              "section_id": "s3"
+            }
+          ],
+          "independentHashRecomputation": "evidence_set_hash, review_context_hash and review_hash all recomputed exactly with a separate reference Keccak-256"
+        },
+        {
+          "reviewId": 2,
+          "proposalId": 8,
+          "verdict": "INSUFFICIENT_EVIDENCE",
+          "requestedBy": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "charterVersionApplied": 4,
+          "evidenceCountAtReview": 1,
+          "evidenceSnapshotIds": [
+            4
+          ],
+          "evidenceSetHash": "0xe8481aa252e59703f9e0c5a848c9daa1c08000837938db7fad8917cee456c153",
+          "reviewContextHash": "0x80ed75d77993f1e57d8eb8e80a7fe30351fb4ceeb9811312f0314365cc674a09",
+          "reviewHash": "0x30f70349ba03eab7f54d4b82747a5f04a99d3944aad0fd454f301948f7e5e8bd",
+          "createdAt": "2026-10-09T18:39:57.472311Z",
+          "findings": [
+            {
+              "evidence_ids": [],
+              "finding": "SATISFIED",
+              "missing_fact": "",
+              "rationale": "The proposal states the product is an open-source MIT licensed RPC gateway for developers.",
+              "repairable": false,
+              "section_id": "s1"
+            },
+            {
+              "evidence_ids": [],
+              "finding": "UNCLEAR",
+              "missing_fact": "VERIFIED evidence of the team token allocation",
+              "rationale": "The team token allocation is mentioned in the proposal, but the supporting evidence is NOT VERIFIED.",
+              "repairable": false,
+              "section_id": "s2"
+            },
+            {
+              "evidence_ids": [],
+              "finding": "SATISFIED",
+              "missing_fact": "",
+              "rationale": "The proposal includes a specific budget breakdown for engineering, infrastructure, and documentation.",
+              "repairable": false,
+              "section_id": "s3"
+            }
+          ],
+          "independentHashRecomputation": "evidence_set_hash, review_context_hash and review_hash all recomputed exactly with a separate reference Keccak-256"
+        },
+        {
+          "reviewId": 3,
+          "proposalId": 5,
+          "verdict": "ELIGIBLE",
+          "requestedBy": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "charterVersionApplied": 4,
+          "evidenceCountAtReview": 2,
+          "evidenceSnapshotIds": [
+            1,
+            2
+          ],
+          "evidenceSetHash": "0x703238f608f51044cce67b4b90d451c477d59de99366fc218851a90ea94f5907",
+          "reviewContextHash": "0x9c6812fbff326fabb83d023ca9608e228eb645a3b92c60c6ae0d8f8040ded215",
+          "reviewHash": "0x353c0783db9eff3238ffa5e45d36e81a42e596e0ef8ef1a88c20f36fc4996952",
+          "createdAt": "2026-10-09T18:42:36.095805Z",
+          "findings": [
+            {
+              "evidence_ids": [],
+              "finding": "SATISFIED",
+              "missing_fact": "",
+              "rationale": "The proposal states the product is open-source (MIT licensed) and all source code is published publicly.",
+              "repairable": false,
+              "section_id": "s1"
+            },
+            {
+              "evidence_ids": [
+                1
+              ],
+              "finding": "SATISFIED",
+              "missing_fact": "",
+              "rationale": "The team token allocation (18%) is disclosed and supported by VERIFIED evidence.",
+              "repairable": false,
+              "section_id": "s2"
+            },
+            {
+              "evidence_ids": [],
+              "finding": "SATISFIED",
+              "missing_fact": "",
+              "rationale": "The proposal includes a specific budget breakdown listing amounts for each cost category.",
+              "repairable": false,
+              "section_id": "s3"
+            }
+          ],
+          "independentHashRecomputation": "evidence_set_hash, review_context_hash and review_hash all recomputed exactly with a separate reference Keccak-256"
+        },
+        {
+          "reviewId": 4,
+          "proposalId": 6,
+          "verdict": "INELIGIBLE",
+          "requestedBy": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "charterVersionApplied": 4,
+          "evidenceCountAtReview": 0,
+          "evidenceSnapshotIds": [],
+          "evidenceSetHash": "0xd9fb496cfba55f0a15833e40a0447c0b93e4e02df27a57cc92e40f80875c02e6",
+          "reviewContextHash": "0x890afa6c12366c8689fec5755378b607ad48c45e25dbbc6e320f0dd13e9f284c",
+          "reviewHash": "0x6cd1f12eab536d1b34c11b4b8c92383fd6bca72f232cfd80394800b1f458da5b",
+          "createdAt": "2026-10-09T18:45:37.538847Z",
+          "findings": [
+            {
+              "evidence_ids": [],
+              "finding": "VIOLATED",
+              "missing_fact": "",
+              "rationale": "The proposal funds a closed-source proprietary custody dashboard rather than open-source developer infrastructure.",
+              "repairable": false,
+              "section_id": "s1"
+            },
+            {
+              "evidence_ids": [],
+              "finding": "UNCLEAR",
+              "missing_fact": "VERIFIED evidence supporting the disclosed 10 percent team token allocation.",
+              "rationale": "The proposal discloses a team token allocation, but no VERIFIED evidence supports it.",
+              "repairable": false,
+              "section_id": "s2"
+            },
+            {
+              "evidence_ids": [],
+              "finding": "SATISFIED",
+              "missing_fact": "",
+              "rationale": "The proposal includes a specific budget breakdown with amounts for each listed cost category.",
+              "repairable": false,
+              "section_id": "s3"
+            }
+          ],
+          "independentHashRecomputation": "evidence_set_hash, review_context_hash and review_hash all recomputed exactly with a separate reference Keccak-256"
+        }
+      ],
+      "transactions": [
+        {
+          "label": "deploy",
+          "hash": "0xb640faef5b65002cdff95d83fa3263311182833ca696f81648120358660ac57f",
+          "signer": "my-studionet-wallet",
+          "finalStatus": "FINALIZED",
+          "executionResult": "SUCCESS",
+          "consensus": "MAJORITY_AGREE",
+          "rounds": 1
+        },
+        {
+          "label": "CHARTER add s1",
+          "method": "add_charter_section",
+          "hash": "0x3c145b8f7fbb70f7ef4792d06173feaef47f9b3840b8e4535ebd51acd3b21d66",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "CHARTER add s2",
+          "method": "add_charter_section",
+          "hash": "0x0a1fb0829c70832b338ff626da43ecf853283b5f05e5c40cb2eee2197b49c9ac",
+          "signer": null,
+          "finalStatus": null,
+          "leaderExecution": null,
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "PROPOSAL A (eligible fixture, carries a quoted injection note)",
+          "method": "submit_proposal",
+          "hash": "0xddbbe48cf94e57d77a69a385d0f4e13dc327eac42c1e7d0e44b854a6092ae71b",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "PROPOSAL B (ineligible fixture)",
+          "method": "submit_proposal",
+          "hash": "0x3f245f9865a5d28a7640b9a4edfb519dd1502264d4255da47114a71c3f9d759a",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "PROPOSAL C (repairable fixture)",
+          "method": "submit_proposal",
+          "hash": "0x76b4c265a253b011be76baa733a73a51585435faeb3facddcd5c97e17d38acc7",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "PROPOSAL D (insufficient-evidence fixture)",
+          "method": "submit_proposal",
+          "hash": "0xcd404de19a59fa778244d476325c23858fcc7474255ca20acb57fe2fad15333f",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "CHARTER add s3 (retry; first attempt sent nothing)",
+          "method": "add_charter_section",
+          "hash": "0x6464ecfff4ff4d7d118ffa80bf22336418d4565854d872489b8043c1a61980e0",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "PROPOSAL A (eligible fixture, carries a quoted injection note)",
+          "method": "submit_proposal",
+          "hash": "0xac3e431730a0c2827182a6a32b86957b14dab54e3ae256f73c37d429a5a7adaa",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "PROPOSAL B (ineligible fixture)",
+          "method": "submit_proposal",
+          "hash": "0x485840cdab9fd2e63ef9d6919e7b943925d942db3700563fc1a019d5c98d75ab",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "PROPOSAL C (repairable fixture)",
+          "method": "submit_proposal",
+          "hash": "0x3e80bfbfcbdfe7fc805f4c59c4c990c6d08c2bb9a486cddddb38fa082da6e4b5",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "PROPOSAL D (insufficient-evidence fixture)",
+          "method": "submit_proposal",
+          "hash": "0x760297d3f5ff0561ebeb12b4f0a13a1cce909530cf2ac6fe2dc1956e5774edf6",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "EVIDENCE p5 relevant team allocation",
+          "method": "submit_evidence",
+          "hash": "0x1d92473a38c8ceadf47e2d7835e12a08a04e06bc0a70c86f635dfcdff9c855c2",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "EVIDENCE p5 unrelated product price",
+          "method": "submit_evidence",
+          "hash": "0xb068770af97147b5f59fc4826fbee2323f9c67d1594cdf21f29c57611986f488",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "EVIDENCE p7 relevant team allocation",
+          "method": "submit_evidence",
+          "hash": "0x4ca1b126b1429ae8368715ee474d27fb5ea789cefa297e7038d153c65a2d8b7b",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "EVIDENCE p8 unsupported team allocation",
+          "method": "submit_evidence",
+          "hash": "0x567b92fdfba12f1407be57219bf29febc1fc1871bbf35f45ef79e61bad15c27f",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "CHARTER amend s3 after proposals 5-8 (relaxes the budget rule)",
+          "method": "update_charter_section",
+          "hash": "0x518c1763f693edab2fff57d69ccf6bc56afd2a545e40bb1989d88d25da098144",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "STRANGER (offset-bob) requests review of proposal 5",
+          "method": "request_constitutional_review",
+          "hash": "0xf8627195869f41a4a9a96400a72dad6b41d5f7fa06abaa1c6a8cd0a62e736480",
+          "signer": "0x10b091a7B19D3F0Da511a06985a8636FA58a0377",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "ERROR",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "REVIEW A p5",
+          "method": "request_constitutional_review",
+          "hash": "0x5975bbd5c16b2e2eba5b13ca0a46c622571415beb62f8be3a845617f8abb6f02",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "ERROR",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "REVIEW attempt p6",
+          "method": "request_constitutional_review",
+          "hash": "0x63201f7a8b419d30df98ab5a9182efaaa24426de903484bdfb58f62f63409145",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "REVIEW attempt p7",
+          "method": "request_constitutional_review",
+          "hash": "0x4758b108ad9e4c2f1de02c89260e0d1cdad38cb0fd12edcfa56912b6809226df",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "REVIEW attempt p8",
+          "method": "request_constitutional_review",
+          "hash": "0xbea0a77f647deb6e841649305a945a9b698ef88164f2d529cd3d4aa6bdc796a4",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "REVIEW attempt 2 p5",
+          "method": "request_constitutional_review",
+          "hash": "0x76c0eb135952e6e99ec943a172bf685995fe3698ce285afb6ac44eea6c89a34a",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "REVIEW attempt 2 p6",
+          "method": "request_constitutional_review",
+          "hash": "0x1402b09f1030a07ed500716ab34c250af322676fd02bf5fc6bfd0946cbeaba83",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "REVIEW attempt 3 p6",
+          "method": "request_constitutional_review",
+          "hash": "0x2171d9e00686b3ac10ca81e90b0f334adefbb59d7cca63afc69c2225480217bd",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "EVIDENCE p5 AFTER its review (community allocation)",
+          "method": "submit_evidence",
+          "hash": "0x4146c5ccbc12d359df2d00609742d4c07ddfb2105809ed437fd2455f04eee7d4",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "SUCCESS",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        },
+        {
+          "label": "DUPLICATE review request for proposal 5",
+          "method": "request_constitutional_review",
+          "hash": "0x383095ffdac3420c5d720892f451f7fbf5f27ba42fdfa95c01a125820dd144be",
+          "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "finalStatus": "FINALIZED",
+          "leaderExecution": "ERROR",
+          "outcomeNote": "outcome field from the smoke helper is unreliable ('return'/'contract_error:idle' are parse artefacts); see rounds and consensus summary and the stored state for the true result"
+        }
+      ],
+      "liveObservations": {
+        "allFourVerdictsProducedLive": true,
+        "failedFirstAttempts": "Review A (proposal 5) needed 2 transactions and review B (proposal 6) needed 3: the earlier ones finalized as MAJORITY_DISAGREE after 4 rounds and wrote nothing (no review id consumed, status unchanged).",
+        "llmErrorsObserved": [
+          "LLM_ERROR:BAD_EVIDENCE_REF (A: 5 leader rounds across 2 transactions; C: 1 round)",
+          "LLM_ERROR:BAD_MISSING_FACT (B: 2 leader rounds)"
+        ],
+        "rotation": "see rounds table in the transactions list / report; cause of the LLM_ERRORs and of validator disagreement is unknown (raw model output is not observable)",
+        "satisfiedVsNotApplicable": "LIVE NOT EXERCISED: no live finding was NOT_APPLICABLE",
+        "allNotApplicableLimitation": "an all-NOT_APPLICABLE review is refused; none of the fixtures depended on it"
+      },
+      "liveState": {
+        "charterVersion": 5,
+        "sectionCount": 3,
+        "proposalCount": 8,
+        "evidenceCount": 5,
+        "reviewCount": 4,
+        "asOf": "after the CLI/SDK live tests, before the browser-wallet E2E"
+      },
+      "reviewTransactionRounds": [
+        {
+          "fixture": "A proposal 5",
+          "attempt": 1,
+          "tx": "0x5975bbd5c16b2e2eba5b13ca0a46c622571415beb62f8be3a845617f8abb6f02",
+          "result": "MAJORITY_DISAGREE",
+          "rounds": 4,
+          "rotations": 3,
+          "stored": false,
+          "rounds_detail": [
+            "r0 leader returned, validators disagreed",
+            "r1-r3 leader LLM_ERROR:BAD_EVIDENCE_REF"
+          ],
+          "wallClockSeconds": 99
+        },
+        {
+          "fixture": "A proposal 5",
+          "attempt": 2,
+          "tx": "0x76c0eb135952e6e99ec943a172bf685995fe3698ce285afb6ac44eea6c89a34a",
+          "result": "MAJORITY_AGREE",
+          "rounds": 3,
+          "rotations": 2,
+          "stored": true,
+          "reviewId": 3,
+          "rounds_detail": [
+            "r0-r1 leader LLM_ERROR:BAD_EVIDENCE_REF",
+            "r2 leader returned; 3 agree 1 disagree"
+          ],
+          "wallClockSeconds": 74
+        },
+        {
+          "fixture": "B proposal 6",
+          "attempt": 1,
+          "tx": "0x63201f7a8b419d30df98ab5a9182efaaa24426de903484bdfb58f62f63409145",
+          "result": "MAJORITY_DISAGREE",
+          "rounds": 4,
+          "rotations": 3,
+          "stored": false,
+          "rounds_detail": [
+            "r0,r1,r3 leader returned, validators mostly disagreed",
+            "r2 leader LLM_ERROR:BAD_MISSING_FACT"
+          ],
+          "wallClockSeconds": 147
+        },
+        {
+          "fixture": "B proposal 6",
+          "attempt": 2,
+          "tx": "0x1402b09f1030a07ed500716ab34c250af322676fd02bf5fc6bfd0946cbeaba83",
+          "result": "MAJORITY_DISAGREE",
+          "rounds": 4,
+          "rotations": 3,
+          "stored": false,
+          "rounds_detail": [
+            "r0,r2,r3 leader returned, validators mostly disagreed",
+            "r1 leader LLM_ERROR:BAD_MISSING_FACT"
+          ],
+          "wallClockSeconds": 95
+        },
+        {
+          "fixture": "B proposal 6",
+          "attempt": 3,
+          "tx": "0x2171d9e00686b3ac10ca81e90b0f334adefbb59d7cca63afc69c2225480217bd",
+          "result": "MAJORITY_AGREE",
+          "rounds": 2,
+          "rotations": 1,
+          "stored": true,
+          "reviewId": 4,
+          "rounds_detail": [
+            "r0 leader returned, validators disagreed",
+            "r1 leader returned; 3 agree 2 disagree"
+          ],
+          "wallClockSeconds": 89
+        },
+        {
+          "fixture": "C proposal 7",
+          "attempt": 1,
+          "tx": "0x4758b108ad9e4c2f1de02c89260e0d1cdad38cb0fd12edcfa56912b6809226df",
+          "result": "MAJORITY_AGREE",
+          "rounds": 2,
+          "rotations": 1,
+          "stored": true,
+          "reviewId": 1,
+          "rounds_detail": [
+            "r0 leader LLM_ERROR:BAD_EVIDENCE_REF",
+            "r1 leader returned; 3 agree 2 disagree"
+          ],
+          "wallClockSeconds": 84
+        },
+        {
+          "fixture": "D proposal 8",
+          "attempt": 1,
+          "tx": "0xbea0a77f647deb6e841649305a945a9b698ef88164f2d529cd3d4aa6bdc796a4",
+          "result": "MAJORITY_AGREE",
+          "rounds": 1,
+          "rotations": 0,
+          "stored": true,
+          "reviewId": 2,
+          "rounds_detail": [
+            "r0 leader returned; 3 agree"
+          ],
+          "wallClockSeconds": 69
+        }
+      ],
+      "otherLiveTests": {
+        "strangerReview": {
+          "tx": "0xf8627195869f41a4a9a96400a72dad6b41d5f7fa06abaa1c6a8cd0a62e736480",
+          "signer": "offset-bob",
+          "result": "rollback EXPECTED:NOT_PROPOSER",
+          "reviewCountUnchanged": true,
+          "proposalUnchanged": true,
+          "cliAccountRestoredTo": "my-studionet-wallet"
+        },
+        "evidenceAfterReview": {
+          "tx": "0x4146c5ccbc12d359df2d00609742d4c07ddfb2105809ed437fd2455f04eee7d4",
+          "note": "evidence #5 added to proposal 5 after review 3; review 3, its findings, snapshot ids and proposal 5 were byte-identical before and after"
+        },
+        "duplicateReview": {
+          "tx": "0x383095ffdac3420c5d720892f451f7fbf5f27ba42fdfa95c01a125820dd144be",
+          "result": "rollback EXPECTED:REVIEW_ALREADY_EXISTS",
+          "reviewCountStill": 4,
+          "stateIdentical": true
+        }
       }
     }
   }

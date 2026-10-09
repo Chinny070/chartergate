@@ -61,7 +61,7 @@ function FindingRow({ finding, sections }: { finding: ReviewFinding; sections: r
       )}
       {finding.finding === "UNCLEAR" && (
         <p>
-          <span className="label">Verified evidence is missing for </span>
+          <span className="label">Undetermined for lack of verified evidence: </span>
           <span className="hash">{finding.missing_fact}</span>
         </p>
       )}
@@ -220,6 +220,9 @@ export function ConstitutionalReviewPanel({ proposal, onVerdict }: { proposal: P
   const charter = sections.data ?? [];
   const active = charter.filter((s) => s.active).length;
   const summary = summarizeEvidence(evidence.data ?? []);
+  // A failed or unfinished read must never be shown as a fact ("0 active sections", "cannot be reviewed").
+  const readsError = sections.error ?? evidence.error ?? reviewId.error;
+  const readsReady = sections.data !== null && evidence.data !== null && id !== null;
   const gate = reviewRequestGate({
     connection: wallet.connection,
     isProposer: sameAddress(wallet.address, proposal.proposer),
@@ -248,18 +251,23 @@ export function ConstitutionalReviewPanel({ proposal, onVerdict }: { proposal: P
               <div className="label">Charter in force</div>
               <div>v{proposal.charter_version_at_submission}</div>
               <div className="muted">
-                {sections.loading && charter.length === 0 ? "Reading the charter…" : `${active} active section${active === 1 ? "" : "s"} will each receive a finding.`}
+                {sections.data === null
+                  ? sections.error
+                    ? "The charter could not be read."
+                    : "Reading the charter…"
+                  : `${active} active section${active === 1 ? "" : "s"} will each receive a finding.`}
               </div>
             </div>
             <div>
               <div className="label">Evidence available</div>
-              <div>{evidence.data === null ? "Reading evidence…" : describeEvidence(summary)}</div>
+              <div>{evidence.data === null ? (evidence.error ? "The evidence could not be read." : "Reading evidence…") : describeEvidence(summary)}</div>
               <div className="muted">
                 Only VERIFIED records can support a finding. Evidence added after the review is requested is not part of it.
               </div>
             </div>
-            {!gate.allowed && gate.reason && <p className="label">{gate.reason}</p>}
-            {gate.allowed && (
+            {readsError && !readsReady && <p className="label">Some of this page could not be read, so the review action is hidden. Reload to try again.</p>}
+            {readsReady && !gate.allowed && gate.reason && <p className="label">{gate.reason}</p>}
+            {readsReady && gate.allowed && (
               <Button variant="primary" disabled={busy} onClick={() => void request()}>
                 REQUEST REVIEW
               </Button>

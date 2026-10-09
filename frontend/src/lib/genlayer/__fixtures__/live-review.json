@@ -1,0 +1,215 @@
+{
+ "contract": "0x49990Cb776469F1363e1F06bD2870e0a5eCB374b",
+ "note": "Real StudioNet data read from the Stage 3 verification deployment (4 live constitutional reviews).",
+ "charterV4": [
+  {
+   "active": true,
+   "body": "Funding proposals must primarily support open-source developer infrastructure. A proposal whose funded product is closed-source or proprietary does not satisfy this requirement. Changing a closed-source product into an open-source one would change the proposal's fundamental purpose.",
+   "changed_at": "2026-10-09T18:17:09.342384Z",
+   "charter_version": 2,
+   "section_id": "s1",
+   "title": "Mission"
+  },
+  {
+   "active": true,
+   "body": "Funding recipients must disclose their material team token allocation. The disclosed allocation must be supported by VERIFIED evidence attached to the proposal.",
+   "changed_at": "2026-10-09T18:17:56.370746Z",
+   "charter_version": 3,
+   "section_id": "s2",
+   "title": "Transparency"
+  },
+  {
+   "active": true,
+   "body": "Every funding proposal must contain a specific budget breakdown listing an amount for each cost category. A missing budget breakdown is a curable proposal deficiency.",
+   "changed_at": "2026-10-09T18:22:37.204569Z",
+   "charter_version": 4,
+   "section_id": "s3",
+   "title": "Budget"
+  }
+ ],
+ "reviews": [
+  {
+   "review": {
+    "charter_version": 4,
+    "created_at": "2026-10-09T18:38:26.809030Z",
+    "evidence_count_at_review": 1,
+    "evidence_set_hash": "0xa275a034884fdd73163c662c9224cf3d53fcae55f87b13abd03520c9e5863c39",
+    "finding_count": 3,
+    "primary_section_id": "s3",
+    "proposal_id": 7,
+    "requested_by": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+    "review_context_hash": "0x0826e38527906271467402ff6a73defaa01a3b2862cc76d7ed3f9956086944e8",
+    "review_hash": "0x4dacb1f82d3874a3dfc765ff26b47f4678f20ab8a1423da4d9bb55fad4d93e25",
+    "review_id": 1,
+    "verdict": "REPAIRABLE"
+   },
+   "findings": [
+    {
+     "evidence_ids": [],
+     "finding": "SATISFIED",
+     "missing_fact": "",
+     "rationale": "The proposal states the product is open-source and supports developer infrastructure.",
+     "repairable": false,
+     "section_id": "s1"
+    },
+    {
+     "evidence_ids": [
+      3
+     ],
+     "finding": "SATISFIED",
+     "missing_fact": "",
+     "rationale": "The team token allocation is disclosed and supported by VERIFIED evidence.",
+     "repairable": false,
+     "section_id": "s2"
+    },
+    {
+     "evidence_ids": [],
+     "finding": "VIOLATED",
+     "missing_fact": "",
+     "rationale": "The proposal gives only a total funding amount and lacks a specific budget breakdown by cost category.",
+     "repairable": true,
+     "section_id": "s3"
+    }
+   ],
+   "snapshot": [
+    3
+   ]
+  },
+  {
+   "review": {
+    "charter_version": 4,
+    "created_at": "2026-10-09T18:39:57.472311Z",
+    "evidence_count_at_review": 1,
+    "evidence_set_hash": "0xe8481aa252e59703f9e0c5a848c9daa1c08000837938db7fad8917cee456c153",
+    "finding_count": 3,
+    "primary_section_id": "s2",
+    "proposal_id": 8,
+    "requested_by": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+    "review_context_hash": "0x80ed75d77993f1e57d8eb8e80a7fe30351fb4ceeb9811312f0314365cc674a09",
+    "review_hash": "0x30f70349ba03eab7f54d4b82747a5f04a99d3944aad0fd454f301948f7e5e8bd",
+    "review_id": 2,
+    "verdict": "INSUFFICIENT_EVIDENCE"
+   },
+   "findings": [
+    {
+     "evidence_ids": [],
+     "finding": "SATISFIED",
+     "missing_fact": "",
+     "rationale": "The proposal states the product is an open-source MIT licensed RPC gateway for developers.",
+     "repairable": false,
+     "section_id": "s1"
+    },
+    {
+     "evidence_ids": [],
+     "finding": "UNCLEAR",
+     "missing_fact": "VERIFIED evidence of the team token allocation",
+     "rationale": "The team token allocation is mentioned in the proposal, but the supporting evidence is NOT VERIFIED.",
+     "repairable": false,
+     "section_id": "s2"
+    },
+    {
+     "evidence_ids": [],
+     "finding": "SATISFIED",
+     "missing_fact": "",
+     "rationale": "The proposal includes a specific budget breakdown for engineering, infrastructure, and documentation.",
+     "repairable": false,
+     "section_id": "s3"
+    }
+   ],
+   "snapshot": [
+    4
+   ]
+  },
+  {
+   "review": {
+    "charter_version": 4,
+    "created_at": "2026-10-09T18:42:36.095805Z",
+    "evidence_count_at_review": 2,
+    "evidence_set_hash": "0x703238f608f51044cce67b4b90d451c477d59de99366fc218851a90ea94f5907",
+    "finding_count": 3,
+    "primary_section_id": "",
+    "proposal_id": 5,
+    "requested_by": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+    "review_context_hash": "0x9c6812fbff326fabb83d023ca9608e228eb645a3b92c60c6ae0d8f8040ded215",
+    "review_hash": "0x353c0783db9eff3238ffa5e45d36e81a42e596e0ef8ef1a88c20f36fc4996952",
+    "review_id": 3,
+    "verdict": "ELIGIBLE"
+   },
+   "findings": [
+    {
+     "evidence_ids": [],
+     "finding": "SATISFIED",
+     "missing_fact": "",
+     "rationale": "The proposal states the product is open-source (MIT licensed) and all source code is published publicly.",
+     "repairable": false,
+     "section_id": "s1"
+    },
+    {
+     "evidence_ids": [
+      1
+     ],
+     "finding": "SATISFIED",
+     "missing_fact": "",
+     "rationale": "The team token allocation (18%) is disclosed and supported by VERIFIED evidence.",
+     "repairable": false,
+     "section_id": "s2"
+    },
+    {
+     "evidence_ids": [],
+     "finding": "SATISFIED",
+     "missing_fact": "",
+     "rationale": "The proposal includes a specific budget breakdown listing amounts for each cost category.",
+     "repairable": false,
+     "section_id": "s3"
+    }
+   ],
+   "snapshot": [
+    1,
+    2
+   ]
+  },
+  {
+   "review": {
+    "charter_version": 4,
+    "created_at": "2026-10-09T18:45:37.538847Z",
+    "evidence_count_at_review": 0,
+    "evidence_set_hash": "0xd9fb496cfba55f0a15833e40a0447c0b93e4e02df27a57cc92e40f80875c02e6",
+    "finding_count": 3,
+    "primary_section_id": "s1",
+    "proposal_id": 6,
+    "requested_by": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+    "review_context_hash": "0x890afa6c12366c8689fec5755378b607ad48c45e25dbbc6e320f0dd13e9f284c",
+    "review_hash": "0x6cd1f12eab536d1b34c11b4b8c92383fd6bca72f232cfd80394800b1f458da5b",
+    "review_id": 4,
+    "verdict": "INELIGIBLE"
+   },
+   "findings": [
+    {
+     "evidence_ids": [],
+     "finding": "VIOLATED",
+     "missing_fact": "",
+     "rationale": "The proposal funds a closed-source proprietary custody dashboard rather than open-source developer infrastructure.",
+     "repairable": false,
+     "section_id": "s1"
+    },
+    {
+     "evidence_ids": [],
+     "finding": "UNCLEAR",
+     "missing_fact": "VERIFIED evidence supporting the disclosed 10 percent team token allocation.",
+     "rationale": "The proposal discloses a team token allocation, but no VERIFIED evidence supports it.",
+     "repairable": false,
+     "section_id": "s2"
+    },
+    {
+     "evidence_ids": [],
+     "finding": "SATISFIED",
+     "missing_fact": "",
+     "rationale": "The proposal includes a specific budget breakdown with amounts for each listed cost category.",
+     "repairable": false,
+     "section_id": "s3"
+    }
+   ],
+   "snapshot": []
+  }
+ ]
+}

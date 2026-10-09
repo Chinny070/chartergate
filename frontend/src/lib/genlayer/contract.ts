@@ -25,18 +25,36 @@ function requireAddress() {
   return CHARTERGATE_ADDRESS;
 }
 
-/** Read call. LATEST_FINAL = only finalized state; use LATEST_NON_FINAL knowingly. */
+/**
+ * Network-level read failures that are worth retrying: a browser "Failed to fetch" (what a rate-limited or dropped RPC
+ * request looks like), a rate-limit reply or a timeout. A contract rejection (for example `execution failed`) is NOT
+ * transient and is never retried.
+ */
+export const isTransientReadError = (e: unknown): boolean =>
+  /failed to fetch|fetch failed|rate limit|(^|\D)429(\D|$)|timed? ?out|econnreset|network/i.test(e instanceof Error ? e.message : String(e));
+
+export const READ_RETRY_DELAYS_MS = [2000, 4000, 8000];
+
+/** Read call. LATEST_FINAL = only finalized state; use LATEST_NON_FINAL knowingly. Retries transient network errors only. */
 export async function readView(
   functionName: string,
   args: CalldataEncodable[] = [],
   client: ChainClient = readClient,
+  retryDelaysMs: readonly number[] = READ_RETRY_DELAYS_MS,
 ): Promise<CalldataEncodable> {
-  return client.readContract({
-    address: requireAddress(),
-    functionName,
-    args,
-    transactionHashVariant: TransactionHashVariant.LATEST_FINAL,
-  });
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await client.readContract({
+        address: requireAddress(),
+        functionName,
+        args,
+        transactionHashVariant: TransactionHashVariant.LATEST_FINAL,
+      });
+    } catch (e) {
+      if (attempt >= retryDelaysMs.length || !isTransientReadError(e)) throw e;
+      await new Promise((resolve) => setTimeout(resolve, retryDelaysMs[attempt]));
+    }
+  }
 }
 
 /**
