@@ -387,3 +387,15 @@ def test_oversized_context_fails_cleanly_instead_of_dropping_a_rule(charter, dir
     with direct_vm.expect_revert("EXPECTED:REVIEW_CONTEXT_TOO_LARGE"):
         request(charter)
     assert charter.get_review_count() == 0
+
+
+def test_more_than_five_evidence_ids_on_one_finding_is_rejected_even_when_all_exist(reviewable, direct_vm):
+    for i in range(2):
+        add_evidence(reviewable, direct_vm, fact=f"extra_fact_{i}")  # evidence #5 and #6, both VERIFIED
+    assert reviewable.get_proposal_evidence_count(1) == 6
+    mock_review(direct_vm, [fnd("1"), fnd("2", "UNCLEAR", ev=[1, 2, 3, 4, 5, 6])])
+    with direct_vm.expect_revert("LLM_ERROR:BAD_EVIDENCE_REF"):
+        request(reviewable)
+    direct_vm.clear_mocks()
+    mock_review(direct_vm, [fnd("1"), fnd("2", "UNCLEAR", ev=[1, 2, 3, 4, 5])])
+    request(reviewable)  # exactly five is allowed
