@@ -129,3 +129,32 @@ def test_context_hash_commits_to_the_proposal_text_and_evidence_set(reviewable, 
     assert b["evidence_set_hash"] == expected_set_hash(reviewable, 2)
     assert b["evidence_count_at_review"] == 0
     assert b["review_context_hash"] == expected_context_hash(reviewable, 2)
+
+
+def test_changing_satisfied_to_not_applicable_changes_the_review_hash(charter, direct_vm, direct_alice):
+    """SATISFIED (applies and is met) and NOT_APPLICABLE (does not govern this proposal) are different constitutional
+    interpretations, so the finding class is part of the review hash.
+
+    Two identical proposals are reviewed with different classes for section 1. Each stored hash equals the documented
+    canonical string for ITS findings, and re-hashing review 1 with section 1 changed to NOT_APPLICABLE (same context,
+    same verdict) gives a different value."""
+    from conftest import MISSION, TRANSPARENCY
+
+    charter.add_charter_section(*MISSION)
+    charter.add_charter_section(*TRANSPARENCY)
+    direct_vm.sender = direct_alice
+    charter.submit_proposal(*PROPOSAL)
+    charter.submit_proposal(*PROPOSAL)
+    mock_review(direct_vm, [fnd("1", "SATISFIED"), fnd("2")])
+    request(charter, 1)
+    direct_vm.clear_mocks()
+    mock_review(direct_vm, [fnd("1", "NOT_APPLICABLE"), fnd("2")])
+    request(charter, 2)
+    sat, na = review_of(charter, 1), review_of(charter, 2)
+    assert sat["verdict"] == na["verdict"] == "ELIGIBLE"
+    assert findings_of(charter, 1)[0]["finding"] == "SATISFIED" and findings_of(charter, 2)[0]["finding"] == "NOT_APPLICABLE"
+    assert sat["review_hash"] == expected_review_hash(sat["review_context_hash"], "ELIGIBLE", findings_of(charter, 1))
+    assert na["review_hash"] == expected_review_hash(na["review_context_hash"], "ELIGIBLE", findings_of(charter, 2))
+    swapped = copy_with(findings_of(charter, 1), 0, finding="NOT_APPLICABLE")
+    assert expected_review_hash(sat["review_context_hash"], "ELIGIBLE", swapped) != sat["review_hash"]
+    assert sat["review_hash"] != na["review_hash"]

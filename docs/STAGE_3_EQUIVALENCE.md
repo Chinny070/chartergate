@@ -48,27 +48,50 @@ After the checks above, the validator runs its own LLM analysis (the same prompt
 the same way, and requires:
 
 1. the same overall verdict
-2. for every section, the same **adverse class**: `VIOLATED`, `UNCLEAR`, or non-adverse (`SATISFIED` and `NOT_APPLICABLE` are
-   interchangeable)
+2. for every section, **exactly the same finding class**: `SATISFIED`, `VIOLATED`, `UNCLEAR` or `NOT_APPLICABLE`. The four classes
+   have distinct constitutional meanings and are never treated as equivalent (Stage 3.1 removed the earlier rule that let
+   `SATISFIED` and `NOT_APPLICABLE` stand in for each other):
+   * `SATISFIED`: this section applies and its requirement is met
+   * `NOT_APPLICABLE`: this section does not govern this proposal
+   * `VIOLATED`: this section applies and the proposal materially conflicts with it
+   * `UNCLEAR`: this section applies but a fact needed to decide is not verified
 3. for every `VIOLATED` section, the same `repairable` value
-4. for every `VIOLATED` section where the leader cited evidence, the validator's finding for that section must cite at least
-   one of the same evidence ids (a violation the leader grounds in evidence #4 is not accepted by a validator that does not rely
-   on #4)
+4. every evidence id the leader stored in a finding must **materially support that finding**, by this validator's own reading
+   of the immutable evidence records (section 4a). Findings that cite no evidence need no such check.
 
 If the validator's own analysis fails for any reason (`LLM_ERROR`, unusable JSON, unusable references), it **rejects**. A failed
 leader is always rejected, which forces rotation.
 
+### 4a. Evidence-reference check (Stage 3.1)
+
+A stored reference must be defensible for *that finding*, not merely exist, be `VERIFIED`, and sit in the snapshot. For each leader
+finding that cites evidence, the validator makes one extra LLM call, "EVIDENCE REFERENCE CHECK", built only from the immutable
+`EvidenceRecord`s, the one charter section, the proposal text and the finding. It returns `{"supporting_ids": [...]}` and the
+validator requires **every** cited id to be in that list:
+
+* `SATISFIED` / `VIOLATED`: a record supports the finding only if it is `VERIFIED` and its fact and value materially bear on whether
+  that section is satisfied or violated by this proposal. A `VERIFIED` record about an unrelated fact does not.
+* `UNCLEAR`: a record qualifies only if it is an attempt to establish the missing fact the finding names.
+* An unusable answer rejects.
+
+This is not a second Stage 2: nothing is fetched and no record is re-verified. The check reasons over what the vault already holds.
+Findings grounded in the proposal text alone, and `NOT_APPLICABLE`, cite nothing and trigger no check. The structural rule in
+section 3 still refuses non-`VERIFIED` evidence as support for `SATISFIED` / `VIOLATED` regardless of what the check says.
+
 ## 5. What is deliberately not compared
 
 `rationale` wording, `missing_fact` wording, punctuation, the order the LLM listed findings (findings are normalised to charter
-order and evidence ids to ascending order), whether a benign section is `SATISFIED` or `NOT_APPLICABLE`, extra evidence a
-validator cites beyond the leader's, and any "verdict" the LLM volunteers (it is ignored; the verdict is derived).
+order and evidence ids to ascending order), extra evidence a validator cites in its own analysis beyond the leader's (only the
+leader's stored references are checked), and any "verdict" the LLM volunteers (it is ignored; the verdict is derived).
 
 ## 6. The two cases from the brief
 
 * leader `ELIGIBLE`, validator finds section 2 violated: **rejected** (adverse class differs).
 * leader "The disclosure requirement is satisfied.", validator "Verified evidence demonstrates the required disclosure.",
   same section judgments, same evidence, same verdict: **accepted**.
+* leader `SATISFIED`, validator `NOT_APPLICABLE` (or the reverse; or `UNCLEAR` / `VIOLATED` against `NOT_APPLICABLE`): **rejected**.
+  `SATISFIED` with different prose on each side, or `NOT_APPLICABLE` on both: **accepted**.
+* leader cites a `VERIFIED` record about an unrelated fact for `SATISFIED` or `VIOLATED`: **rejected** (section 4a).
 
 ## 7. Why the verdict is derived and the INSUFFICIENT_EVIDENCE rule
 
@@ -81,7 +104,9 @@ rejected by a validator whose own analysis says `SATISFIED` for that section (ad
 A review that fails (malformed output, validators disagree until the transaction fails) writes nothing: no review id is consumed,
 the proposal status is unchanged, and the charter and evidence are untouched. Real StudioNet already needed leader rotation on
 2 of 8 Stage 2 LLM submissions (operational observation, cause unconfirmed); a longer, multi-section Stage 3 prompt may rotate
-more. That is a liveness cost, not a safety weakening, and the rules above were not relaxed for it.
+more. Requiring exact finding classes and a per-finding reference check makes agreement stricter, so rotation may become more
+likely, and each validator makes one extra LLM call per finding that cites evidence (at most one per section, so at most 12).
+That is a liveness and cost trade-off, not a safety weakening, and the rules above were not relaxed for it.
 
 ## 9. What is NOT proven locally
 

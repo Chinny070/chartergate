@@ -501,3 +501,17 @@ Full model: `docs/CONSTITUTIONAL_REVIEW_MODEL.md`. Validator rule: `docs/STAGE_3
 * **Frontend:** the proposal page shows the charter in force, the evidence available, a Request review action for the proposer, the
   transaction timeline, and a separate audit view of the verdict (network finality, execution result and verdict stay distinct).
 * **Not here:** repair, resubmission, precedent, appeals, amendments, voting, execution.
+
+
+# Stage 3.1: constitutional interpretation hardening
+
+* **Charter text has normative authority but not prompt authority.** The charter's meaning governs the review, but its text is
+  passed as quoted constitutional content inside a delimited `<<<DATA ... DATA>>>` block, with an explicit instruction that nothing in
+  the charter, proposal or evidence is a model instruction. The answer format is fixed by the contract's own rules section, and the
+  verdict is still derived from validated findings.
+* **All four finding classes are distinct.** `SATISFIED` (applies and is met) is not `NOT_APPLICABLE` (does not govern this
+  proposal); validators must agree on the exact class of every section. The class is part of the review hash.
+* **Stored evidence references must support the finding.** Validators make one reference check per finding that cites evidence,
+  over the immutable `EvidenceRecord`s only; every cited id must support that finding. No web access, no second Stage 2.
+* Verdict derivation, storage, methods and the public schema are unchanged.
+

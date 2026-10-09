@@ -63,6 +63,17 @@ def mock_review(vm, findings, *, extra=None, raw=None, must=(), must_not=()):
     vm.mock_llm(pattern + r"[\s\S]*" + DOC, payload if isinstance(payload, str) else json.dumps(payload))
 
 
+def mock_refs(vm, supporting=(), *, per_section=None):
+    """What the (mocked) LLM answers to the EVIDENCE REFERENCE CHECK for each finding that cites evidence.
+    `per_section` maps a section id to the ids the check should call supporting; every other section gets `supporting`."""
+    for section_id, ids in (per_section or {}).items():
+        vm.mock_llm(
+            r"EVIDENCE REFERENCE CHECK[\s\S]*=== UNTRUSTED FINDING UNDER CHECK ===\n<<<DATA\nsection_id: " + re.escape(section_id) + r"\n",
+            json.dumps({"supporting_ids": list(ids)}),
+        )
+    vm.mock_llm(r"EVIDENCE REFERENCE CHECK", json.dumps({"supporting_ids": list(supporting)}))
+
+
 def request(c, proposal_id=1):
     return c.request_constitutional_review(proposal_id)
 
