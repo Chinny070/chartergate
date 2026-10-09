@@ -166,6 +166,17 @@
       "readonly": true,
       "ret": "int"
     },
+    "get_constitutional_review": {
+      "params": [
+        [
+          "review_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
     "get_dao_metadata": {
       "params": [],
       "kwparams": {},
@@ -300,6 +311,92 @@
           "$rep": "dict"
         }
       ]
+    },
+    "get_review_count": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_review_evidence_ids_page": {
+      "params": [
+        [
+          "review_id",
+          "int"
+        ],
+        [
+          "offset",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "int"
+        }
+      ]
+    },
+    "get_review_findings_page": {
+      "params": [
+        [
+          "review_id",
+          "int"
+        ],
+        [
+          "offset",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "dict"
+        }
+      ]
+    },
+    "get_review_for_proposal": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_review_id_for_proposal": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "request_constitutional_review": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
     },
     "submit_evidence": {
       "params": [

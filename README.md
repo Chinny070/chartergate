@@ -7,12 +7,14 @@ evidence and prior rulings, by an Intelligent Contract whose result is settled b
 AI-validator consensus. The goal is for every decision to be inspectable: the clause applied,
 the evidence used, the timestamp, the validator outcome.
 
-> **Status: Stage 2 (evidence vault), local only.** The contract stores a DAO charter with immutable
-> history, accepts proposals, and lets a proposer attach **public web evidence** that GenLayer fetches
-> itself (`web.get` or a JavaScript `web.render`), verifies through validator consensus, timestamps
-> with protocol time and records with a normalised-evidence hash. **Nothing judges, reviews or approves
-> proposals yet**: no eligibility verdicts, precedent, appeals or voting. The Stage 2 contract is not
-> deployed; the Stage 1.2 verification deployment is recorded in `deployments/studionet.json`.
+> **Status: Stage 3 (constitutional adjudication), local only.** The contract stores a DAO charter with immutable
+> history, accepts proposals, lets a proposer attach **public web evidence** that GenLayer verifies through validator
+> consensus, and lets the proposer request a **constitutional review**: GenLayer judges the proposal against the
+> charter that was in force when it was submitted and the VERIFIED evidence that existed at review time, and records
+> an immutable verdict (`ELIGIBLE`, `INELIGIBLE`, `REPAIRABLE` or `INSUFFICIENT_EVIDENCE`) with per-section findings.
+> **Nothing repairs, appeals, votes on or executes proposals yet.** The Stage 3 contract is not deployed; the Stage 2
+> verification deployment is recorded in `deployments/studionet.json` (`canonicalDeployment` is still `null`).
+> See `docs/CONSTITUTIONAL_REVIEW_MODEL.md` and `docs/STAGE_3_EQUIVALENCE.md`.
 
 ## Architecture
 

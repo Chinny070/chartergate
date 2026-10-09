@@ -84,6 +84,36 @@ export interface EvidenceRecord {
   related_revision_version: number;
 }
 
+/** The four constitutional verdicts. Derived by the contract from the findings; never supplied by the model. */
+export type ReviewVerdict = "ELIGIBLE" | "INELIGIBLE" | "REPAIRABLE" | "INSUFFICIENT_EVIDENCE";
+export type FindingKind = "SATISFIED" | "VIOLATED" | "UNCLEAR" | "NOT_APPLICABLE";
+
+/** One immutable constitutional review, exactly as stored. `verdict` is NOT the transaction outcome. */
+export interface ConstitutionalReview {
+  review_id: number;
+  proposal_id: number;
+  requested_by: string;
+  charter_version: number;
+  evidence_count_at_review: number;
+  evidence_set_hash: string;
+  review_context_hash: string;
+  verdict: ReviewVerdict;
+  finding_count: number;
+  primary_section_id: string;
+  created_at: string;
+  review_hash: string;
+}
+
+/** The finding for one charter section (one per active section at the proposal's charter version). */
+export interface ReviewFinding {
+  section_id: string;
+  finding: FindingKind;
+  repairable: boolean;
+  evidence_ids: number[];
+  missing_fact: string;
+  rationale: string;
+}
+
 /**
  * Every contract method this wrapper can call, with its argument count. `charterGate.schema.test.ts`
  * compares this table to `docs/charter_gate.schema.json`, so a rename or signature change in the
@@ -108,6 +138,13 @@ export const CONTRACT_METHODS = {
   get_proposal_evidence_ids_page: { args: 3, write: false },
   get_proposal_evidence_page: { args: 3, write: false },
   submit_evidence: { args: 6, write: true },
+  request_constitutional_review: { args: 1, write: true },
+  get_constitutional_review: { args: 1, write: false },
+  get_review_for_proposal: { args: 1, write: false },
+  get_review_id_for_proposal: { args: 1, write: false },
+  get_review_count: { args: 0, write: false },
+  get_review_findings_page: { args: 3, write: false },
+  get_review_evidence_ids_page: { args: 3, write: false },
 } as const;
 
 type ViewName = { [K in keyof typeof CONTRACT_METHODS]: (typeof CONTRACT_METHODS)[K]["write"] extends false ? K : never }[keyof typeof CONTRACT_METHODS];
@@ -125,6 +162,7 @@ export const LIMITS = {
   claim: 500,
   factKey: 64,
   evidencePerProposal: 25,
+  reviewSections: 12,
   pageSize: 50,
 } as const;
 
@@ -133,6 +171,8 @@ export const SECTION_ID_PATTERN = /^[A-Za-z0-9._-]+$/;
 export const SOURCE_KINDS: readonly SourceKind[] = ["STATIC_WEB", "DYNAMIC_WEB", "API"];
 export const EVIDENCE_STATUSES: readonly EvidenceStatus[] = ["VERIFIED", "UNVERIFIABLE", "SOURCE_UNAVAILABLE", "INVALID_SOURCE"];
 export const RETRIEVAL_METHODS: readonly RetrievalMethod[] = ["GET", "RENDER_TEXT"];
+export const REVIEW_VERDICTS: readonly ReviewVerdict[] = ["ELIGIBLE", "INELIGIBLE", "REPAIRABLE", "INSUFFICIENT_EVIDENCE"];
+export const FINDING_KINDS: readonly FindingKind[] = ["SATISFIED", "VIOLATED", "UNCLEAR", "NOT_APPLICABLE"];
 
 // ---- decoding ---------------------------------------------------------------------------
 
@@ -249,6 +289,40 @@ export function decodeEvidence(raw: unknown): EvidenceRecord {
   };
 }
 
+export function decodeReview(raw: unknown): ConstitutionalReview {
+  const r = asRecord(raw);
+  return {
+    review_id: int(r, "review_id"),
+    proposal_id: int(r, "proposal_id"),
+    requested_by: str(r, "requested_by"),
+    charter_version: int(r, "charter_version"),
+    evidence_count_at_review: int(r, "evidence_count_at_review"),
+    evidence_set_hash: str(r, "evidence_set_hash"),
+    review_context_hash: str(r, "review_context_hash"),
+    verdict: oneOf(r, "verdict", REVIEW_VERDICTS),
+    finding_count: int(r, "finding_count"),
+    primary_section_id: str(r, "primary_section_id"),
+    created_at: str(r, "created_at"),
+    review_hash: str(r, "review_hash"),
+  };
+}
+
+export function decodeFinding(raw: unknown): ReviewFinding {
+  const r = asRecord(raw);
+  const ids = r.evidence_ids;
+  if (!Array.isArray(ids) || ids.some((i) => typeof i !== "number" && typeof i !== "bigint")) {
+    throw new Error('Contract field "evidence_ids" is not a list of integers');
+  }
+  return {
+    section_id: str(r, "section_id"),
+    finding: oneOf(r, "finding", FINDING_KINDS),
+    repairable: bool(r, "repairable"),
+    evidence_ids: ids.map((i) => Number(i)),
+    missing_fact: str(r, "missing_fact"),
+    rationale: str(r, "rationale"),
+  };
+}
+
 function asList(raw: unknown): unknown[] {
   if (!Array.isArray(raw)) throw new Error("Expected a list from the contract");
   return raw;
@@ -296,6 +370,25 @@ export const getEvidencePage = async (offset = 0, limit: number = LIMITS.pageSiz
 export const getProposalEvidencePage = async (proposalId: number, offset = 0, limit: number = LIMITS.pageSize) =>
   asList(await view("get_proposal_evidence_page", [proposalId, offset, limit])).map(decodeEvidence);
 
+/** 0 when the proposal has not been reviewed. */
+export const getReviewIdForProposal = async (proposalId: number) => {
+  const n = await view("get_review_id_for_proposal", [proposalId]);
+  if (typeof n !== "number" && typeof n !== "bigint") throw new Error("get_review_id_for_proposal did not return an integer");
+  return Number(n);
+};
+
+export const getConstitutionalReview = async (reviewId: number) =>
+  decodeReview(await view("get_constitutional_review", [reviewId]));
+
+export const getReviewFindingsPage = async (reviewId: number, offset = 0, limit: number = LIMITS.pageSize) =>
+  asList(await view("get_review_findings_page", [reviewId, offset, limit])).map(decodeFinding);
+
+export const getReviewEvidenceIdsPage = async (reviewId: number, offset = 0, limit: number = LIMITS.pageSize) =>
+  asList(await view("get_review_evidence_ids_page", [reviewId, offset, limit])).map((i) => {
+    if (typeof i !== "number" && typeof i !== "bigint") throw new Error("Expected an evidence id");
+    return Number(i);
+  });
+
 // ---- writes -----------------------------------------------------------------------------
 
 type OnState = (s: TxState) => void;
@@ -333,3 +426,11 @@ export const submitEvidence = (
   relatedSectionId: string,
   on: OnState,
 ) => write(c, "submit_evidence", [proposalId, sourceUrl, sourceKind, claim, factKey, relatedSectionId], on);
+
+/**
+ * Proposer only (enforced by the contract). Asks GenLayer to judge the proposal against the charter in force
+ * when it was submitted and the VERIFIED evidence that exists now. Takes only the proposal id: the charter
+ * version, evidence snapshot and verdict are all determined on-chain, never supplied from here.
+ */
+export const requestConstitutionalReview = (c: ChainClient, proposalId: number, on: OnState) =>
+  write(c, "request_constitutional_review", [proposalId], on);

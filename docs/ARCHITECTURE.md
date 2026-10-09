@@ -481,3 +481,23 @@ vector, and check the keccak primitive against known Ethereum test vectors. A te
   also answers "does the leader's quote state the fact?".
 - Residual risk is documented, not hidden: the binding check is an LLM judgment (a single model error is not enough to verify, but a coordinated one
   could be), and the fact key and claim are both the submitter's words.
+
+
+# Stage 3: constitutional adjudication
+
+Full model: `docs/CONSTITUTIONAL_REVIEW_MODEL.md`. Validator rule: `docs/STAGE_3_EQUIVALENCE.md`.
+
+* **New immutable record:** `ConstitutionalReview`, with per-section `ReviewFinding`s, created only by `request_constitutional_review`
+  (proposer only, one per proposal).
+* **Historical charter:** the review always applies the charter version recorded on the proposal, rebuilt from the Stage 1.1 history.
+* **Evidence snapshot:** the first `evidence_count_at_review` ids of the proposal's append-only evidence list, committed by
+  `evidence_set_hash`; only `VERIFIED` records may support a finding. The web is never re-fetched.
+* **LLM:** one structured-JSON analysis (a finding per active section). The overall verdict is derived deterministically
+  (INELIGIBLE > REPAIRABLE > INSUFFICIENT_EVIDENCE > ELIGIBLE), never taken from the model.
+* **Consensus:** validators rebuild the context from their own state and compare identity exactly and material findings semantically
+  (never prose).
+* **Hashes:** `evidence_set_hash`, `review_context_hash`, `review_hash` (prose excluded).
+* **Proposal status:** the only change to a proposal after submission is `SUBMITTED` to the verdict, on a finalized review.
+* **Frontend:** the proposal page shows the charter in force, the evidence available, a Request review action for the proposer, the
+  transaction timeline, and a separate audit view of the verdict (network finality, execution result and verdict stay distinct).
+* **Not here:** repair, resubmission, precedent, appeals, amendments, voting, execution.

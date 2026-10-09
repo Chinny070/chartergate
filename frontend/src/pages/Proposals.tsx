@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { Badge, Button, Docket, EmptyState, ErrorBanner } from "../components/primitives";
 import { ChainTime, Field, ReadBoundary } from "../components/common";
 import { EvidenceList, SubmitEvidenceForm } from "../components/Evidence";
+import { ConstitutionalReviewPanel } from "../components/Review";
+import { statusLabel, statusTone } from "../lib/review";
 import { shortAddress } from "../lib/format";
 import { TransactionTimeline } from "../components/TransactionTimeline";
 import {
@@ -19,7 +21,7 @@ import { useRead, useTx } from "../lib/genlayer/hooks";
 import { useWallet } from "../lib/genlayer/wallet-context";
 
 /** Stage 1 proposals only reach SUBMITTED; this label is deliberately not a verdict. */
-const StatusBadge = ({ status }: { status: string }) => <Badge tone="active">{status}</Badge>;
+const StatusBadge = ({ status }: { status: string }) => <Badge tone={statusTone(status)}>{statusLabel(status)}</Badge>;
 
 export function ProposalsPage() {
   const read = useRead(() => getProposalsPage(0, LIMITS.pageSize));
@@ -50,7 +52,7 @@ export function ProposalsPage() {
           )
         }
       </ReadBoundary>
-      <p className="label">Open a case to submit evidence. Eligibility verdicts, precedent and appeals are not implemented yet (later stages).</p>
+      <p className="label">Open a case to submit evidence and request a constitutional review. Repair, precedent, appeals and voting are not implemented yet (later stages).</p>
     </div>
   );
 }
@@ -59,6 +61,8 @@ export function ProposalDetailPage() {
   const { id } = useParams();
   const num = Number(id);
   const valid = Number.isInteger(num) && num >= 1;
+  // Set by the review panel once a finalized review is read, so the status shown never lags the verdict.
+  const [verdict, setVerdict] = useState<string | null>(null);
   const read = useRead(() => (valid ? getProposal(num) : Promise.reject(new Error("Invalid proposal id"))), [num]);
 
   return (
@@ -78,14 +82,11 @@ export function ProposalDetailPage() {
                 </Docket>
                 <CharterAtSubmission version={p.charter_version_at_submission} />
                 <ProposalEvidence proposal={p} />
-                <Docket label="Constitutional review">
-                  Not implemented. Judgment, precedent and appeals arrive in later stages. Evidence can be attached above,
-                  but nothing yet decides whether this proposal complies with the charter.
-                </Docket>
+                <ConstitutionalReviewPanel proposal={p} onVerdict={setVerdict} />
               </div>
               <Docket label="Status">
                 <div className="stack">
-                  <StatusBadge status={p.status} />
+                  <StatusBadge status={verdict ?? p.status} />
                   <div>
                     <div className="label">Proposer</div>
                     <div className="hash">{p.proposer}</div>
