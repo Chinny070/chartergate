@@ -183,6 +183,17 @@
       "readonly": true,
       "ret": "dict"
     },
+    "get_effective_proposal": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
     "get_evidence": {
       "params": [
         [
@@ -293,6 +304,85 @@
         }
       ]
     },
+    "get_proposal_review_count": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_proposal_reviews_page": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ],
+        [
+          "offset",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "dict"
+        }
+      ]
+    },
+    "get_proposal_revision": {
+      "params": [
+        [
+          "revision_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_proposal_revision_count": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_proposal_revisions_page": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ],
+        [
+          "offset",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "dict"
+        }
+      ]
+    },
     "get_proposals_page": {
       "params": [
         [
@@ -301,6 +391,21 @@
         ],
         [
           "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "dict"
+        }
+      ]
+    },
+    "get_repair_targets": {
+      "params": [
+        [
+          "proposal_id",
           "int"
         ]
       ],
@@ -375,6 +480,17 @@
       "readonly": true,
       "ret": "dict"
     },
+    "get_review_for_revision": {
+      "params": [
+        [
+          "revision_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
     "get_review_id_for_proposal": {
       "params": [
         [
@@ -386,10 +502,33 @@
       "readonly": true,
       "ret": "int"
     },
+    "get_review_revision_id": {
+      "params": [
+        [
+          "review_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
     "request_constitutional_review": {
       "params": [
         [
           "proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "request_revision_review": {
+      "params": [
+        [
+          "revision_id",
           "int"
         ]
       ],
@@ -432,6 +571,30 @@
     },
     "submit_proposal": {
       "params": [
+        [
+          "title",
+          "string"
+        ],
+        [
+          "description",
+          "string"
+        ],
+        [
+          "requested_action",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "submit_repair_revision": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ],
         [
           "title",
           "string"

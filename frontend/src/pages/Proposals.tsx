@@ -4,6 +4,7 @@ import { Badge, Button, Docket, EmptyState, ErrorBanner } from "../components/pr
 import { ChainTime, Field, ReadBoundary } from "../components/common";
 import { EvidenceList, SubmitEvidenceForm } from "../components/Evidence";
 import { ConstitutionalReviewPanel } from "../components/Review";
+import { LineagePanel } from "../components/Repair";
 import { statusLabel, statusTone } from "../lib/review";
 import { shortAddress } from "../lib/format";
 import { TransactionTimeline } from "../components/TransactionTimeline";
@@ -83,6 +84,7 @@ export function ProposalDetailPage() {
                 <CharterAtSubmission version={p.charter_version_at_submission} />
                 <ProposalEvidence proposal={p} />
                 <ConstitutionalReviewPanel proposal={p} onVerdict={setVerdict} />
+                <LineagePanel proposal={p} onStatus={setVerdict} />
               </div>
               <Docket label="Status">
                 <div className="stack">

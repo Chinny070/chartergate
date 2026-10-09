@@ -46,10 +46,12 @@ export const FINDING_INFO: Record<FindingKind, { label: string; tone: Tone }> = 
 
 /** Proposal statuses: SUBMITTED until a finalized review sets one of the four verdicts. */
 export function statusTone(status: string): Tone {
+  if (status === "REVISED") return "precedent";
   return (VERDICT_INFO as Record<string, { tone: Tone }>)[status]?.tone ?? "active";
 }
 
 export function statusLabel(status: string): string {
+  if (status === "REVISED") return "REVISED · AWAITING REVIEW";
   return (VERDICT_INFO as Record<string, { label: string }>)[status]?.label ?? status;
 }
 

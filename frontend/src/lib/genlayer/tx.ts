@@ -225,6 +225,12 @@ export function readExecutionOutcome(tx: unknown): ExecutionOutcome {
 export function describeContractError(code: string): string {
   if (code === "") return "The contract rejected the transaction.";
   if (code === "EXPECTED:NOT_OWNER") return "Only the contract owner can do this.";
+  if (code === "EXPECTED:NOT_PROPOSER") return "Only the proposer can do this.";
+  if (code === "EXPECTED:REPAIR_NOT_ALLOWED") return "This proposal cannot be repaired now: only a REPAIRABLE proposal with no pending revision can.";
+  if (code === "EXPECTED:REVISION_LIMIT_REACHED") return "This proposal has reached its maximum number of repair revisions.";
+  if (code === "EXPECTED:REVISION_UNCHANGED") return "The revision is identical to the current text, so there is nothing to repair.";
+  const rejected = /^EXPECTED:REPAIR_REJECTED:(.+)$/.exec(code);
+  if (rejected) return "Repair rejected: the proposed revision is not an admissible repair of this proposal.";
   const typeMatch = /^EXPECTED:INVALID_TYPE:(.+)$/.exec(code);
   if (typeMatch) return `The value for "${typeMatch[1]}" has the wrong type.`;
   const rangeMatch = /^EXPECTED:INTEGER_OUT_OF_RANGE:(.+)$/.exec(code);

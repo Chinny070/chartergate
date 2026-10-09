@@ -114,6 +114,47 @@ export interface ReviewFinding {
   rationale: string;
 }
 
+/** One immutable repair revision (revision 2 and later). Revision 1 is the original Stage 1 proposal. */
+export interface ProposalRevision {
+  revision_id: number;
+  proposal_id: number;
+  revision_number: number;
+  /** 0 when the parent is the original proposal (revision 1). */
+  parent_revision_id: number;
+  source_review_id: number;
+  proposer: string;
+  title: string;
+  description: string;
+  requested_action: string;
+  charter_version: number;
+  addressed_section_ids: string[];
+  created_at: string;
+  revision_hash: string;
+}
+
+/** The current text of a proposal: the original (revision 1, `revision_id` 0) or its latest accepted repair. */
+export interface EffectiveProposal {
+  proposal_id: number;
+  revision_id: number;
+  revision_number: number;
+  title: string;
+  description: string;
+  requested_action: string;
+  charter_version: number;
+  /** "" for revision 1. */
+  revision_hash: string;
+  status: string;
+}
+
+/** A repairable violation from the latest review, with the section text as it read at the proposal's charter version. */
+export interface RepairTarget {
+  section_id: string;
+  title: string;
+  body: string;
+  rationale: string;
+  evidence_ids: number[];
+}
+
 /**
  * Every contract method this wrapper can call, with its argument count. `charterGate.schema.test.ts`
  * compares this table to `docs/charter_gate.schema.json`, so a rename or signature change in the
@@ -145,6 +186,17 @@ export const CONTRACT_METHODS = {
   get_review_count: { args: 0, write: false },
   get_review_findings_page: { args: 3, write: false },
   get_review_evidence_ids_page: { args: 3, write: false },
+  submit_repair_revision: { args: 4, write: true },
+  request_revision_review: { args: 1, write: true },
+  get_proposal_revision: { args: 1, write: false },
+  get_proposal_revision_count: { args: 1, write: false },
+  get_proposal_revisions_page: { args: 3, write: false },
+  get_effective_proposal: { args: 1, write: false },
+  get_review_for_revision: { args: 1, write: false },
+  get_review_revision_id: { args: 1, write: false },
+  get_proposal_review_count: { args: 1, write: false },
+  get_proposal_reviews_page: { args: 3, write: false },
+  get_repair_targets: { args: 1, write: false },
 } as const;
 
 type ViewName = { [K in keyof typeof CONTRACT_METHODS]: (typeof CONTRACT_METHODS)[K]["write"] extends false ? K : never }[keyof typeof CONTRACT_METHODS];
@@ -163,6 +215,7 @@ export const LIMITS = {
   factKey: 64,
   evidencePerProposal: 25,
   reviewSections: 12,
+  repairRevisions: 5,
   pageSize: 50,
 } as const;
 
@@ -323,6 +376,59 @@ export function decodeFinding(raw: unknown): ReviewFinding {
   };
 }
 
+export function decodeProposalRevision(raw: unknown): ProposalRevision {
+  const r = asRecord(raw);
+  const ids = r.addressed_section_ids;
+  if (!Array.isArray(ids) || ids.some((i) => typeof i !== "string")) {
+    throw new Error('Contract field "addressed_section_ids" is not a list of strings');
+  }
+  return {
+    revision_id: int(r, "revision_id"),
+    proposal_id: int(r, "proposal_id"),
+    revision_number: int(r, "revision_number"),
+    parent_revision_id: int(r, "parent_revision_id"),
+    source_review_id: int(r, "source_review_id"),
+    proposer: str(r, "proposer"),
+    title: str(r, "title"),
+    description: str(r, "description"),
+    requested_action: str(r, "requested_action"),
+    charter_version: int(r, "charter_version"),
+    addressed_section_ids: ids as string[],
+    created_at: str(r, "created_at"),
+    revision_hash: str(r, "revision_hash"),
+  };
+}
+
+export function decodeEffectiveProposal(raw: unknown): EffectiveProposal {
+  const r = asRecord(raw);
+  return {
+    proposal_id: int(r, "proposal_id"),
+    revision_id: int(r, "revision_id"),
+    revision_number: int(r, "revision_number"),
+    title: str(r, "title"),
+    description: str(r, "description"),
+    requested_action: str(r, "requested_action"),
+    charter_version: int(r, "charter_version"),
+    revision_hash: str(r, "revision_hash"),
+    status: str(r, "status"),
+  };
+}
+
+export function decodeRepairTarget(raw: unknown): RepairTarget {
+  const r = asRecord(raw);
+  const ids = r.evidence_ids;
+  if (!Array.isArray(ids) || ids.some((i) => typeof i !== "number" && typeof i !== "bigint")) {
+    throw new Error('Contract field "evidence_ids" is not a list of integers');
+  }
+  return {
+    section_id: str(r, "section_id"),
+    title: str(r, "title"),
+    body: str(r, "body"),
+    rationale: str(r, "rationale"),
+    evidence_ids: ids.map((i) => Number(i)),
+  };
+}
+
 function asList(raw: unknown): unknown[] {
   if (!Array.isArray(raw)) throw new Error("Expected a list from the contract");
   return raw;
@@ -389,6 +495,25 @@ export const getReviewEvidenceIdsPage = async (reviewId: number, offset = 0, lim
     return Number(i);
   });
 
+export const getEffectiveProposal = async (proposalId: number) =>
+  decodeEffectiveProposal(await view("get_effective_proposal", [proposalId]));
+
+export const getProposalRevisionsPage = async (proposalId: number, offset = 0, limit: number = LIMITS.pageSize) =>
+  asList(await view("get_proposal_revisions_page", [proposalId, offset, limit])).map(decodeProposalRevision);
+
+/** Every review of the proposal's lineage, oldest first: the review of the original, then of each revision in order. */
+export const getProposalReviewsPage = async (proposalId: number, offset = 0, limit: number = LIMITS.pageSize) =>
+  asList(await view("get_proposal_reviews_page", [proposalId, offset, limit])).map(decodeReview);
+
+export const getRepairTargets = async (proposalId: number) =>
+  asList(await view("get_repair_targets", [proposalId])).map(decodeRepairTarget);
+
+export const getReviewRevisionId = async (reviewId: number) => {
+  const n = await view("get_review_revision_id", [reviewId]);
+  if (typeof n !== "number" && typeof n !== "bigint") throw new Error("get_review_revision_id did not return an integer");
+  return Number(n);
+};
+
 // ---- writes -----------------------------------------------------------------------------
 
 type OnState = (s: TxState) => void;
@@ -434,3 +559,15 @@ export const submitEvidence = (
  */
 export const requestConstitutionalReview = (c: ChainClient, proposalId: number, on: OnState) =>
   write(c, "request_constitutional_review", [proposalId], on);
+
+/**
+ * Proposer only. Submits a repair of a proposal whose latest review is REPAIRABLE. Takes only the revised text: the
+ * lineage, parent, source review, charter version, repair targets and admissibility are all determined on-chain. GenLayer
+ * consensus decides whether it is genuinely a repair; an inadmissible repair rolls back and enters no history.
+ */
+export const submitRepairRevision = (c: ChainClient, proposalId: number, title: string, description: string, action: string, on: OnState) =>
+  write(c, "submit_repair_revision", [proposalId, title, description, action], on);
+
+/** Proposer only. A full constitutional review of an accepted revision (the same Stage 3 adjudication). */
+export const requestRevisionReview = (c: ChainClient, revisionId: number, on: OnState) =>
+  write(c, "request_revision_review", [revisionId], on);

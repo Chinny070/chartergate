@@ -515,3 +515,23 @@ Full model: `docs/CONSTITUTIONAL_REVIEW_MODEL.md`. Validator rule: `docs/STAGE_3
   over the immutable `EvidenceRecord`s only; every cited id must support that finding. No web access, no second Stage 2.
 * Verdict derivation, storage, methods and the public schema are unchanged.
 
+
+
+# Stage 4: proposal repair, revision lineage and re-review
+
+Full model: `docs/PROPOSAL_REVISION_MODEL.md`. Validator rule: `docs/STAGE_4_EQUIVALENCE.md`.
+
+* **Repair is versioning, not editing.** A `REPAIRABLE` proposal can receive an immutable `ProposalRevision` (revision 2 to 6). The original
+  proposal (revision 1), its review, findings, evidence snapshot and hashes never change. Revisions keep the root `proposal_id`, so evidence
+  stays attached to the same lineage and is not copied.
+* **Charter version does not move.** Every revision inherits the proposal's charter version at submission.
+* **Repair targets come from the parent review** (its repairable `VIOLATED` findings), not from a new LLM judgment.
+* **Admissibility is a GenLayer judgment, derived deterministically** (same purpose AND addresses a target AND no material scope change)
+  with a custom validator rule. An inadmissible repair rolls back (`EXPECTED:REPAIR_REJECTED:*`) and leaves no history.
+* **Linear and bounded:** one child per reviewed revision, at most 5 repair revisions.
+* **Re-review is a full Stage 3 review** of the revision (`request_revision_review`), bound to the exact revision and using a versioned
+  context hash (`chartergate.reviewcontext.v2`). Reviews of the original keep the v1 format.
+* **Status:** `REPAIRABLE` -> `REVISED` (awaiting review) -> the revision's verdict. Every earlier review stays in the lineage history.
+* **Frontend:** a repair workspace (targets, current vs proposed revision, a field-level diff), the repair assessment shown separately from
+  the transaction, the revision request/review, and a revision timeline.
+* **Not here:** precedent, dissent, appeals, amendments, voting, execution, accountability, evidence remediation for `INSUFFICIENT_EVIDENCE`.

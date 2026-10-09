@@ -7,14 +7,13 @@ evidence and prior rulings, by an Intelligent Contract whose result is settled b
 AI-validator consensus. The goal is for every decision to be inspectable: the clause applied,
 the evidence used, the timestamp, the validator outcome.
 
-> **Status: Stage 3 (constitutional adjudication), local only.** The contract stores a DAO charter with immutable
-> history, accepts proposals, lets a proposer attach **public web evidence** that GenLayer verifies through validator
-> consensus, and lets the proposer request a **constitutional review**: GenLayer judges the proposal against the
-> charter that was in force when it was submitted and the VERIFIED evidence that existed at review time, and records
-> an immutable verdict (`ELIGIBLE`, `INELIGIBLE`, `REPAIRABLE` or `INSUFFICIENT_EVIDENCE`) with per-section findings.
-> **Nothing repairs, appeals, votes on or executes proposals yet.** The Stage 3 contract is not deployed; the Stage 2
-> verification deployment is recorded in `deployments/studionet.json` (`canonicalDeployment` is still `null`).
-> See `docs/CONSTITUTIONAL_REVIEW_MODEL.md` and `docs/STAGE_3_EQUIVALENCE.md`.
+> **Status: Stage 4 (proposal repair and re-review), local only.** The contract stores a DAO charter with immutable history,
+> accepts proposals and **public web evidence** verified through validator consensus, and records an immutable **constitutional review**
+> of each proposal against the charter in force when it was submitted. A `REPAIRABLE` proposal can now be repaired: the proposer submits a
+> new immutable **revision** (the original and its review never change), GenLayer judges whether it is genuinely a repair, and the accepted
+> revision gets a full constitutional re-review under the same charter version. **Nothing handles precedent, appeals, voting or execution
+> yet.** The Stage 4 contract is not deployed; the Stage 3 verification deployment is recorded in `deployments/studionet.json`
+> (`canonicalDeployment` is still `null`). See `docs/PROPOSAL_REVISION_MODEL.md` and `docs/STAGE_4_EQUIVALENCE.md`.
 
 ## Architecture
 
