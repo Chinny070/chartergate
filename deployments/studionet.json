@@ -2143,6 +2143,253 @@
           "reviewHash": "0xfda1332553e1f0d3add19fbe4edbc16dd9acf172467bdbf5ca83c9d296bf32cf"
         }
       ]
+    },
+    "stage_6_appeals_dissent_verification": {
+      "status": "VERIFICATION_DEPLOYMENT",
+      "active": true,
+      "note": "Stage 6 appeals and reasoned dissent verification deployment, not the canonical production deployment. Owner is permanent; a canonical deployment will be a new contract. Stage 1-5 entries are preserved.",
+      "network": "studionet",
+      "chainId": 61999,
+      "rpc": "https://studio.genlayer.com/api",
+      "contractAddress": "0x050AFCd8B8a74Cbf8aaF682CA113bc510c6269e8",
+      "deployTxHash": "0x36d42c2f4e7eb4c3d037e9b407b4cad654f17c1a637ecf25041274f4466b31b7",
+      "deployTxFinalStatus": "FINALIZED",
+      "deployTxExecutionResult": "SUCCESS",
+      "deployTxConsensus": "MAJORITY_AGREE",
+      "deployedAtOnChain": "2026-10-10T21:22:51.108336Z",
+      "deployer": {
+        "cliAccountName": "my-studionet-wallet",
+        "address": "0xaffe15eec45b68835cc9e5b4ab85dd5deae8e70b"
+      },
+      "owner": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+      "constructorArgs": [
+        "Atlas DAO",
+        "A DAO that funds open-source infrastructure."
+      ],
+      "source": {
+        "file": "contracts/charter_gate.py",
+        "versionHeader": "v0.2.16",
+        "sha256_lfNormalizedTrimmed": "a0defd0d7c81a5cb697d69932e35bfb8e522dd90011771461810119a1187e8b8",
+        "gitCommit": "a9eefbb"
+      },
+      "verification": {
+        "deployedSourceIdenticalToApproved": true,
+        "deployedSchemaIdenticalToLocal": true,
+        "schemaMethodCount": 57
+      },
+      "knownDesignLimitation": "Appellate decisions are not yet indexed as precedent; a modified or reversed original review is excluded from future automatic precedent.",
+      "liveValidation": {
+        "status": "PARTIAL",
+        "browserE2E": "WAITING_FOR_USER",
+        "browserE2ECandidate": {
+          "proposalId": 8,
+          "reviewId": 6,
+          "note": "REPAIRABLE and unappealed"
+        }
+      },
+      "liveCharter": {
+        "v2": "s1 Mission",
+        "v3": "s2 Transparency (disclosed team allocation must be supported by VERIFIED evidence)",
+        "v4": "s3 Budget (itemized budget; missing is repairable)",
+        "v5": "s3 Budget amended (adds a delivery timeline): section revision s3@5. Applied AFTER reviews 1 and 2, which stay under v4"
+      },
+      "evidenceFixturePage": "https://httpbin.org/base64/<base64 of: Atlas Protocol tokenomics (test fixture page). Team token allocation: 18%. Community allocation: 52%. Treasury allocation: 30%.>",
+      "proposals": {
+        "1": "Atlas Gateway Grant (evidence #1, no budget): review attempts failed with BAD_EVIDENCE_REF / MAJORITY_DISAGREE, never reviewed",
+        "2": "Atlas Indexer Grant (approximate budget). Review 1; LATE evidence #3 submitted AFTER review 1; appeal 1; repaired to revision 1, review 5 ELIGIBLE",
+        "3": "Atlas Docs Grant (complete budget, evidence #2): review attempts failed with BAD_EVIDENCE_REF / MAJORITY_DISAGREE, never reviewed",
+        "4": "Atlas Wallet Grant: review 2 (candidate review 1), appeal 2",
+        "5": "Atlas Oracle Grant: review 3; repaired (revision 2); an appeal of review 3 afterwards was refused REPAIR_ALREADY_STARTED",
+        "6": "Atlas Studio Grant (charter v5): review 4 (candidates reviews 3, 2), appeal 3",
+        "7": "Atlas Community Grant: review attempts failed with BAD_MISSING_FACT / MAJORITY_DISAGREE, never reviewed",
+        "8": "Atlas Relay Grant: review 6, REPAIRABLE, UNAPPEALED: the browser E2E candidate"
+      },
+      "reviews": [
+        {
+          "reviewId": 1,
+          "proposalId": 2,
+          "verdict": "REPAIRABLE",
+          "rounds": 3,
+          "reviewHash": "0xdb234dc2959ff5deae4d062ead74b6d817f9094293b9ca9004107fcca5bc5d01",
+          "tx": "0xf601daa86de9c3996c536519406554c54a39ed1a045039fd091c02e2baaeec39"
+        },
+        {
+          "reviewId": 2,
+          "proposalId": 4,
+          "verdict": "REPAIRABLE",
+          "rounds": 1,
+          "reviewHash": "0x38ef73349b90e12d52571182c4431389ad4809b32918cc60a1d544501184f3cd",
+          "tx": "0x5a1032fd841b90d95e36f5ab0af4009c86330e4dda2378bec02b581edaa6be00"
+        },
+        {
+          "reviewId": 3,
+          "proposalId": 5,
+          "verdict": "REPAIRABLE",
+          "rounds": 1,
+          "reviewHash": "0xb05d7e460d9029d8d8ffa4eba24792e8436a953131c21eb50e1cdae5d7d272cb",
+          "tx": "0xc169531779c4da74a35098a5254a0a86f8ad0d00a91ec88ab7e23876e0f368f4"
+        },
+        {
+          "reviewId": 4,
+          "proposalId": 6,
+          "verdict": "REPAIRABLE",
+          "rounds": 4,
+          "reviewHash": "0xeb280dc60650c9107b361d2a0b2ddbb9795223913e9c2723cfea90b200405bbd",
+          "tx": "0xcdb947687caf65ea019fb28d817cbd5699ab667de424de22c20e60c007f490f4"
+        },
+        {
+          "reviewId": 5,
+          "proposalId": 2,
+          "judgedRevisionId": 1,
+          "verdict": "ELIGIBLE",
+          "rounds": 3,
+          "tx": "0x4ed1c4cf03e139a3f74addd708193cb5c347aa4e8bddef4a2b3ea1020c95eede"
+        },
+        {
+          "reviewId": 6,
+          "proposalId": 8,
+          "verdict": "REPAIRABLE",
+          "rounds": 1,
+          "tx": "0x050390caa79763f8aaaae1f0a640fab1268eccd00f9e02359d9ba19ac750cdca",
+          "note": "unappealed, kept for the browser E2E"
+        }
+      ],
+      "appeals": [
+        {
+          "appealId": 1,
+          "reviewId": 1,
+          "ground": "EVIDENCE_MISAPPLICATION",
+          "decisionKind": "AFFIRMED",
+          "verdict": "REPAIRABLE",
+          "rounds": 2,
+          "tx": "0xba3f76ec5e2e8e9c5bd400011ad1e6fd42bb52dbfe02b992f7403e8d7fbd9637",
+          "closedRecord": "charter v4 (s3 was amended to v5 earlier), evidence_count 0 although evidence #3 arrived after the review, no precedent",
+          "appealHash": "0xb136a50f46997ab7177c700f4b0c8c6df4872c9657525c19d89e4543fb1cadcb",
+          "appealContextHash": "0x63dc3d55d2c2a55ac1952ec7d52e19f83a83569eb45093cea6afc123c4749361",
+          "decisionHash": "0x4b7a4be282e6545c4a67a4a4cb31e450d5849d9f2ddc2913bcc1dd169450cf40"
+        },
+        {
+          "appealId": 2,
+          "reviewId": 2,
+          "ground": "CHARTER_MISINTERPRETATION",
+          "decisionKind": "AFFIRMED",
+          "verdict": "REPAIRABLE",
+          "rounds": 1,
+          "tx": "0xfe97edf5db24aa3c895961e1e98ab5f7f401f8072e0870f5a8dc36587b8e1e72",
+          "closedRecord": "frozen precedent snapshot = review 1 only, although reviews 3 to 6 exist now",
+          "appealHash": "0x8937b84795acb1c3b174b4674e915237cd011371e1337b9f0f53bf1a7b841fd7",
+          "appealContextHash": "0x40f6a46a252b01ec3ef8cc17c7f4797bb5363ee14fe8e578e0a7816441fc63fd",
+          "decisionHash": "0xf16e1bb04a8fb63fc0ea55dc3c1798884c786831fc234e664479704e1d75c3a7"
+        },
+        {
+          "appealId": 3,
+          "reviewId": 4,
+          "ground": "CHARTER_MISINTERPRETATION",
+          "decisionKind": "AFFIRMED",
+          "verdict": "REPAIRABLE",
+          "rounds": 4,
+          "tx": "0xff0f27d49f34d542854655c79929146b794702e53cebbf5c2f21f8a194c592d6",
+          "closedRecord": "charter v5, frozen precedent snapshot = reviews 3 and 2; the appellate precedent pass cited them (FOLLOWED and DISTINGUISHED)",
+          "appealHash": "0xf11deec4a51b2d85645669fa754cf8388a825bdc65891028b80f5355beb61cd9",
+          "appealContextHash": "0x200b11a24591aa36a82570d6cd364fd754675b4e56586524ceb4bf2a94f65667",
+          "decisionHash": "0x94d07a2ff7aef7e6de250f6780fe1583201b9f079d663b68eeec376b9de0fe54"
+        }
+      ],
+      "dissents": {
+        "stored": 0,
+        "attempts": [
+          {
+            "appealId": 1,
+            "tx": "0xbadc1b08813a864fdab4c4fb119789153c735370bfa3004b85f42cd04e895a3d",
+            "result": "rolled back EXPECTED:NO_MATERIAL_DISSENT, nothing stored",
+            "rounds": 1
+          },
+          {
+            "appealId": 2,
+            "tx": "0x7e51cd414c5aa3a31ecf74606c469664aa1f2888f35e5ab6b8269eb28eea98b7",
+            "result": "rolled back EXPECTED:NO_MATERIAL_DISSENT, nothing stored",
+            "rounds": 2
+          },
+          {
+            "appealId": 1,
+            "tx": "0xdb55b12123ba7f8c10e0c28bbb946f8ff03b136d0c73118823368d4e59e69b43",
+            "result": "second attempt: NO_MATERIAL_DISSENT again, which also proves the first stored nothing"
+          },
+          {
+            "appealId": 3,
+            "tx": "0x97e63b0486e2259157c395df11aef046c411411ab37418ee5c6fe817fac38e3a",
+            "result": "rolled back EXPECTED:NO_MATERIAL_DISSENT, nothing stored",
+            "rounds": 1
+          }
+        ],
+        "note": "The real model found no materially different reading in all attempts. A positive (stored) dissent was NOT observed live; it is proven by the direct tests only. A reasoned dissent is an AI-generated non-controlling alternative, never an authenticated validator minority."
+      },
+      "repairInteractions": {
+        "repairAfterAffirmedAppeal": {
+          "proposal": 2,
+          "tx": "0x88e84e3151de3ed79eaeec0a9c49a532e3bc253bb729777d904dc8defe760414",
+          "result": "admitted (targets came from the appellate findings); revision 1 reviewed as review 5 ELIGIBLE"
+        },
+        "appealAfterRepairStarted": {
+          "review": 3,
+          "tx": "0xc2ac70df9e93e8400f8037e9074d8c5a13f07460595f00e077c67a30e6529206",
+          "result": "refused EXPECTED:REPAIR_ALREADY_STARTED"
+        },
+        "repairAfterReversal": "not observed live: no appeal was reversed (all three were affirmed); proven by the direct tests"
+      },
+      "refusals": {
+        "invalidGround": "EXPECTED:APPEAL_GROUND_INVALID (0xf572f6ba...)",
+        "precedentGroundWithoutPrecedent": "EXPECTED:GROUND_NOT_APPLICABLE (0x36883b6d...)",
+        "unknownReview": "EXPECTED:REVIEW_NOT_FOUND (0x5a6da86f...)",
+        "duplicateAppeal": "EXPECTED:APPEAL_ALREADY_EXISTS (0x06e3dd15...)",
+        "unknownAppealDissent": "EXPECTED:APPEAL_NOT_FOUND (0xdc19be41...)",
+        "blankStatement": "the genlayer CLI turned the whitespace argument into a non-string: EXPECTED:INVALID_TYPE (0x6a37563f...); the empty-statement rule is proven by the direct tests",
+        "strangerAndEligible": "no second account exists in the CLI and no ELIGIBLE review was available to appeal; both are proven by the direct tests"
+      },
+      "failedAttempts": [
+        {
+          "what": "review of proposal 1",
+          "tx": "0x61a07bd739a77d4934251f3f2570529e09973bdda17b0cbeb48fb8c21d3c3c44",
+          "result": "LLM_ERROR:BAD_EVIDENCE_REF, MAJORITY_DISAGREE after 4 rounds, nothing stored"
+        },
+        {
+          "what": "review of proposal 1, retry",
+          "tx": "0xc9521799fc1144d9236062a115b77b70ef0540cd921fbc413f255316dda64d87",
+          "result": "MAJORITY_DISAGREE after 4 rounds, nothing stored"
+        },
+        {
+          "what": "review of proposal 3",
+          "tx": "0x02142a5199cf014f2bf740237d92f7317621ca10ab773b521d9135bd2a16980e",
+          "result": "LLM_ERROR:BAD_EVIDENCE_REF, MAJORITY_DISAGREE after 4 rounds, nothing stored"
+        },
+        {
+          "what": "review of proposal 3, retry",
+          "tx": "0x7abcdf50c9fcb18937211e03cedac54e561e6d48e967ab7329916f499eb47614",
+          "result": "LLM_ERROR:BAD_EVIDENCE_REF, MAJORITY_DISAGREE after 4 rounds, nothing stored"
+        },
+        {
+          "what": "review of proposal 6",
+          "tx": "0x97690a0692dcbdb5a1cfd025e997f206c0f8e0bec79a532cfd94997c17703d30",
+          "result": "LLM_ERROR:BAD_MISSING_FACT, MAJORITY_DISAGREE after 4 rounds, nothing stored; the retry succeeded"
+        },
+        {
+          "what": "review of proposal 7",
+          "tx": "0xb4ac375141143948193a362f01a326a3285f9f6e892ba53a23418386581580c1",
+          "result": "LLM_ERROR:BAD_MISSING_FACT, MAJORITY_DISAGREE after 4 rounds, nothing stored"
+        },
+        {
+          "what": "review of proposal 7, retry",
+          "tx": "0xb08e215da2a8079e5e6450009a080132bab637dc19614d323eeb4cd5c855298d",
+          "result": "MAJORITY_DISAGREE after 4 rounds, nothing stored"
+        }
+      ],
+      "independentHashVerification": "ALL EXACT: 6 reviews (set, precedent, context v1/v2/v3 and review v1/v2 hashes), 2 revisions and 3 appeals (appeal.v1, appealcontext.v1, appellate.v1) recomputed with a reference Keccak-256 from the documented formats; the closed record bound to the original review, the frozen precedent snapshot identical to the original's, and every disposition re-derived.",
+      "knownLimitations": [
+        "Appellate decisions are not yet indexed as precedent (a modified or reversed original review is excluded from future automatic precedent).",
+        "The /precedent route is still a placeholder page.",
+        "The case page lists the appellate history of the controlling review only.",
+        "Reviews with cited evidence or ambiguous UNCLEAR findings frequently end MAJORITY_DISAGREE (BAD_EVIDENCE_REF, BAD_MISSING_FACT), as in Stages 3 to 5."
+      ]
     }
   }
 }
