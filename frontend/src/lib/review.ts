@@ -27,7 +27,7 @@ export const VERDICT_INFO: Record<ReviewVerdict, { label: string; tone: Tone; he
     tone: "warning",
     headline: "The proposal currently fails the charter, but the failure looks curable.",
     explain:
-      "Each failing requirement could be cured by changing or supplying specific terms or disclosures without changing the proposal's purpose. The repair workflow is not implemented yet (a later stage).",
+      "Each failing requirement could be cured by changing or supplying specific terms or disclosures without changing the proposal's purpose. The proposer can repair it as a new revision, which is reviewed again.",
   },
   INSUFFICIENT_EVIDENCE: {
     label: "INSUFFICIENT EVIDENCE",

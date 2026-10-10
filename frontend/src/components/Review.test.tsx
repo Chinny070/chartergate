@@ -76,7 +76,7 @@ describe("ReviewResultView", () => {
   it("REPAIRABLE names the failing rule and says repair is not available", () => {
     const html = render("REPAIRABLE", [fnd("1", "SATISFIED"), fnd("2", "VIOLATED", { repairable: true })]);
     expect(html).toContain("Currently failing: §2 Transparency");
-    expect(html).toContain("Repair is not available yet");
+    expect(html).toContain("submit a repair as a new revision");
     expect(html).toContain("this failure looks curable");
     expect(html).not.toContain("<button");
   });

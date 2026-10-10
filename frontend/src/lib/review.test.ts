@@ -57,7 +57,7 @@ describe("verdicts", () => {
   it("say what is and is not implemented", () => {
     expect(VERDICT_INFO.ELIGIBLE.headline).toBe("Constitutional review passed.");
     expect(VERDICT_INFO.ELIGIBLE.explain).toContain("Governance voting is not implemented in this stage.");
-    expect(VERDICT_INFO.REPAIRABLE.explain).toContain("repair workflow is not implemented");
+    expect(VERDICT_INFO.REPAIRABLE.explain).toContain("repair it as a new revision");
     expect(VERDICT_INFO.INSUFFICIENT_EVIDENCE.explain).toContain("Missing proof is not a violation");
   });
 

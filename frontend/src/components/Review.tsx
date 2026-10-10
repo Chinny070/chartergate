@@ -115,7 +115,7 @@ export function ReviewResultView({
         )}
         {review.verdict === "REPAIRABLE" && violated.length > 0 && (
           <p>
-            Currently failing: {violated.map((f) => `§${f.section_id} ${sectionTitle(sections, f.section_id)}`).join("; ")}. Repair is not available yet.
+            Currently failing: {violated.map((f) => `§${f.section_id} ${sectionTitle(sections, f.section_id)}`).join("; ")}. The proposer can submit a repair as a new revision.
           </p>
         )}
         {review.verdict === "INSUFFICIENT_EVIDENCE" && unclear.length > 0 && (

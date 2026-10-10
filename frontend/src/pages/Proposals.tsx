@@ -53,7 +53,7 @@ export function ProposalsPage() {
           )
         }
       </ReadBoundary>
-      <p className="label">Open a case to submit evidence and request a constitutional review. Repair, precedent, appeals and voting are not implemented yet (later stages).</p>
+      <p className="label">Open a case to submit evidence and request a constitutional review. A repairable proposal can be revised, and each review shows the earlier rulings it was compared with. Appeals and voting are not implemented yet (later stages).</p>
     </div>
   );
 }
