@@ -63,3 +63,20 @@ observation to measure on StudioNet, not a relaxation of any rule.
 
 The direct tests mock the LLM. They prove the contract's own rules. They do not prove that a real model reasons sensibly about precedent, how often it cites,
 or how often validators agree. That needs StudioNet.
+
+## 9. Frozen: live verification status and backlog
+
+Stage 5 (including Stage 5.1) is complete and frozen. Verification contract: `0x9F846B040DA015F4Aed94467Af065Cd7c84dbeCA` (`canonicalDeployment` is `null`).
+Proven live on StudioNet and in the browser (see `deployments/studionet.json`): a first case with no precedent (old hash formats); a FOLLOWED and a DISTINGUISHED
+citation; prior evidence never counting as current evidence; amended-rule exclusion (`s3@4` cases are not candidates for `s3@5`); same-lineage exclusion;
+snapshot immutability; newest-first candidates capped at 2 per section; independent recomputation of every precedent set hash, context hash and review hash; and
+a browser review showing the Precedent Memory panel and the prior-ruling inspector.
+
+Backlog (non-blocking; no prompt, equivalence, validator or contract change is implied):
+
+* **S5-R1** Constitutional reviews can still experience `BAD_MISSING_FACT` / `MAJORITY_DISAGREE` rotations.
+* **S5-R2** Precedent consistency and review prose may be returned in a language different from the frontend language.
+* **S5-R3** StudioNet's practical RPC read limit makes complex case pages take roughly 30 to 40 seconds to settle even after request deduplication and throttling.
+* **S5-R4** Precedent-specific atomic failure was not deliberately forced live; the direct tests prove this path.
+* **S5-R5** Precedent poisoning remains only partially mitigated by exact-rule matching, bounded candidates, lineage exclusion, advisory semantics and
+  independent current-case adjudication.

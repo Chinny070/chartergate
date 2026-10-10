@@ -2057,9 +2057,9 @@
         "schemaMethodCount": 46
       },
       "liveValidation": {
-        "status": "IN_PROGRESS",
+        "status": "COMPLETE_FROZEN",
         "independentHashRecomputation": "5 of 5 reviews exact (precedent_set_hash, reviewcontext v1/v3, review v1/v2); review 1 uses the old v1/v1 formats",
-        "browserE2E": "WAITING_FOR_USER"
+        "browserE2E": "PASS (reported by user)"
       },
       "liveCharter": {
         "v2": "s1 Mission",
