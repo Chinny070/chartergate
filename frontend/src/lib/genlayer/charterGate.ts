@@ -530,7 +530,26 @@ function asList(raw: unknown): unknown[] {
 
 // ---- reads (finalized state only; see readView) -----------------------------------------
 
-const view = (name: ViewName, args: CalldataEncodable[] = []) => readView(name, args);
+// StudioNet allows roughly 30 reads a minute and answers the excess with an error the browser reports as "Failed to fetch".
+// A case page asks for the same view from more than one component, so identical in-flight reads share one request, and read
+// starts are spaced out so a page does not exhaust the quota (and then its own retries) in its first second.
+export const READ_SPACING_MS = import.meta.env.MODE === "test" ? 0 : 1500;
+const inflight = new Map<string, Promise<CalldataEncodable>>();
+let nextReadSlot = 0;
+
+const view = (name: ViewName, args: CalldataEncodable[] = []): Promise<CalldataEncodable> => {
+  const key = name + JSON.stringify(args, (_k, v) => (typeof v === "bigint" ? v.toString() + "n" : v));
+  const shared = inflight.get(key);
+  if (shared) return shared;
+  const now = Date.now();
+  const start = Math.max(now, nextReadSlot);
+  nextReadSlot = start + READ_SPACING_MS;
+  const wait = start - now;
+  const begin = wait > 0 ? new Promise<void>((resolve) => setTimeout(resolve, wait)) : Promise.resolve();
+  const request = begin.then(() => readView(name, args)).finally(() => inflight.delete(key));
+  inflight.set(key, request);
+  return request;
+};
 
 export const getDaoMetadata = async () => decodeDaoMetadata(await view("get_dao_metadata"));
 

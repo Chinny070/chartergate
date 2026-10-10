@@ -2022,6 +2022,127 @@
           "userObserved": "the revision review timeline showed all five phases to Finalized · Success; the constitutional verdict appeared separately; revision 1 stayed REPAIRABLE; status returned to REPAIRABLE"
         }
       }
+    },
+    "stage_5_precedent_memory_verification": {
+      "status": "VERIFICATION_DEPLOYMENT",
+      "active": true,
+      "note": "Stage 5 Precedent Memory verification deployment (includes Stage 5.1), not the canonical production deployment. Owner is permanent; a canonical deployment will be a new contract. Stage 1-4 entries are preserved unchanged.",
+      "network": "studionet",
+      "chainId": 61999,
+      "rpc": "https://studio.genlayer.com/api",
+      "contractAddress": "0x9F846B040DA015F4Aed94467Af065Cd7c84dbeCA",
+      "deployTxHash": "0x76143ffe2d74103a1cf94b567b3a5088eacaccdfdeabaa1ba8eb35bc58be9554",
+      "deployTxFinalStatus": "FINALIZED",
+      "deployTxExecutionResult": "SUCCESS",
+      "deployTxConsensus": "MAJORITY_AGREE",
+      "deployedAtOnChain": "2026-10-10T11:53:51.212464Z",
+      "deployer": {
+        "cliAccountName": "my-studionet-wallet",
+        "address": "0xaffe15eec45b68835cc9e5b4ab85dd5deae8e70b"
+      },
+      "owner": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+      "constructorArgs": [
+        "Atlas DAO",
+        "A DAO that funds open-source infrastructure."
+      ],
+      "source": {
+        "file": "contracts/charter_gate.py",
+        "versionHeader": "v0.2.16",
+        "sha256_lfNormalizedTrimmed": "9c70690524fd7f3c78f750dbd5b41c8bb3e273125f7c2008c1411f67ebf09baf",
+        "gitCommit": "12f792d"
+      },
+      "verification": {
+        "deployedSourceIdenticalToApproved": true,
+        "deployedSchemaIdenticalToLocal": true,
+        "schemaMethodCount": 46
+      },
+      "liveValidation": {
+        "status": "IN_PROGRESS",
+        "independentHashRecomputation": "5 of 5 reviews exact (precedent_set_hash, reviewcontext v1/v3, review v1/v2); review 1 uses the old v1/v1 formats",
+        "browserE2E": "WAITING_FOR_USER"
+      },
+      "liveCharter": {
+        "v2": "s1 Mission",
+        "v3": "s2 Transparency (disclosed team allocation must be supported by VERIFIED evidence)",
+        "v4": "s3 Budget (itemized budget breakdown; missing is repairable)",
+        "v5": "s3 Budget amended (adds a delivery timeline): section revision s3@5"
+      },
+      "evidenceFixturePage": "https://httpbin.org/base64/<base64 of: Atlas Protocol tokenomics (test fixture page). Team token allocation: 18%. Community allocation: 52%. Treasury allocation: 30%.>",
+      "fixtures": {
+        "A_first_case_no_precedent": {
+          "proposalId": 1,
+          "reviewId": 1,
+          "note": "VERIFIED 18% evidence #1 on s2; description carries a quoted injection string as data"
+        },
+        "B_followed": {
+          "proposalId": 2,
+          "reviewId": 2
+        },
+        "C_distinguished": {
+          "proposalId": 3,
+          "reviewId": 3
+        },
+        "D_not_evidence": "reviews 2 and 3 (no current evidence) after review 1 had VERIFIED 18% evidence: s2 stayed VIOLATED, never SATISFIED",
+        "E_amended_rule": {
+          "proposalId": 4,
+          "reviewId": 4,
+          "revisionId": 1,
+          "revisionReviewId": 5
+        },
+        "browserE2ECandidate": {
+          "proposalId": 5,
+          "note": "unreviewed duplicate of proposal 4's text, charter v5, has precedent candidates"
+        }
+      },
+      "reviews": [
+        {
+          "reviewId": 1,
+          "proposalId": 1,
+          "tx": "0x27679bc21934dcaabe5227db3ae84601778476ed43cde88673f0033169bb1898",
+          "verdict": "REPAIRABLE",
+          "candidates": 0,
+          "citations": 0,
+          "reviewHash": "0x2924503261cc2426743953f5653be284a2b74ee0e52d669caebc0cbeaa20bbcc"
+        },
+        {
+          "reviewId": 2,
+          "proposalId": 2,
+          "tx": "0x04435adabc9e0e671a62ace0e131938948cac9d4eef20bea33e5932ddff7facd",
+          "verdict": "REPAIRABLE",
+          "candidates": 3,
+          "citations": "s1 FOLLOWED, s2 DISTINGUISHED, s3 FOLLOWED (all review 1)",
+          "reviewHash": "0x31db058eb812fd696926c3e9ebb3e24feafdd782fe5a45593f0aa779749bdcb8"
+        },
+        {
+          "reviewId": 3,
+          "proposalId": 3,
+          "tx": "0x94f184c031384a9123313d5e2301d133531c6938c15a5d5156d214ef8fe23bc3",
+          "verdict": "REPAIRABLE",
+          "candidates": 6,
+          "citations": 6,
+          "reviewHash": "0xd8af57a14085bf7eaf2cc7851560d731d45c29566d64f48ca6e026a24634748d"
+        },
+        {
+          "reviewId": 4,
+          "proposalId": 4,
+          "tx": "0x6ee3cf63810607b44378d2ea4cbf9f553bc7f6d9b4788c5009d15d2ced196dff",
+          "verdict": "REPAIRABLE",
+          "candidates": 4,
+          "citations": 2,
+          "reviewHash": "0x18eb995d0a67c5c98e96f29f80b617b291b247d689418fbaa3b32abb2835615e",
+          "note": "an earlier attempt (0x00bf23bf...) finalized MAJORITY_DISAGREE after 4 rounds and stored nothing"
+        },
+        {
+          "reviewId": 5,
+          "proposalId": 4,
+          "judgedRevisionId": 1,
+          "tx": "0x28efd626a22a442e64216dd54b77fbeac93ee8863309941dc2f082d88524d224",
+          "verdict": "REPAIRABLE",
+          "candidates": 4,
+          "citations": 2,
+          "reviewHash": "0xfda1332553e1f0d3add19fbe4edbc16dd9acf172467bdbf5ca83c9d296bf32cf"
+        }
+      ]
     }
   }
 }
