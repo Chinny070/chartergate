@@ -45,6 +45,79 @@
       "ret": "null",
       "payable": false
     },
+    "get_appeal": {
+      "params": [
+        [
+          "appeal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_appeal_count": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_appeal_findings_page": {
+      "params": [
+        [
+          "appeal_id",
+          "int"
+        ],
+        [
+          "offset",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "dict"
+        }
+      ]
+    },
+    "get_appeal_id_for_review": {
+      "params": [
+        [
+          "review_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_appeal_record": {
+      "params": [
+        [
+          "appeal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_appellate_decision": {
+      "params": [
+        [
+          "appeal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
     "get_charter_revision": {
       "params": [
         [
@@ -184,6 +257,17 @@
       "ret": "dict"
     },
     "get_effective_proposal": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_effective_ruling": {
       "params": [
         [
           "proposal_id",
@@ -417,6 +501,17 @@
         }
       ]
     },
+    "get_reasoned_dissent": {
+      "params": [
+        [
+          "appeal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
     "get_repair_targets": {
       "params": [
         [
@@ -431,6 +526,17 @@
           "$rep": "dict"
         }
       ]
+    },
+    "get_review_appeal_status": {
+      "params": [
+        [
+          "review_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
     },
     "get_review_count": {
       "params": [],
@@ -573,10 +679,42 @@
         }
       ]
     },
+    "request_appeal": {
+      "params": [
+        [
+          "review_id",
+          "int"
+        ],
+        [
+          "ground",
+          "string"
+        ],
+        [
+          "statement",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
     "request_constitutional_review": {
       "params": [
         [
           "proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "request_reasoned_dissent": {
+      "params": [
+        [
+          "appeal_id",
           "int"
         ]
       ],

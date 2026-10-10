@@ -49,7 +49,7 @@ function EvidenceRefs({ ids }: { ids: readonly number[] }) {
   );
 }
 
-function FindingRow({ finding, sections }: { finding: ReviewFinding; sections: readonly CharterRevision[] }) {
+export function FindingRow({ finding, sections }: { finding: ReviewFinding; sections: readonly CharterRevision[] }) {
   const info = FINDING_INFO[finding.finding];
   return (
     <div className="finding" data-finding={finding.finding}>

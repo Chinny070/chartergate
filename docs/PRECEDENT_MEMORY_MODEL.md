@@ -125,6 +125,10 @@ exact rule matching, a bounded candidate set (2 per section), same-lineage exclu
 evidence, and validators still adjudicating the current case independently. This does **not** fully solve poisoning (for example, a flood of recent
 contrived rulings can crowd out older useful ones within the 2-per-section window). It is recorded for future governance work.
 
+## 10a. Appeals (Stage 6)
+
+A review that an appeal **modified or reversed** is excluded from future automatic candidate selection (it stays in the history and the index, and stays inspectable). An **affirmed** review stays eligible. The appellate decision is not yet automatic precedent. Frozen snapshots of earlier reviews are never altered. See `docs/APPEAL_MODEL.md`.
+
 ## 11. Not in Stage 5
 
 Appeals, appellate review, dissent, overturning or hierarchy of precedent, precedent weight or binding force, cross-amendment jurisprudence,

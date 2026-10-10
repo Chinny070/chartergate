@@ -7,12 +7,14 @@ evidence and prior rulings, by an Intelligent Contract whose result is settled b
 AI-validator consensus. The goal is for every decision to be inspectable: the clause applied,
 the evidence used, the timestamp, the validator outcome.
 
-> **Status: Stage 5 (precedent memory), local only.** The contract stores a DAO charter with immutable history, accepts proposals and **public web
+> **Status: Stage 6 (appeals and reasoned dissent), local only.** The contract stores a DAO charter with immutable history, accepts proposals and **public web
 > evidence** verified through validator consensus, records an immutable **constitutional review** of each proposal against the charter in force when it was
 > submitted, lets a `REPAIRABLE` proposal be repaired as an immutable revision with a full re-review, and now gives reviews **constitutional memory**: a bounded set
 > of earlier rulings under the exact same charter rule, cited as followed or distinguished. Precedent is advisory and never replaces the charter or current evidence: the findings are produced by a model call that never sees precedent (Stage 5.1).
-> **Nothing handles appeals, dissent, voting or execution yet.** The Stage 5 contract is not deployed; the Stage 4 verification deployment is recorded in
-> `deployments/studionet.json` (`canonicalDeployment` is still `null`). See `docs/PRECEDENT_MEMORY_MODEL.md`, `docs/STAGE_5_EQUIVALENCE.md` and `docs/STAGE_5_1_AUTHORITY_BOUNDARY.md`.
+> Stage 6 adds **appeals**: the proposer can challenge an adverse ruling on the closed record it judged (appeal is not repair), which creates an immutable appellate decision above the original review, and an
+> optional, truthfully labelled, non-controlling **reasoned dissent** (GenVM exposes no validator minority opinion, so it is an AI-generated alternative, not a vote).
+> **Nothing handles voting or execution yet.** The Stage 6 contract is not deployed; the Stage 1 to 5 verification deployments are recorded in
+> `deployments/studionet.json` (`canonicalDeployment` is still `null`). See `docs/PRECEDENT_MEMORY_MODEL.md`, `docs/STAGE_5_EQUIVALENCE.md` and `docs/STAGE_5_1_AUTHORITY_BOUNDARY.md`, `docs/APPEAL_MODEL.md` and `docs/STAGE_6_EQUIVALENCE.md`.
 
 ## Architecture
 

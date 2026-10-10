@@ -5,6 +5,7 @@ import { ChainTime, Field, ReadBoundary } from "../components/common";
 import { EvidenceList, SubmitEvidenceForm } from "../components/Evidence";
 import { ConstitutionalReviewPanel } from "../components/Review";
 import { LineagePanel } from "../components/Repair";
+import { AppealPanel } from "../components/Appeal";
 import { statusLabel, statusTone } from "../lib/review";
 import { shortAddress } from "../lib/format";
 import { TransactionTimeline } from "../components/TransactionTimeline";
@@ -53,7 +54,7 @@ export function ProposalsPage() {
           )
         }
       </ReadBoundary>
-      <p className="label">Open a case to submit evidence and request a constitutional review. A repairable proposal can be revised, and each review shows the earlier rulings it was compared with. Appeals and voting are not implemented yet (later stages).</p>
+      <p className="label">Open a case to submit evidence and request a constitutional review. A repairable proposal can be revised, an adverse ruling can be appealed on its closed record, and each review shows the earlier rulings it was compared with. Voting is not implemented yet (a later stage).</p>
     </div>
   );
 }
@@ -88,6 +89,8 @@ export function ProposalDetailPage() {
                     not the verdict of the original review that the review panel shows. */}
                 <ConstitutionalReviewPanel proposal={p} onFinalized={() => setRefresh((n) => n + 1)} />
                 <LineagePanel proposal={p} onStatus={setVerdict} refreshKey={refresh} />
+                {/* Repair changes the proposal; an appeal challenges the ruling on the existing closed record. */}
+                <AppealPanel proposal={p} refreshKey={refresh} onChanged={() => setRefresh((n) => n + 1)} />
               </div>
               <Docket label="Status">
                 <div className="stack">

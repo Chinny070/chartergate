@@ -556,3 +556,22 @@ Full model: `docs/PRECEDENT_MEMORY_MODEL.md`. Validator rule: `docs/STAGE_5_EQUI
   from the base adjudication prompt entirely.
 * **Frontend:** a Precedent Memory panel per review: available prior rulings per rule, followed or distinguished treatment, an inspector for each prior ruling, and an advisory note.
 * **Known limitation:** no reputation or approval of precedent, so contrived cases can pollute it. Not in Stage 5: appeals, dissent, overturning, weight, voting, execution.
+
+# Stage 6: constitutional appeals and non-controlling dissent
+
+Full model: `docs/APPEAL_MODEL.md`. Validator rule: `docs/STAGE_6_EQUIVALENCE.md`.
+
+* **Repair vs appeal vs dissent.** Repair changes the proposal (a new revision). An appeal challenges the ruling on the **closed record** the original review judged and creates an
+  immutable appellate decision above it. A reasoned dissent is a separate, non-controlling alternative reading. The original review is never changed.
+* **Closed record.** The exact proposal or revision, the historical charter and section revisions, the evidence snapshot and the frozen precedent snapshot of the original review, proven identical to its
+  `review_context_hash` before any model call. Later evidence, later charter amendments and later precedents never enter an appeal.
+* **Eligibility.** Proposer-only; adverse rulings only (`INELIGIBLE`, `REPAIRABLE`, `INSUFFICIENT_EVIDENCE`); only the latest controlling review; one appeal per review; not after a repair child exists.
+* **Adjudication.** Precedent-free appellate findings (same four classes, same derivation) from the closed record, then, only if the frozen snapshot had candidates, the Stage 5.1 precedent-consistency pass.
+  The verdict and the disposition (`AFFIRMED` / `MODIFIED` / `REVERSED`) are deterministic; the model supplies neither.
+* **Effective verdict.** `get_effective_ruling` reports what controls a proposal; the proposal status and the repair targets follow the controlling (appellate) ruling. Repair after an appeal uses the appellate findings.
+* **Precedent after an appeal.** A `MODIFIED` or `REVERSED` original is excluded from future automatic precedent and stays in the history. The appellate decision is not yet automatic precedent (a documented limitation).
+* **Dissent.** GenVM exposes no authenticated validator-minority opinion, so a dissent is an AI-generated, immutable, non-controlling alternative reading of the same record, labelled as such. One per appeal, separate write path, must
+  disagree materially, never changes anything that controls.
+* **Hashes.** `chartergate.appeal.v1`, `chartergate.appealcontext.v1`, `chartergate.appellate.v1`, `chartergate.dissent.v1`. Stage 3 to 5 formats are unchanged.
+* **Frontend.** An Appeal decision entry separate from Repair, an appeal workspace with the frozen-record note, an ORIGINAL REVIEW, APPEAL, APPELLATE DECISION history with the original, appellate and effective verdicts, and a truthfully labelled REASONED DISSENT.
+* **Not in Stage 6:** amendment governance, voting, ratification, treasury execution, accountability, appeal of an appeal.

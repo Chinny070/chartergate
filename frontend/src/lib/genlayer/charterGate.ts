@@ -241,6 +241,17 @@ export const CONTRACT_METHODS = {
   get_rule_precedent_count: { args: 1, write: false },
   get_rule_precedents_page: { args: 3, write: false },
   get_precedent_case: { args: 2, write: false },
+  request_appeal: { args: 3, write: true },
+  request_reasoned_dissent: { args: 1, write: true },
+  get_appeal: { args: 1, write: false },
+  get_appeal_count: { args: 0, write: false },
+  get_appeal_id_for_review: { args: 1, write: false },
+  get_appellate_decision: { args: 1, write: false },
+  get_appeal_findings_page: { args: 3, write: false },
+  get_review_appeal_status: { args: 1, write: false },
+  get_appeal_record: { args: 1, write: false },
+  get_reasoned_dissent: { args: 1, write: false },
+  get_effective_ruling: { args: 1, write: false },
 } as const;
 
 type ViewName = { [K in keyof typeof CONTRACT_METHODS]: (typeof CONTRACT_METHODS)[K]["write"] extends false ? K : never }[keyof typeof CONTRACT_METHODS];
@@ -267,6 +278,90 @@ export const SECTION_ID_PATTERN = /^[A-Za-z0-9._-]+$/;
 
 export const SOURCE_KINDS: readonly SourceKind[] = ["STATIC_WEB", "DYNAMIC_WEB", "API"];
 export const EVIDENCE_STATUSES: readonly EvidenceStatus[] = ["VERIFIED", "UNVERIFIABLE", "SOURCE_UNAVAILABLE", "INVALID_SOURCE"];
+export type AppealGround = "CHARTER_MISINTERPRETATION" | "EVIDENCE_MISAPPLICATION" | "PRECEDENT_MISAPPLICATION" | "PROCEDURAL_ERROR";
+export type DecisionKind = "AFFIRMED" | "MODIFIED" | "REVERSED";
+
+/** An appeal as filed: the ruling it challenges and the closed record that ruling judged. */
+export interface Appeal {
+  appeal_id: number;
+  review_id: number;
+  proposal_id: number;
+  /** 0 when the appealed review judged the original proposal. */
+  revision_id: number;
+  appellant: string;
+  ground: AppealGround;
+  statement: string;
+  original_verdict: ReviewVerdict;
+  original_review_hash: string;
+  charter_version: number;
+  evidence_count: number;
+  evidence_set_hash: string;
+  precedent_set_hash: string;
+  created_at: string;
+  appeal_hash: string;
+}
+
+/** The appellate decision. It sits ABOVE the original review and never replaces it. */
+export interface AppellateDecision {
+  appeal_id: number;
+  review_id: number;
+  verdict: ReviewVerdict;
+  decision_kind: DecisionKind;
+  finding_count: number;
+  appeal_context_hash: string;
+  decision_hash: string;
+  created_at: string;
+}
+
+/** A non-controlling, AI-generated alternative reading of the same closed record. Not a validator vote. */
+export interface ReasonedDissent {
+  dissent_id: number;
+  appeal_id: number;
+  decision_hash: string;
+  verdict: ReviewVerdict;
+  disagreeing_section_ids: string[];
+  finding_count: number;
+  created_at: string;
+  dissent_hash: string;
+  findings: ReviewFinding[];
+}
+
+/** The whole appellate record in one read. */
+export interface AppealRecord {
+  appeal: Appeal;
+  review: ConstitutionalReview;
+  original_findings: ReviewFinding[];
+  decision: AppellateDecision;
+  findings: ReviewFinding[];
+  citations: PrecedentCitation[];
+  precedent_candidates: PrecedentCandidate[];
+  evidence_ids: number[];
+  dissent: ReasonedDissent | null;
+}
+
+/** What currently controls a proposal: its latest review, or that review's appellate decision. Both stay readable. */
+export interface EffectiveRuling {
+  proposal_id: number;
+  /** 0 when the proposal has no review yet. */
+  review_id: number;
+  original_verdict: ReviewVerdict | "";
+  appeal_id: number;
+  decision_kind: DecisionKind | "";
+  effective_verdict: ReviewVerdict | "";
+  controlled_by: "NONE" | "REVIEW" | "APPELLATE_DECISION";
+  appealable: boolean;
+  findings: ReviewFinding[];
+  status: string;
+}
+
+export interface ReviewAppealStatus {
+  review_id: number;
+  appealable: boolean;
+  blocked_reason: string;
+  appeal_id: number;
+  dissent_id: number;
+}
+
 export const RETRIEVAL_METHODS: readonly RetrievalMethod[] = ["GET", "RENDER_TEXT"];
 export const REVIEW_VERDICTS: readonly ReviewVerdict[] = ["ELIGIBLE", "INELIGIBLE", "REPAIRABLE", "INSUFFICIENT_EVIDENCE"];
 export const FINDING_KINDS: readonly FindingKind[] = ["SATISFIED", "VIOLATED", "UNCLEAR", "NOT_APPLICABLE"];
@@ -523,6 +618,121 @@ export function decodePrecedentCase(raw: unknown): PrecedentCase {
   };
 }
 
+export const APPEAL_GROUND_IDS: readonly AppealGround[] = ["CHARTER_MISINTERPRETATION", "EVIDENCE_MISAPPLICATION", "PRECEDENT_MISAPPLICATION", "PROCEDURAL_ERROR"];
+export const DECISION_KINDS: readonly DecisionKind[] = ["AFFIRMED", "MODIFIED", "REVERSED"];
+
+function listOf(r: Record<string, unknown>, k: string): unknown[] {
+  const v = r[k];
+  if (!Array.isArray(v)) throw new Error(`Contract field "${k}" is not a list`);
+  return v;
+}
+
+export function decodeAppeal(raw: unknown): Appeal {
+  const r = asRecord(raw);
+  return {
+    appeal_id: int(r, "appeal_id"),
+    review_id: int(r, "review_id"),
+    proposal_id: int(r, "proposal_id"),
+    revision_id: int(r, "revision_id"),
+    appellant: str(r, "appellant"),
+    ground: oneOf(r, "ground", APPEAL_GROUND_IDS),
+    statement: str(r, "statement"),
+    original_verdict: oneOf(r, "original_verdict", REVIEW_VERDICTS),
+    original_review_hash: str(r, "original_review_hash"),
+    charter_version: int(r, "charter_version"),
+    evidence_count: int(r, "evidence_count"),
+    evidence_set_hash: str(r, "evidence_set_hash"),
+    precedent_set_hash: str(r, "precedent_set_hash"),
+    created_at: str(r, "created_at"),
+    appeal_hash: str(r, "appeal_hash"),
+  };
+}
+
+export function decodeAppellateDecision(raw: unknown): AppellateDecision {
+  const r = asRecord(raw);
+  return {
+    appeal_id: int(r, "appeal_id"),
+    review_id: int(r, "review_id"),
+    verdict: oneOf(r, "verdict", REVIEW_VERDICTS),
+    decision_kind: oneOf(r, "decision_kind", DECISION_KINDS),
+    finding_count: int(r, "finding_count"),
+    appeal_context_hash: str(r, "appeal_context_hash"),
+    decision_hash: str(r, "decision_hash"),
+    created_at: str(r, "created_at"),
+  };
+}
+
+export function decodeReasonedDissent(raw: unknown): ReasonedDissent {
+  const r = asRecord(raw);
+  const sections = listOf(r, "disagreeing_section_ids");
+  if (sections.some((x) => typeof x !== "string")) throw new Error('Contract field "disagreeing_section_ids" is not a list of strings');
+  return {
+    dissent_id: int(r, "dissent_id"),
+    appeal_id: int(r, "appeal_id"),
+    decision_hash: str(r, "decision_hash"),
+    verdict: oneOf(r, "verdict", REVIEW_VERDICTS),
+    disagreeing_section_ids: sections as string[],
+    finding_count: int(r, "finding_count"),
+    created_at: str(r, "created_at"),
+    dissent_hash: str(r, "dissent_hash"),
+    findings: listOf(r, "findings").map(decodeFinding),
+  };
+}
+
+export function decodeAppealRecord(raw: unknown): AppealRecord {
+  const r = asRecord(raw);
+  const evidenceIds = listOf(r, "evidence_ids");
+  if (evidenceIds.some((i) => typeof i !== "number" && typeof i !== "bigint")) throw new Error('Contract field "evidence_ids" is not a list of integers');
+  const ap = asRecord(r.appeal);
+  const precedents = decodeReviewPrecedents({
+    review_id: int(ap, "review_id"),
+    precedent_set_hash: str(ap, "precedent_set_hash"),
+    candidates: listOf(r, "precedent_candidates"),
+    citations: listOf(r, "citations"),
+  });
+  return {
+    appeal: decodeAppeal(r.appeal),
+    review: decodeReview(r.review),
+    original_findings: listOf(r, "original_findings").map(decodeFinding),
+    decision: decodeAppellateDecision(r.decision),
+    findings: listOf(r, "findings").map(decodeFinding),
+    citations: precedents.citations,
+    precedent_candidates: precedents.candidates,
+    evidence_ids: evidenceIds.map((i) => Number(i)),
+    dissent: r.dissent === null || r.dissent === undefined ? null : decodeReasonedDissent(r.dissent),
+  };
+}
+
+const CONTROLLED_BY = ["NONE", "REVIEW", "APPELLATE_DECISION"] as const;
+
+export function decodeEffectiveRuling(raw: unknown): EffectiveRuling {
+  const r = asRecord(raw);
+  const verdictOrEmpty = (k: string): ReviewVerdict | "" => (str(r, k) === "" ? "" : oneOf(r, k, REVIEW_VERDICTS));
+  return {
+    proposal_id: int(r, "proposal_id"),
+    review_id: int(r, "review_id"),
+    original_verdict: verdictOrEmpty("original_verdict"),
+    appeal_id: int(r, "appeal_id"),
+    decision_kind: str(r, "decision_kind") === "" ? "" : oneOf(r, "decision_kind", DECISION_KINDS),
+    effective_verdict: verdictOrEmpty("effective_verdict"),
+    controlled_by: oneOf(r, "controlled_by", CONTROLLED_BY),
+    appealable: bool(r, "appealable"),
+    findings: listOf(r, "findings").map(decodeFinding),
+    status: str(r, "status"),
+  };
+}
+
+export function decodeReviewAppealStatus(raw: unknown): ReviewAppealStatus {
+  const r = asRecord(raw);
+  return {
+    review_id: int(r, "review_id"),
+    appealable: bool(r, "appealable"),
+    blocked_reason: str(r, "blocked_reason"),
+    appeal_id: int(r, "appeal_id"),
+    dissent_id: int(r, "dissent_id"),
+  };
+}
+
 function asList(raw: unknown): unknown[] {
   if (!Array.isArray(raw)) throw new Error("Expected a list from the contract");
   return raw;
@@ -630,6 +840,14 @@ export const getReviewRevisionId = async (reviewId: number) => {
 /** What precedent a review saw and cited: one bounded read (at most 24 candidates and 24 citations). */
 export const getReviewPrecedents = async (reviewId: number) => decodeReviewPrecedents(await view("get_review_precedents", [reviewId]));
 
+/** The whole appellate record in ONE read (appeal, original judgment, decision, findings, precedent treatment, dissent). */
+export const getAppealRecord = async (appealId: number) => decodeAppealRecord(await view("get_appeal_record", [appealId]));
+
+/** What currently controls a proposal, in one read. */
+export const getEffectiveRuling = async (proposalId: number) => decodeEffectiveRuling(await view("get_effective_ruling", [proposalId]));
+
+export const getReviewAppealStatus = async (reviewId: number) => decodeReviewAppealStatus(await view("get_review_appeal_status", [reviewId]));
+
 /** One prior section-level ruling in full, in a single read. */
 export const getPrecedentCase = async (reviewId: number, sectionId: string) =>
   decodePrecedentCase(await view("get_precedent_case", [reviewId, sectionId]));
@@ -691,3 +909,14 @@ export const submitRepairRevision = (c: ChainClient, proposalId: number, title: 
 /** Proposer only. A full constitutional review of an accepted revision (the same Stage 3 adjudication). */
 export const requestRevisionReview = (c: ChainClient, revisionId: number, on: OnState) =>
   write(c, "request_revision_review", [revisionId], on);
+
+/**
+ * Proposer only. Appeals the proposal's controlling adverse review on the CLOSED record that review judged. Takes only the ground and
+ * the statement: the record, the verdict and the disposition are all determined on-chain. New evidence, a newer charter and later
+ * precedent are never part of an appeal, and the original review is never changed.
+ */
+export const requestAppeal = (c: ChainClient, reviewId: number, ground: AppealGround, statement: string, on: OnState) =>
+  write(c, "request_appeal", [reviewId, ground, statement], on);
+
+/** Proposer only. Asks for a non-controlling, AI-generated alternative reading of an appeal's closed record. */
+export const requestReasonedDissent = (c: ChainClient, appealId: number, on: OnState) => write(c, "request_reasoned_dissent", [appealId], on);
