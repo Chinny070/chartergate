@@ -155,6 +155,46 @@ export interface RepairTarget {
   evidence_ids: number[];
 }
 
+export type PrecedentTreatment = "FOLLOWED" | "DISTINGUISHED";
+
+/** One prior section-level ruling that was available to a review (its precedent snapshot, in the contract's order). */
+export interface PrecedentCandidate {
+  section_id: string;
+  /** The exact rule identity: section id + "@" + section revision. */
+  rule: string;
+  precedent_review_id: number;
+  precedent_review_hash: string;
+}
+
+/** A precedent a finding cited, and whether it followed or distinguished it. The reason is explanatory prose only. */
+export interface PrecedentCitation {
+  section_id: string;
+  precedent_review_id: number;
+  treatment: PrecedentTreatment;
+  reason: string;
+}
+
+/** What precedent a review saw and used. `precedent_set_hash` is "" when no prior ruling existed under any of its rules. */
+export interface ReviewPrecedents {
+  review_id: number;
+  precedent_set_hash: string;
+  candidates: PrecedentCandidate[];
+  citations: PrecedentCitation[];
+}
+
+/** One prior ruling in full, for inspection: the review, its finding for one section, the text it judged and its cited evidence. */
+export interface PrecedentCase {
+  review: ConstitutionalReview;
+  finding: ReviewFinding;
+  rule: string;
+  title: string;
+  description: string;
+  requested_action: string;
+  revision_id: number;
+  revision_number: number;
+  evidence: EvidenceRecord[];
+}
+
 /**
  * Every contract method this wrapper can call, with its argument count. `charterGate.schema.test.ts`
  * compares this table to `docs/charter_gate.schema.json`, so a rename or signature change in the
@@ -197,6 +237,10 @@ export const CONTRACT_METHODS = {
   get_proposal_review_count: { args: 1, write: false },
   get_proposal_reviews_page: { args: 3, write: false },
   get_repair_targets: { args: 1, write: false },
+  get_review_precedents: { args: 1, write: false },
+  get_rule_precedent_count: { args: 1, write: false },
+  get_rule_precedents_page: { args: 3, write: false },
+  get_precedent_case: { args: 2, write: false },
 } as const;
 
 type ViewName = { [K in keyof typeof CONTRACT_METHODS]: (typeof CONTRACT_METHODS)[K]["write"] extends false ? K : never }[keyof typeof CONTRACT_METHODS];
@@ -429,6 +473,56 @@ export function decodeRepairTarget(raw: unknown): RepairTarget {
   };
 }
 
+export const PRECEDENT_TREATMENTS: readonly PrecedentTreatment[] = ["FOLLOWED", "DISTINGUISHED"];
+
+export function decodeReviewPrecedents(raw: unknown): ReviewPrecedents {
+  const r = asRecord(raw);
+  const list = (k: string): unknown[] => {
+    const v = r[k];
+    if (!Array.isArray(v)) throw new Error(`Contract field "${k}" is not a list`);
+    return v;
+  };
+  return {
+    review_id: int(r, "review_id"),
+    precedent_set_hash: str(r, "precedent_set_hash"),
+    candidates: list("candidates").map((c) => {
+      const x = asRecord(c);
+      return {
+        section_id: str(x, "section_id"),
+        rule: str(x, "rule"),
+        precedent_review_id: int(x, "precedent_review_id"),
+        precedent_review_hash: str(x, "precedent_review_hash"),
+      };
+    }),
+    citations: list("citations").map((c) => {
+      const x = asRecord(c);
+      return {
+        section_id: str(x, "section_id"),
+        precedent_review_id: int(x, "precedent_review_id"),
+        treatment: oneOf(x, "treatment", PRECEDENT_TREATMENTS),
+        reason: str(x, "reason"),
+      };
+    }),
+  };
+}
+
+export function decodePrecedentCase(raw: unknown): PrecedentCase {
+  const r = asRecord(raw);
+  const evidence = r.evidence;
+  if (!Array.isArray(evidence)) throw new Error('Contract field "evidence" is not a list');
+  return {
+    review: decodeReview(r.review),
+    finding: decodeFinding(r.finding),
+    rule: str(r, "rule"),
+    title: str(r, "title"),
+    description: str(r, "description"),
+    requested_action: str(r, "requested_action"),
+    revision_id: int(r, "revision_id"),
+    revision_number: int(r, "revision_number"),
+    evidence: evidence.map(decodeEvidence),
+  };
+}
+
 function asList(raw: unknown): unknown[] {
   if (!Array.isArray(raw)) throw new Error("Expected a list from the contract");
   return raw;
@@ -513,6 +607,13 @@ export const getReviewRevisionId = async (reviewId: number) => {
   if (typeof n !== "number" && typeof n !== "bigint") throw new Error("get_review_revision_id did not return an integer");
   return Number(n);
 };
+
+/** What precedent a review saw and cited: one bounded read (at most 24 candidates and 24 citations). */
+export const getReviewPrecedents = async (reviewId: number) => decodeReviewPrecedents(await view("get_review_precedents", [reviewId]));
+
+/** One prior section-level ruling in full, in a single read. */
+export const getPrecedentCase = async (reviewId: number, sectionId: string) =>
+  decodePrecedentCase(await view("get_precedent_case", [reviewId, sectionId]));
 
 // ---- writes -----------------------------------------------------------------------------
 

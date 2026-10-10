@@ -535,3 +535,20 @@ Full model: `docs/PROPOSAL_REVISION_MODEL.md`. Validator rule: `docs/STAGE_4_EQU
 * **Frontend:** a repair workspace (targets, current vs proposed revision, a field-level diff), the repair assessment shown separately from
   the transaction, the revision request/review, and a revision timeline.
 * **Not here:** precedent, dissent, appeals, amendments, voting, execution, accountability, evidence remediation for `INSUFFICIENT_EVIDENCE`.
+
+
+# Stage 5: precedent memory and consistency-aware review
+
+Full model: `docs/PRECEDENT_MEMORY_MODEL.md`. Validator rule: `docs/STAGE_5_EQUIVALENCE.md`.
+
+* **Constitutional memory, not law.** A new review can see up to 2 earlier rulings per section, under the **exact same rule identity** (section id and
+  section revision), from **other proposal lineages**, newest first. Precedent is advisory: the charter, the current case and the current VERIFIED evidence decide.
+* **Precedent is never evidence.** Prior evidence is shown only as historical context; a current finding can cite only current evidence.
+* **Deterministic and bounded.** An index per rule is appended only after a review is stored; the candidate scan is bounded; a stored snapshot per review is immutable.
+* **Hashes.** `precedent_set_hash` (`chartergate.precedents.v1`); `reviewcontext.v3` only when candidates exist; `review.v2` only when a precedent is cited.
+  Reviews without precedent keep the old formats exactly.
+* **Citations.** At most 2 per finding, `FOLLOWED` (consistent) or `DISTINGUISHED` (with a reason). Validators check the leader's chosen subset structurally; they do
+  not re-choose it, and no extra LLM call is added.
+* **Prompt boundary.** Everything a prior ruling carries (text, rationale, missing fact, evidence) is untrusted, defanged data in a fenced block.
+* **Frontend:** a Precedent Memory panel per review: available prior rulings per rule, followed or distinguished treatment, an inspector for each prior ruling, and an advisory note.
+* **Known limitation:** no reputation or approval of precedent, so contrived cases can pollute it. Not in Stage 5: appeals, dissent, overturning, weight, voting, execution.

@@ -128,7 +128,13 @@ def test_context_hash_commits_to_the_proposal_text_and_evidence_set(reviewable, 
     assert a["review_context_hash"] != b["review_context_hash"]
     assert b["evidence_set_hash"] == expected_set_hash(reviewable, 2)
     assert b["evidence_count_at_review"] == 0
-    assert b["review_context_hash"] == expected_context_hash(reviewable, 2)
+    # Stage 5: review 1 is precedent for review 2 (same rules, a different proposal), so review 2's context hash is the v3 hash
+    # over the v1 context recomputed above. A review with NO precedent keeps the v1 hash exactly (see test_review_record_fields).
+    base = expected_context_hash(reviewable, 2)
+    snapshot = reviewable.get_review_precedents(2)["precedent_set_hash"]
+    assert snapshot != ""
+    v3 = keccak_hex("\n".join(["chartergate.reviewcontext.v3", f"base_context_hash={base}", f"precedent_set_hash={snapshot}"]))
+    assert b["review_context_hash"] == v3 != base
 
 
 def test_changing_satisfied_to_not_applicable_changes_the_review_hash(charter, direct_vm, direct_alice):

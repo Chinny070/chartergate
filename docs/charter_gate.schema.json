@@ -230,6 +230,21 @@
         }
       ]
     },
+    "get_precedent_case": {
+      "params": [
+        [
+          "review_id",
+          "int"
+        ],
+        [
+          "section_id",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
     "get_proposal": {
       "params": [
         [
@@ -502,6 +517,17 @@
       "readonly": true,
       "ret": "int"
     },
+    "get_review_precedents": {
+      "params": [
+        [
+          "review_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
     "get_review_revision_id": {
       "params": [
         [
@@ -512,6 +538,40 @@
       "kwparams": {},
       "readonly": true,
       "ret": "int"
+    },
+    "get_rule_precedent_count": {
+      "params": [
+        [
+          "rule",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_rule_precedents_page": {
+      "params": [
+        [
+          "rule",
+          "string"
+        ],
+        [
+          "offset",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "int"
+        }
+      ]
     },
     "request_constitutional_review": {
       "params": [

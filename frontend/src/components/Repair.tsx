@@ -25,6 +25,7 @@ import {
   getRepairTargets,
   getReviewEvidenceIdsPage,
   getReviewFindingsPage,
+  getReviewPrecedents,
   LIMITS,
   requestRevisionReview,
   submitRepairRevision,
@@ -138,14 +139,18 @@ export function RevisionTimeline({ entries, sections }: { entries: readonly Line
 function RevisionReview({ review, sections }: { review: ConstitutionalReview; sections: readonly CharterRevision[] }) {
   const read = useRead(
     async () => {
-      const [findings, ids] = await Promise.all([getReviewFindingsPage(review.review_id), getReviewEvidenceIdsPage(review.review_id)]);
-      return { findings, ids };
+      const [findings, ids, precedents] = await Promise.all([
+        getReviewFindingsPage(review.review_id),
+        getReviewEvidenceIdsPage(review.review_id),
+        getReviewPrecedents(review.review_id),
+      ]);
+      return { findings, ids, precedents };
     },
     [review.review_id],
   );
   if (read.error) return <ErrorBanner title="Could not read the review">{read.error}</ErrorBanner>;
   if (read.data === null) return <Docket label="Constitutional review">Reading the finalized review from GenLayer…</Docket>;
-  return <ReviewResultView review={review} findings={read.data.findings} sections={sections} snapshotIds={read.data.ids} />;
+  return <ReviewResultView review={review} findings={read.data.findings} sections={sections} snapshotIds={read.data.ids} precedents={read.data.precedents} />;
 }
 
 /**

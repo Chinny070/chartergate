@@ -7,13 +7,12 @@ evidence and prior rulings, by an Intelligent Contract whose result is settled b
 AI-validator consensus. The goal is for every decision to be inspectable: the clause applied,
 the evidence used, the timestamp, the validator outcome.
 
-> **Status: Stage 4 (proposal repair and re-review), local only.** The contract stores a DAO charter with immutable history,
-> accepts proposals and **public web evidence** verified through validator consensus, and records an immutable **constitutional review**
-> of each proposal against the charter in force when it was submitted. A `REPAIRABLE` proposal can now be repaired: the proposer submits a
-> new immutable **revision** (the original and its review never change), GenLayer judges whether it is genuinely a repair, and the accepted
-> revision gets a full constitutional re-review under the same charter version. **Nothing handles precedent, appeals, voting or execution
-> yet.** The Stage 4 contract is not deployed; the Stage 3 verification deployment is recorded in `deployments/studionet.json`
-> (`canonicalDeployment` is still `null`). See `docs/PROPOSAL_REVISION_MODEL.md` and `docs/STAGE_4_EQUIVALENCE.md`.
+> **Status: Stage 5 (precedent memory), local only.** The contract stores a DAO charter with immutable history, accepts proposals and **public web
+> evidence** verified through validator consensus, records an immutable **constitutional review** of each proposal against the charter in force when it was
+> submitted, lets a `REPAIRABLE` proposal be repaired as an immutable revision with a full re-review, and now gives reviews **constitutional memory**: a bounded set
+> of earlier rulings under the exact same charter rule, cited as followed or distinguished. Precedent is advisory and never replaces the charter or current evidence.
+> **Nothing handles appeals, dissent, voting or execution yet.** The Stage 5 contract is not deployed; the Stage 4 verification deployment is recorded in
+> `deployments/studionet.json` (`canonicalDeployment` is still `null`). See `docs/PRECEDENT_MEMORY_MODEL.md` and `docs/STAGE_5_EQUIVALENCE.md`.
 
 ## Architecture
 

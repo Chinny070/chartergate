@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Button, Docket, ErrorBanner } from "./primitives";
 import { ChainTime } from "./common";
+import { PrecedentMemory } from "./Precedent";
 import { TransactionTimeline } from "./TransactionTimeline";
 import {
   adverseFindings,
@@ -19,11 +20,13 @@ import {
   getReviewEvidenceIdsPage,
   getReviewFindingsPage,
   getReviewIdForProposal,
+  getReviewPrecedents,
   requestConstitutionalReview,
   type CharterRevision,
   type ConstitutionalReview,
   type Proposal,
   type ReviewFinding,
+  type ReviewPrecedents,
 } from "../lib/genlayer/charterGate";
 import { useRead, useTx } from "../lib/genlayer/hooks";
 import { sameAddress } from "../lib/format";
@@ -81,11 +84,14 @@ export function ReviewResultView({
   findings,
   sections,
   snapshotIds,
+  precedents = null,
 }: {
   review: ConstitutionalReview;
   findings: readonly ReviewFinding[];
   sections: readonly CharterRevision[];
   snapshotIds: readonly number[];
+  /** The precedent snapshot and citations of this review; null when not loaded. */
+  precedents?: ReviewPrecedents | null;
 }) {
   const info = VERDICT_INFO[review.verdict];
   const { violated, unclear } = adverseFindings(findings);
@@ -153,6 +159,8 @@ export function ReviewResultView({
           ))}
         </div>
 
+        {precedents && <PrecedentMemory precedents={precedents} sections={sections} />}
+
         <div className="grid-2">
           <ChainTime label="Reviewed" value={review.created_at} />
           <div>
@@ -180,12 +188,13 @@ export function ReviewResultView({
 function StoredReview({ reviewId, sections, onVerdict }: { reviewId: number; sections: readonly CharterRevision[]; onVerdict?: (v: string) => void }) {
   const read = useRead(
     async () => {
-      const [review, findings, ids] = await Promise.all([
+      const [review, findings, ids, precedents] = await Promise.all([
         getConstitutionalReview(reviewId),
         getReviewFindingsPage(reviewId),
         getReviewEvidenceIdsPage(reviewId),
+        getReviewPrecedents(reviewId),
       ]);
-      return { review, findings, ids };
+      return { review, findings, ids, precedents };
     },
     [reviewId],
   );
@@ -195,7 +204,9 @@ function StoredReview({ reviewId, sections, onVerdict }: { reviewId: number; sec
   }, [verdict, onVerdict]);
   if (read.error) return <ErrorBanner title="Could not read the review">{read.error}</ErrorBanner>;
   if (read.data === null) return <Docket label="Constitutional review">Reading the finalized review from GenLayer…</Docket>;
-  return <ReviewResultView review={read.data.review} findings={read.data.findings} sections={sections} snapshotIds={read.data.ids} />;
+  return (
+    <ReviewResultView review={read.data.review} findings={read.data.findings} sections={sections} snapshotIds={read.data.ids} precedents={read.data.precedents} />
+  );
 }
 
 /**
