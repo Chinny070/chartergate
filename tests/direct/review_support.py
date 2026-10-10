@@ -54,13 +54,35 @@ def all_findings(s1=None, s2=None):
     return [s1 or fnd("1"), s2 or fnd("2", ev=[1])]
 
 
-def mock_review(vm, findings, *, extra=None, raw=None, must=(), must_not=()):
+def mock_review(vm, findings, *, extra=None, raw=None, must=(), must_not=(), pmust=(), pmust_not=(), check=True, precedent_raw=None, cmust=(), cmust_not=()):
     """What the (mocked) LLM returns for the review prompt. `must` / `must_not` are regexes that the prompt
     itself must (not) match, so a test can prove what the prompt contained: no match means no mock, which
-    fails the transaction."""
+    fails the transaction.
+
+    Stage 5.1: precedent is a SEPARATE pass. A finding that carries a "precedents" list is stripped from the base answer, and the
+    citations are served to the precedent-consistency prompt (`pmust` / `pmust_not` constrain THAT prompt). `check` is what the
+    validators' per-citation semantic check answers (True, False, or a callable taking the prompt)."""
+    cites = []
+    if raw is None:
+        base = []
+        for f in findings:
+            if not isinstance(f, dict):
+                base.append(f)
+                continue
+            f = dict(f)
+            for c in f.pop("precedents", None) or []:
+                cites.append({"section_id": f["section_id"], **c})
+            base.append(f)
+        findings = base
     payload = raw if raw is not None else {"findings": findings, **(extra or {})}
-    pattern = r"\A" + "".join(f"(?=[\\s\\S]*{m})" for m in must) + "".join(f"(?![\\s\\S]*{m})" for m in must_not)
+    pattern = r"\A" + "".join(rf"(?=[\s\S]*{m})" for m in must) + "".join(rf"(?![\s\S]*{m})" for m in must_not)
     vm.mock_llm(pattern + r"[\s\S]*" + DOC, payload if isinstance(payload, str) else json.dumps(payload))
+    ppat = r"\A" + "".join(rf"(?=[\s\S]*{m})" for m in pmust) + "".join(rf"(?![\s\S]*{m})" for m in pmust_not) + r"PRECEDENT CONSISTENCY ANALYSIS[\s\S]*"
+    pay = precedent_raw if precedent_raw is not None else {"precedents": cites}
+    vm.mock_llm(ppat + r"[\s\S]*", pay if isinstance(pay, str) else json.dumps(pay))
+    if check is not None:
+        cpat = r"\A" + "".join(rf"(?=[\s\S]*{m})" for m in cmust) + "".join(rf"(?![\s\S]*{m})" for m in cmust_not) + r"PRECEDENT CITATION CHECK[\s\S]*"
+        vm.mock_llm(cpat, json.dumps({"supported": bool(check)}))
 
 
 def mock_refs(vm, supporting=(), *, per_section=None):

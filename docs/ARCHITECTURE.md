@@ -547,8 +547,12 @@ Full model: `docs/PRECEDENT_MEMORY_MODEL.md`. Validator rule: `docs/STAGE_5_EQUI
 * **Deterministic and bounded.** An index per rule is appended only after a review is stored; the candidate scan is bounded; a stored snapshot per review is immutable.
 * **Hashes.** `precedent_set_hash` (`chartergate.precedents.v1`); `reviewcontext.v3` only when candidates exist; `review.v2` only when a precedent is cited.
   Reviews without precedent keep the old formats exactly.
-* **Citations.** At most 2 per finding, `FOLLOWED` (consistent) or `DISTINGUISHED` (with a reason). Validators check the leader's chosen subset structurally; they do
-  not re-choose it, and no extra LLM call is added.
-* **Prompt boundary.** Everything a prior ruling carries (text, rationale, missing fact, evidence) is untrusted, defanged data in a fenced block.
+* **Citations.** At most 2 per finding, `FOLLOWED` (consistent) or `DISTINGUISHED` (with a reason).
+* **Authority boundary (Stage 5.1, `docs/STAGE_5_1_AUTHORITY_BOUNDARY.md`).** The constitutional findings come from a base adjudication that **never sees
+  precedent**. Only afterwards does a separate, bounded precedent-consistency pass (leader only, only when candidates exist) annotate the fixed findings with
+  citations; it cannot change a finding, repairability, evidence reference, missing fact or the verdict. Validators check the leader's chosen citations
+  structurally and **semantically** (one bounded check per citation). A failed pass or citation stores nothing.
+* **Prompt boundary.** Everything a prior ruling carries (text, rationale, missing fact, evidence) is untrusted, defanged data in a fenced block, and is absent
+  from the base adjudication prompt entirely.
 * **Frontend:** a Precedent Memory panel per review: available prior rulings per rule, followed or distinguished treatment, an inspector for each prior ruling, and an advisory note.
 * **Known limitation:** no reputation or approval of precedent, so contrived cases can pollute it. Not in Stage 5: appeals, dissent, overturning, weight, voting, execution.

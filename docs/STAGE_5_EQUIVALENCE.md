@@ -1,8 +1,9 @@
 # Stage 5 equivalence principle: precedent-aware review
 
-Stage 5 does not add a nondeterministic call. Precedent is part of the **existing** constitutional review
-(`request_constitutional_review` / `request_revision_review`), so the Stage 3 and 3.1 rules in `docs/STAGE_3_EQUIVALENCE.md` still apply in full.
-This document says only what is new. The model is in `docs/PRECEDENT_MEMORY_MODEL.md`.
+Precedent is an annotation on the **existing** constitutional review (`request_constitutional_review` / `request_revision_review`). The Stage 3 and 3.1
+rules in `docs/STAGE_3_EQUIVALENCE.md` still apply in full: the base adjudication is the Stage 3.1 call and **never sees precedent** (Stage 5.1). After the
+findings are fixed, the leader runs one bounded precedent-consistency pass; validators semantically check the leader's chosen citations
+(`docs/STAGE_5_1_AUTHORITY_BOUNDARY.md`). This document says only what is new. The model is in `docs/PRECEDENT_MEMORY_MODEL.md`.
 
 ## 1. What every node rebuilds from its own state
 
@@ -30,28 +31,32 @@ Every citation in the leader's result is checked against this validator's own sn
 
 Citing a prior case's evidence id as current evidence is rejected by the existing Stage 3 rule that an id must belong to the current snapshot.
 
-## 4. Material agreement is unchanged
+## 4. Material agreement, then semantic validation of the leader's citations
 
-The validator runs its own analysis and the Stage 3 comparison is unchanged: the same verdict, the same class for every section, and the same repairability
-for violations, plus the Stage 3.1 evidence-reference check. **Citations are not compared.** The validator's own citations are parsed leniently (invalid ones are
-dropped, never an `LLM_ERROR`) because it validates the leader's selected subset instead of re-choosing it. This keeps leader rotation no higher than before.
+The validator re-runs the **base adjudication only** (no precedent in its prompt, no precedent pass of its own) and the Stage 3 comparison is unchanged: the
+same verdict, the same class for every section, and the same repairability for violations, plus the Stage 3.1 evidence-reference check.
+
+It then makes one bounded `PRECEDENT CITATION CHECK` call for each citation the **leader** chose, built from the validator's own fixed finding, its own
+reconstruction of the current case, the exact charter rule, the cited historical case and the citation. `FOLLOWED` must be materially comparable;
+`DISTINGUISHED` needs a prior case that is relevant AND a difference that is real (present in the current case) AND material. If any check says unsupported, the
+validator disagrees. A validator has no citations of its own to compare, so optional subset choice cannot cause a disagreement.
 
 Not compared and not hashed: the `reason` of any citation, any distinction prose, the order of explanations.
 
 ## 5. The current finding stays primary
 
-A finding's validity never depends on a citation. Removing all citations leaves the same classes and the same verdict. Precedent explains consistency; it
-cannot rescue an unsupported finding.
+A finding's validity never depends on a citation, and (Stage 5.1) the finding is produced before the model sees any precedent. Removing all citations leaves the same
+classes and the same verdict. Precedent explains consistency; it cannot rescue an unsupported finding.
 
 ## 6. Failure paths
 
-A review that fails (malformed output, an invalid citation from the leader, validators disagreeing until the transaction fails) writes nothing: no review id, no
+A review that fails (malformed output, an invalid or failing precedent pass, an invalid citation from the leader, validators disagreeing until the transaction fails) writes nothing: no review id, no
 index slot, no snapshot, no citation. The index is appended only after the review is stored.
 
 ## 7. Liveness
 
-The leader is strict about its own citations, so a model that cites a non-candidate or follows incompatibly produces an `LLM_ERROR` and a rotation. Stage 3 and 4
-live testing already showed rotations and retries for re-reviews; a longer prompt with a precedent block could make that slightly worse. This is an operational
+The leader is strict about its precedent pass, so a model that cites a non-candidate or follows incompatibly produces an `LLM_ERROR` and a rotation, and a validator may
+refuse a citation it finds semantically unsupported. Stage 3 and 4 live testing already showed rotations and retries for re-reviews; the extra passes could make that slightly worse. This is an operational
 observation to measure on StudioNet, not a relaxation of any rule.
 
 ## 8. What is not proven locally

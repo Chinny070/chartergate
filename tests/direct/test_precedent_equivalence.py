@@ -67,10 +67,10 @@ def test_a_validator_that_cites_nothing_still_accepts_the_leaders_valid_citation
     assert replay(direct_vm, findings(**VIOLATED)) is True  # the optional subset is validated, not re-chosen
 
 
-def test_a_validators_own_invalid_citations_do_not_make_it_reject(case, direct_vm):
+def test_a_validator_never_runs_its_own_precedent_pass_so_its_would_be_citations_are_irrelevant(case, direct_vm):
     case(findings(**FOLLOWED))
     junk = findings(precedents={"3": [cite(99, "FOLLOWED", ""), cite(1, "OVERRULED", "x")]}, **VIOLATED)
-    assert replay(direct_vm, junk) is True  # lenient: dropped, not an LLM_ERROR
+    assert replay(direct_vm, junk) is True  # Stage 5.1: the validator has no precedent pass of its own; junk is never read
 
 
 def test_a_valid_distinction_is_accepted(case, direct_vm):

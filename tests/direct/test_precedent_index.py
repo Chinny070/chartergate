@@ -28,7 +28,7 @@ from review_support import fnd, mock_review, request
 
 def test_the_first_review_has_no_precedent_context_and_keeps_the_old_formats(world, direct_vm):
     pid = propose(world)
-    mock_review(direct_vm, findings(**VIOLATED), must_not=["PRECEDENT"])  # the prompt is byte-for-byte the Stage 3 prompt
+    mock_review(direct_vm, findings(**VIOLATED), pmust_not=["PRECEDENT"])  # the prompt is byte-for-byte the Stage 3 prompt
     request(world, pid)
     p = precedents_of(world, 1)
     assert p == {"review_id": 1, "precedent_set_hash": "", "candidates": [], "citations": []}
@@ -51,7 +51,7 @@ def test_all_finding_classes_become_history(world, direct_vm):
     mock_review(
         direct_vm,
         findings(),
-        must=[r"historical_finding: NOT_APPLICABLE", r"historical_finding: UNCLEAR", r"historical_finding: VIOLATED\n"],
+        pmust=[r"historical_finding: NOT_APPLICABLE", r"historical_finding: UNCLEAR", r"historical_finding: VIOLATED\n"],
     )
     request(world, pid)
     assert [x["section_id"] for x in precedents_of(world, 2)["candidates"]] == ["1", "2", "3"]
@@ -76,12 +76,11 @@ def test_the_prompt_lists_the_precedent_as_untrusted_data_with_the_same_rule(wor
     mock_review(
         direct_vm,
         findings(),
-        must=[
+        pmust=[
             r"=== UNTRUSTED PRECEDENT CONTEXT: prior rulings under the SAME charter rule\. Advisory only; NOT evidence about this case ===",
             r"<<<DATA\nsection_id: 3\nrule: 3@4\nprecedent_review_id: 1\nhistorical_verdict: REPAIRABLE\nhistorical_finding: VIOLATED \(repairable\)\n",
             r"historical_proposal_title: Atlas Docs\n",
-            r"PRECEDENT: prior rulings by this DAO under the SAME charter rule",
-            r"A prior ruling can NEVER establish a fact about this proposal",
+            r"restate them\. You only annotate how they relate to earlier rulings of this DAO under the SAME charter rule",
         ],
     )
     request(world, pid)
@@ -120,7 +119,7 @@ def test_the_prompt_never_shows_the_amended_rules_old_ruling(world, direct_vm, d
     world.update_charter_section("3", "Budget", "Budget breakdowns are optional.")
     direct_vm.sender = direct_alice
     pid = propose(world, ITEMIZED)
-    mock_review(direct_vm, findings(), must=[r"section_id: 1\nrule: 1@2"], must_not=[r"section_id: 3\nrule: 3@4", r"rule: 3@4"])
+    mock_review(direct_vm, findings(), pmust=[r"section_id: 1\nrule: 1@2"], pmust_not=[r"section_id: 3\nrule: 3@4", r"rule: 3@4"])
     request(world, pid)
 
 
@@ -136,7 +135,7 @@ def test_a_proposals_own_earlier_reviews_are_not_external_precedent(world, direc
     mock_repair(direct_vm)
     world.submit_repair_revision(first, ITEMIZED[0], ITEMIZED[1], ITEMIZED[2])
     direct_vm.clear_mocks()
-    mock_review(direct_vm, findings(), must_not=["PRECEDENT"])  # review 1 is the same lineage: no candidates, no precedent block
+    mock_review(direct_vm, findings(), pmust_not=["PRECEDENT"])  # review 1 is the same lineage: no candidates, no precedent block
     world.request_revision_review(1)
     assert precedents_of(world, 2) == {"review_id": 2, "precedent_set_hash": "", "candidates": [], "citations": []}
     assert world.get_review_revision_id(2) == 1  # Stage 4 lineage stays visible separately
@@ -154,7 +153,7 @@ def test_a_revision_review_of_another_proposal_can_become_precedent(world, direc
     world.request_revision_review(1)  # review 2 judges the REVISION of proposal 1
     direct_vm.clear_mocks()
     other = propose(world, ITEMIZED)
-    mock_review(direct_vm, findings(), must=[r"precedent_review_id: 2\n", r"historical_proposal_description: Atlas Gateway is an open-source RPC gateway\. Budget"])
+    mock_review(direct_vm, findings(), pmust=[r"precedent_review_id: 2\n", r"historical_proposal_description: Atlas Gateway is an open-source RPC gateway\. Budget"])
     request(world, other)
     assert candidates_for(world, 3, "3") == [2, 1]  # newest first; both come from OTHER lineages' point of view
 
@@ -201,7 +200,7 @@ def test_repeated_construction_gives_the_identical_snapshot_and_order(world, dir
         request(world, pid)
     assert world.get_rule_precedent_count("3@4") == 3
     direct_vm.clear_mocks()
-    mock_review(direct_vm, findings(), must=[r"precedent_review_id: 3\n[\s\S]*precedent_review_id: 2\n"])  # newest first, in the prompt
+    mock_review(direct_vm, findings(), pmust=[r"precedent_review_id: 3\n[\s\S]*precedent_review_id: 2\n"])  # newest first, in the prompt
     request(world, pid)
     first = precedents_of(world, 4)
     assert first["precedent_set_hash"] == precedent_set_hash_reference(world, 4)
@@ -298,8 +297,8 @@ def test_historical_text_is_truncated_so_the_precedent_context_stays_bounded(wor
     mock_review(
         direct_vm,
         findings(),
-        must=[r"historical_proposal_description: Z{299}…\n"],  # 300 characters including the ellipsis
-        must_not=[r"Z{301}"],
+        pmust=[r"historical_proposal_description: Z{299}…\n"],  # 300 characters including the ellipsis
+        pmust_not=[r"Z{301}"],
     )
     request(world, pid)
 
@@ -310,7 +309,7 @@ def test_at_most_two_historical_evidence_records_are_shown_per_candidate(world, 
         add_verified_evidence(world, direct_vm, prior, fact=f"fact_{i}")
     review(world, direct_vm, prior, findings(s2_kw=dict(ev=[1, 2, 3])))
     pid = propose(world, ITEMIZED)
-    mock_review(direct_vm, findings(), must=[r"historical_evidence: id=1 [^\n]*\nhistorical_evidence: id=2 "], must_not=[r"historical_evidence: id=3 "])
+    mock_review(direct_vm, findings(), pmust=[r"historical_evidence: id=1 [^\n]*\nhistorical_evidence: id=2 "], pmust_not=[r"historical_evidence: id=3 "])
     request(world, pid)
     assert world.get_precedent_case(1, "2")["evidence"][2]["evidence_id"] == 3  # the full list stays readable on demand
 
@@ -321,11 +320,10 @@ def test_the_prompt_states_that_precedent_is_advisory_and_never_a_current_fact(w
     mock_review(
         direct_vm,
         findings(),
-        must=[
-            r"Precedent is advisory interpretive context only\. The charter, the current proposal and the current VERIFIED evidence decide every\n",
-            r"finding\. A prior ruling can NEVER establish a fact about this proposal: a fact stated or proven in a prior case is not evidence\n",
-            r"here, and you must not cite a prior case's evidence ids\. If the current evidence does not support a finding, precedent cannot rescue it\.\n",
-            r"Cite nothing if no prior case is materially relevant\. Omitting precedents is always acceptable\.",
+        pmust=[
+            r"Precedent is advisory\. It never establishes a fact about the current proposal, and facts or evidence of a prior case are not evidence here\.\n",
+            r"You cannot change, question or\n",
+            r"Cite nothing for a section if no prior ruling is materially relevant\. Omitting citations is always acceptable\.",
         ],
     )
     request(world, pid)

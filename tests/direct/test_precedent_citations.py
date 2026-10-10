@@ -27,9 +27,9 @@ def prior(world, direct_vm):
     return world
 
 
-def attempt(c, vm, fs, proposal_id=2):
+def attempt(c, vm, fs, proposal_id=2, **kw):
     vm.clear_mocks()
-    mock_review(vm, fs)
+    mock_review(vm, fs, **kw)
     request(c, proposal_id)
 
 
@@ -158,9 +158,10 @@ def test_same_lineage_reviews_cannot_be_cited(world, direct_vm):
     mock_repair(direct_vm)
     world.submit_repair_revision(first, ITEMIZED[0], ITEMIZED[1], ITEMIZED[2])
     direct_vm.clear_mocks()
-    mock_review(direct_vm, findings(precedents={"3": [cite(1, "DISTINGUISHED", "My own earlier review.")]}))
-    with direct_vm.expect_revert("LLM_ERROR:BAD_PRECEDENT_REF"):
-        world.request_revision_review(1)
+    # the lineage's own review is not a candidate, so the revision review has no candidates and runs NO precedent pass at all
+    mock_review(direct_vm, findings(), precedent_raw={"precedents": [{"section_id": "3", **cite(1, "DISTINGUISHED", "My own earlier review.")}]})
+    world.request_revision_review(1)
+    assert precedents_of(world, 2)["candidates"] == [] and precedents_of(world, 2)["citations"] == []
 
 
 @pytest.mark.parametrize(
@@ -184,7 +185,7 @@ def test_malformed_citations_fail_closed(prior, direct_vm, item, code):
 
 def test_a_non_list_precedents_field_fails_closed(prior, direct_vm):
     with direct_vm.expect_revert("LLM_ERROR:BAD_PRECEDENT_REF"):
-        attempt(prior, direct_vm, findings(precedents={"3": "review 1"}))
+        attempt(prior, direct_vm, findings(), precedent_raw={"precedents": "review 1"})
 
 
 def test_treatment_case_and_a_numeric_string_id_are_tolerated(prior, direct_vm):
@@ -210,11 +211,11 @@ def test_the_prior_evidence_is_shown_only_inside_the_precedent_block_never_as_cu
     mock_review(
         direct_vm,
         findings(s2="UNCLEAR"),
-        must=[
-            r"=== UNTRUSTED EVIDENCE DATA: VERIFIED \(may support facts\) ===\n\(none\)\n",  # the CURRENT proposal has no evidence
+        pmust=[
+            r"=== UNTRUSTED CURRENT CASE DATA: its VERIFIED evidence ===\n\(none\)",  # the CURRENT proposal has no evidence
             r"historical_evidence: id=1 fact=team_token_allocation value=46% ",  # the prior case's evidence, labelled historical
         ],
-        must_not=[r"=== UNTRUSTED EVIDENCE DATA: VERIFIED \(may support facts\) ===\n<<<DATA\nevidence_id: 1"],
+        pmust_not=[r"its VERIFIED evidence ===\n<<<DATA\nevidence_id: 1"],
     )
     request(evidenced, 2)
     assert review_of(evidenced, 2)["verdict"] == "INSUFFICIENT_EVIDENCE"

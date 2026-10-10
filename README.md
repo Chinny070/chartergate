@@ -10,9 +10,9 @@ the evidence used, the timestamp, the validator outcome.
 > **Status: Stage 5 (precedent memory), local only.** The contract stores a DAO charter with immutable history, accepts proposals and **public web
 > evidence** verified through validator consensus, records an immutable **constitutional review** of each proposal against the charter in force when it was
 > submitted, lets a `REPAIRABLE` proposal be repaired as an immutable revision with a full re-review, and now gives reviews **constitutional memory**: a bounded set
-> of earlier rulings under the exact same charter rule, cited as followed or distinguished. Precedent is advisory and never replaces the charter or current evidence.
+> of earlier rulings under the exact same charter rule, cited as followed or distinguished. Precedent is advisory and never replaces the charter or current evidence: the findings are produced by a model call that never sees precedent (Stage 5.1).
 > **Nothing handles appeals, dissent, voting or execution yet.** The Stage 5 contract is not deployed; the Stage 4 verification deployment is recorded in
-> `deployments/studionet.json` (`canonicalDeployment` is still `null`). See `docs/PRECEDENT_MEMORY_MODEL.md` and `docs/STAGE_5_EQUIVALENCE.md`.
+> `deployments/studionet.json` (`canonicalDeployment` is still `null`). See `docs/PRECEDENT_MEMORY_MODEL.md`, `docs/STAGE_5_EQUIVALENCE.md` and `docs/STAGE_5_1_AUTHORITY_BOUNDARY.md`.
 
 ## Architecture
 

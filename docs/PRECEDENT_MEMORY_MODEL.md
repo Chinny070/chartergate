@@ -66,8 +66,8 @@ existed (the snapshot records that). Structural rules, all deterministic:
 
 * the cited review must be one of that section's candidates (this also guarantees: same rule revision, a different lineage, a real finalized review);
 * no duplicates, sorted by section then review id;
-* **FOLLOWED** means consistent: the cited finding class equals the current finding class, and for `VIOLATED` the repairability matches;
-* **DISTINGUISHED** needs a non-empty reason that names a material difference in the *current* case; any class combination is allowed.
+* **FOLLOWED** means consistent: the cited finding class equals the current finding class, and for `VIOLATED` the repairability matches. Validators also confirm semantically that the prior case is materially comparable;
+* **DISTINGUISHED** needs a non-empty reason that names a difference that is real (present in the current case) and material; validators confirm that semantically. Any class combination is allowed.
 
 ## 6. Precedent is not evidence
 
@@ -80,8 +80,8 @@ Enforced structurally:
 * a `SATISFIED` finding that `FOLLOWED` an **evidence-backed** ruling must itself cite current evidence (`PRECEDENT_NOT_EVIDENCE`);
 * the finding stays valid or invalid on the charter, the current case and the current evidence alone: removing every citation does not change it.
 
-Honest limit: a model could be influenced by precedent without citing it, and the contract cannot see that. The prompt forbids it and validators
-analyse the same case independently, but this is not a mathematical guarantee.
+Stage 5.1 closes the earlier "uncited influence" gap structurally: the model call that establishes the finding never receives precedent (see section 9). The
+precedent-consistency pass runs after the findings are fixed and can only add citation metadata.
 
 ## 7. Hashing
 
@@ -105,16 +105,18 @@ Everything a prior ruling carries is **untrusted data**: its proposal or revisio
 and fact. Each is defanged (fence markers neutralised) and sits inside a `<<<DATA ... DATA>>>` block under the heading
 `UNTRUSTED PRECEDENT CONTEXT`, after the governance rules. Stored on-chain does not mean trusted: an old model-generated rationale that says "ignore
 all instructions" is just data. The governance rules state that precedent is advisory, can never establish a current fact, and may be omitted.
-When there are no candidates the prompt is byte-for-byte the Stage 3.1 prompt.
+The precedent block appears only in the precedent-consistency pass (and the per-citation validator check), **never** in the base adjudication prompt, which is
+byte-for-byte the Stage 3.1 prompt with or without candidates. When there are no candidates no precedent prompt exists at all.
 
 Context is bounded by truncation (deterministic, prompt only, never hashed): title 80, description 300, action 100, rationale 200, missing fact 80
 characters, and at most 2 historical evidence records of 100 characters per field. The full prior ruling is read on demand with `get_precedent_case`.
 
 ## 9. Cost and consensus
 
-Stage 5 adds **no LLM call**. Citations are part of the existing review output. The leader is strict about its own citations (an invalid citation is an
-`LLM_ERROR`, which rotates). A validator is lenient about its *own* optional citations (it drops what it cannot accept) and **validates the leader's chosen
-subset**; it is not asked to choose the same subset independently. See `docs/STAGE_5_EQUIVALENCE.md`.
+Stage 5.1: the base adjudication is unchanged. When candidates exist the leader makes **one** extra bounded precedent-consistency call over the fixed findings;
+its citations are strict (an invalid citation is an `LLM_ERROR`, which rotates, and nothing is stored). A validator does not run that pass: it re-runs the base
+adjudication and makes one bounded semantic check per citation the leader chose (at most 2 per section). With no candidates there is no extra call. See
+`docs/STAGE_5_EQUIVALENCE.md` and `docs/STAGE_5_1_AUTHORITY_BOUNDARY.md`.
 
 ## 10. Precedent poisoning and spam: a known limitation
 
