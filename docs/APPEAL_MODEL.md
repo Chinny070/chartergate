@@ -206,6 +206,8 @@ Historical precedent is **absent** from the base appellate prompt (proven by tes
 
 ## 12. Limits and known issues
 
+The frozen live-verification status, the accepted coverage gaps and the backlog (S6-G1 to S6-L7) are in `docs/STAGE_6_EQUIVALENCE.md`, section 10.
+
 * Real model behavior is not proven locally: the direct tests mock the LLM and prove the contract's own rules.
 * The appellate decision is not yet automatic precedent (section 7).
 * The case page shows the appellate history of the **controlling** review; an earlier appealed review that was later repaired is still on-chain and readable (`get_review_appeal_status`, `get_appeal_record`) but is not listed in the case page.

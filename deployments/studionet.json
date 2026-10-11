@@ -2179,7 +2179,7 @@
       },
       "knownDesignLimitation": "Appellate decisions are not yet indexed as precedent; a modified or reversed original review is excluded from future automatic precedent.",
       "liveValidation": {
-        "status": "PARTIAL",
+        "status": "CONDITIONALLY ACCEPTED: FROZEN WITH DOCUMENTED COVERAGE GAPS",
         "browserE2E": "PASS_WITH_NOTES (see browserE2E)",
         "notObservedLive": [
           "a stored reasoned dissent",
@@ -2426,6 +2426,16 @@
           "The browser dissent request produced the no-dissent rollback, not a stored dissent."
         ],
         "dissentRequestedInBrowser": "requested on appeal 4: rolled back NO_MATERIAL_DISSENT and the UI reported it correctly (tx 0xae196db6...)"
+      },
+      "freeze": {
+        "status": "CONDITIONALLY ACCEPTED: FROZEN WITH DOCUMENTED COVERAGE GAPS (not an unconditional pass)",
+        "notes": "docs/STAGE_6_EQUIVALENCE.md section 10 separates live evidence from direct-test coverage and lists the backlog S6-G1 to S6-L7. The contract, prompts, equivalence rules and validation rules are unchanged; no redeployment.",
+        "coverageGaps": [
+          "stored dissent",
+          "MODIFIED and REVERSED decisions",
+          "repair after a reversal",
+          "stranger authorization and the ELIGIBLE-review refusal"
+        ]
       }
     }
   }
