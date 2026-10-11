@@ -2515,6 +2515,41 @@
         "a non-owner account calling any method (single signer; covered by direct tests only)",
         "enable_amendment_governance (deliberately not activated)"
       ]
+    },
+    "throwaway_governance_test": {
+      "status": "THROWAWAY",
+      "note": "Disposable deployment used only to test the one-way governance switch. Never canonical; do not use.",
+      "address": "0xF4A0c02ec41202FA5DFA984b464ECA5a9c3579f0",
+      "deployTx": "0x46a04c02dae80833e563eaf1b14fe0620cd8c2bc82b5e4c58aa1d3937f95a5f8",
+      "sourceHash": "ccca5e4d6f00161a401b3e3505f65db4b26ebf50c87948ffb94e076cf4c11a28",
+      "methodCount": 72,
+      "signers": {
+        "owner": "my-studionet-wallet",
+        "stranger": "gltest-seller-a (local test account)"
+      },
+      "governanceEnabledTx": "0xb47b3606b94f41ee6583bb04803921e2a64c595d4e177394141ca5fbb63cf299",
+      "refusedTransactions": {
+        "stranger_enable": "0xdc294a57d16e826f2fcf7369713fb02ad4dd70f29c12657e7aa2c51c2ed0acd7",
+        "owner_enable_again": "0xdd2f0b7ed3526100150bf5cf58c7374fe91545a5c68b9b580bb8e2b8dac1ede4",
+        "owner_direct_add": "0x30257b310d853c982c14df7480b599879aeed84310dbfd5e4b14e2386bebcedd",
+        "owner_direct_update": "0x12dbd9dc0e568e6731ba5148a750d2d43b5bde97ddc45e8187a29ffc9f7bcda1",
+        "owner_direct_deactivate": "0x6b873d9d30c9427eaf9c86fb0f67f54e75bf50b486fb04ac4b7aec7d2032885d",
+        "stranger_direct_add_after_activation": "0x7a410835f49d67f1d6baa87403d40ed0ce6885e9d06ad722c3b0440bc3228249",
+        "stale_evaluation": "0x1e8c8895d9618ebff18914dca33e022affbe64e7dd329f03dc507a49c5034dfb",
+        "stranger_apply_not_proposer": "0xba8d834032f4aaa9f61dd2e7212eca6c2d67db669536fc14fce066f91166d241"
+      },
+      "amendmentTransactionsAfterActivation": {
+        "a1_apply": "0x91313127c7864f62a0aed6f6674d3e4c8df463e64d6b86417d0dc1ba400d8437",
+        "a2_close_stale": "0xda90896eb5d90758ba06cf4d6d8ec5d7b71a12db79a5e0657c2c03371cc21669",
+        "a3_propose": "0xf5d42ee1868267100d4f3c41fd40edccff3d4b8ab93333918f873a78c9583dda",
+        "a3_evaluate": "0x43783dd8cbb6eaa0028c7151651e713c76c9197a1e043b1f1117f3356b229a08",
+        "a3_approve": "0xd1d9e30e746fa43b3fbbb2062a8dfea2fffd0e8f60b442e490a2fc40800337a6",
+        "a3_apply": "0xfc4d13e78af1876fd86f6dac53c08bdaac0f3fc84874de8af320e062e489ca41"
+      },
+      "notVerified": [
+        "DEACTIVATE amendment live (CLI 0.39.1 cannot send an empty-string argument; covered by direct tests)"
+      ],
+      "details": "docs/GOVERNANCE_VERIFICATION.md"
     }
   }
 }

@@ -77,3 +77,4 @@ Use a fresh deployment. Step 7 is **irreversible** for that deployment.
   amendment refused, proposal execution reports (always unverified), an AFFIRMED appeal and a stored reasoned dissent. Every transaction and refusal is listed in `deployments/studionet.json`.
 * **Not observed:** the governance switch (deliberately not activated; it is irreversible), MODIFIED or REVERSED appeals, repair after a reversal, validator disagreement on these transactions, any non-owner account.
 * `canonicalDeployment` stays `null`.
+* Governance switch safety verification on a throwaway deployment, lock-out analysis and the demo script: `docs/GOVERNANCE_VERIFICATION.md`. The live switch is still OFF.
