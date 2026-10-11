@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { CHARTERGATE_ADDRESS, CHAIN, STUDIONET_CHAIN_ID } from "../config/chain";
 import { Badge, Docket, ErrorBanner } from "../components/primitives";
 import { ReadBoundary } from "../components/common";
@@ -24,7 +24,8 @@ export function Home() {
           on GenLayer.
         </p>
         <div className="row">
-          <Badge tone="warning">Stage 2 · charter, proposals + evidence vault</Badge>
+          <Badge tone="final">Review · repair · precedent · appeals</Badge>
+          <Badge tone="final">Amendments · accountability</Badge>
         </div>
       </section>
 
@@ -41,6 +42,26 @@ export function Home() {
           </Docket>
         )}
       </ReadBoundary>
+
+      <Docket label="Where to start">
+        <ul style={{ margin: 0, paddingLeft: 18 }}>
+          <li>
+            <Link to="/constitution">The charter</Link>: the rules in force and every earlier version.
+          </li>
+          <li>
+            <Link to="/proposals">Proposals</Link>: submit one, add evidence, request a constitutional review, repair it or appeal the ruling.
+          </li>
+          <li>
+            <Link to="/precedent">Precedent</Link>: how earlier rulings guide, but never decide, a case.
+          </li>
+          <li>
+            <Link to="/constitution/amend">Amendments</Link>: change the charter on the record.
+          </li>
+          <li>
+            <Link to="/accountability">Accountability</Link>: what happened after a decision, and what is verified.
+          </li>
+        </ul>
+      </Docket>
 
       <div className="grid-2">
         <Docket label="Foundation status">
@@ -70,16 +91,12 @@ export function Home() {
   );
 }
 
-/** Honest placeholder: routes exist, features are planned for later stages. */
-export function Planned({ title, stage }: { title: string; stage: string }) {
-  const { id } = useParams();
+/** Shown for an address that matches no page. */
+export function NotFound() {
   return (
     <div className="stack">
-      <h1 style={{ fontSize: "clamp(2rem, 6vw, 4rem)" }}>{title}</h1>
-      {id && <p className="hash">ref: {id}</p>}
-      <Docket label="Not implemented">
-        This page is planned for {stage}. So far CharterGate implements the charter, proposals and the evidence vault.
-      </Docket>
+      <h1 style={{ fontSize: "clamp(2rem, 6vw, 4rem)" }}>Not found</h1>
+      <Docket label="No such page">This address does not match any page of CharterGate.</Docket>
       <Link to="/" className="label">
         ← back to court
       </Link>

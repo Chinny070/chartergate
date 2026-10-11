@@ -6,6 +6,7 @@ import { EvidenceList, SubmitEvidenceForm } from "../components/Evidence";
 import { ConstitutionalReviewPanel } from "../components/Review";
 import { LineagePanel } from "../components/Repair";
 import { AppealPanel } from "../components/Appeal";
+import { ProposalAccountabilityPanel } from "../components/Accountability";
 import { statusLabel, statusTone } from "../lib/review";
 import { shortAddress } from "../lib/format";
 import { TransactionTimeline } from "../components/TransactionTimeline";
@@ -91,6 +92,8 @@ export function ProposalDetailPage() {
                 <LineagePanel proposal={p} onStatus={setVerdict} refreshKey={refresh} />
                 {/* Repair changes the proposal; an appeal challenges the ruling on the existing closed record. */}
                 <AppealPanel proposal={p} refreshKey={refresh} onChanged={() => setRefresh((n) => n + 1)} />
+                {/* What happened after an approved decision. Self-reported and never verified by the contract. */}
+                <ProposalAccountabilityPanel proposal={p} refreshKey={refresh} />
               </div>
               <Docket label="Status">
                 <div className="stack">

@@ -252,6 +252,21 @@ export const CONTRACT_METHODS = {
   get_appeal_record: { args: 1, write: false },
   get_reasoned_dissent: { args: 1, write: false },
   get_effective_ruling: { args: 1, write: false },
+  enable_amendment_governance: { args: 0, write: true },
+  propose_amendment: { args: 7, write: true },
+  request_amendment_evaluation: { args: 1, write: true },
+  approve_amendment: { args: 1, write: true },
+  reject_amendment: { args: 1, write: true },
+  apply_amendment: { args: 1, write: true },
+  close_stale_amendment: { args: 1, write: true },
+  report_execution: { args: 3, write: true },
+  get_governance_status: { args: 0, write: false },
+  get_amendment: { args: 1, write: false },
+  get_amendment_count: { args: 0, write: false },
+  get_amendments_page: { args: 2, write: false },
+  get_amendment_accountability: { args: 1, write: false },
+  get_proposal_accountability: { args: 1, write: false },
+  get_precedent_overview: { args: 0, write: false },
 } as const;
 
 type ViewName = { [K in keyof typeof CONTRACT_METHODS]: (typeof CONTRACT_METHODS)[K]["write"] extends false ? K : never }[keyof typeof CONTRACT_METHODS];
@@ -360,6 +375,101 @@ export interface ReviewAppealStatus {
   blocked_reason: string;
   appeal_id: number;
   dissent_id: number;
+}
+
+export type AmendmentAction = "ADD" | "UPDATE" | "DEACTIVATE";
+export type AmendmentStatus = "PROPOSED" | "EVALUATED" | "APPROVED" | "REJECTED" | "APPLIED" | "SUPERSEDED";
+export type AmendmentExecutionState = "NOT_APPROVED" | "APPROVED_NOT_APPLIED" | "APPROVED_BUT_STALE" | "APPLIED" | "REJECTED" | "SUPERSEDED";
+
+/** A proposed charter change, written against one exact charter version. */
+export interface Amendment {
+  amendment_id: number;
+  proposer: string;
+  action: AmendmentAction;
+  section_id: string;
+  title: string;
+  body: string;
+  rationale: string;
+  base_version: number;
+  /** 0 when the amendment does not reference a proposal. */
+  source_proposal_id: number;
+  status: AmendmentStatus;
+  amendment_hash: string;
+  created_at: string;
+  /** "" until evaluated; the evaluation only advises. */
+  eval_verdict: "" | "COMPATIBLE" | "CONFLICTING";
+  eval_conflicting_section_ids: string[];
+  eval_hash: string;
+  evaluated_at: string;
+  decided_by: string;
+  decided_at: string;
+  /** 0 until applied. */
+  applied_version: number;
+  applied_by: string;
+  applied_at: string;
+}
+
+export interface AmendmentEvent {
+  kind: string;
+  actor: string;
+  at: string;
+  charter_version: number;
+}
+
+/** What the contract itself can establish about an amendment's execution. */
+export interface AmendmentAccountability {
+  amendment: Amendment;
+  events: AmendmentEvent[];
+  stale: boolean;
+  current_charter_version: number;
+  execution_state: AmendmentExecutionState;
+  contract_verified: boolean;
+}
+
+export interface GovernanceStatus {
+  governance_enabled: boolean;
+  governance_enabled_at: string;
+  charter_version: number;
+  owner: string;
+  amendment_count: number;
+}
+
+export type ExecutionOutcome = "ATTEMPTED" | "REPORTED_COMPLETE" | "REPORTED_FAILED";
+
+/** A proposer's report about executing an approved proposal. Self-reported: `verified` is always false. */
+export interface ExecutionReport {
+  report_number: number;
+  proposal_id: number;
+  outcome: ExecutionOutcome;
+  note: string;
+  reporter: string;
+  reported_at: string;
+  charter_version: number;
+  review_id: number;
+  appeal_id: number;
+  ruling_hash: string;
+  verified: boolean;
+}
+
+export interface ProposalAccountability {
+  proposal_id: number;
+  review_id: number;
+  appeal_id: number;
+  effective_verdict: ReviewVerdict | "";
+  ruling_hash: string;
+  charter_version: number;
+  approved: boolean;
+  execution_state: "NOT_APPROVED" | "APPROVED_NOT_REPORTED" | ExecutionOutcome;
+  reports: ExecutionReport[];
+  verified: boolean;
+}
+
+export interface PrecedentRule {
+  section_id: string;
+  title: string;
+  rule: string;
+  review_count: number;
+  newest_review_ids: number[];
 }
 
 export const RETRIEVAL_METHODS: readonly RetrievalMethod[] = ["GET", "RENDER_TEXT"];
@@ -733,6 +843,121 @@ export function decodeReviewAppealStatus(raw: unknown): ReviewAppealStatus {
   };
 }
 
+export const AMENDMENT_ACTIONS: readonly AmendmentAction[] = ["ADD", "UPDATE", "DEACTIVATE"];
+export const AMENDMENT_STATUSES: readonly AmendmentStatus[] = ["PROPOSED", "EVALUATED", "APPROVED", "REJECTED", "APPLIED", "SUPERSEDED"];
+export const AMENDMENT_EXECUTION_STATES: readonly AmendmentExecutionState[] = ["NOT_APPROVED", "APPROVED_NOT_APPLIED", "APPROVED_BUT_STALE", "APPLIED", "REJECTED", "SUPERSEDED"];
+export const EXECUTION_OUTCOMES: readonly ExecutionOutcome[] = ["ATTEMPTED", "REPORTED_COMPLETE", "REPORTED_FAILED"];
+
+export function decodeAmendment(raw: unknown): Amendment {
+  const r = asRecord(raw);
+  const conflicts = listOf(r, "eval_conflicting_section_ids");
+  if (conflicts.some((x) => typeof x !== "string")) throw new Error('Contract field "eval_conflicting_section_ids" is not a list of strings');
+  const verdict = str(r, "eval_verdict");
+  if (verdict !== "" && verdict !== "COMPATIBLE" && verdict !== "CONFLICTING") throw new Error(`Contract field "eval_verdict" has unknown value "${verdict}"`);
+  return {
+    amendment_id: int(r, "amendment_id"),
+    proposer: str(r, "proposer"),
+    action: oneOf(r, "action", AMENDMENT_ACTIONS),
+    section_id: str(r, "section_id"),
+    title: str(r, "title"),
+    body: str(r, "body"),
+    rationale: str(r, "rationale"),
+    base_version: int(r, "base_version"),
+    source_proposal_id: int(r, "source_proposal_id"),
+    status: oneOf(r, "status", AMENDMENT_STATUSES),
+    amendment_hash: str(r, "amendment_hash"),
+    created_at: str(r, "created_at"),
+    eval_verdict: verdict,
+    eval_conflicting_section_ids: conflicts as string[],
+    eval_hash: str(r, "eval_hash"),
+    evaluated_at: str(r, "evaluated_at"),
+    decided_by: str(r, "decided_by"),
+    decided_at: str(r, "decided_at"),
+    applied_version: int(r, "applied_version"),
+    applied_by: str(r, "applied_by"),
+    applied_at: str(r, "applied_at"),
+  };
+}
+
+function decodeAmendmentEvent(raw: unknown): AmendmentEvent {
+  const r = asRecord(raw);
+  return { kind: str(r, "kind"), actor: str(r, "actor"), at: str(r, "at"), charter_version: int(r, "charter_version") };
+}
+
+export function decodeAmendmentAccountability(raw: unknown): AmendmentAccountability {
+  const r = asRecord(raw);
+  return {
+    amendment: decodeAmendment(r.amendment),
+    events: listOf(r, "events").map(decodeAmendmentEvent),
+    stale: bool(r, "stale"),
+    current_charter_version: int(r, "current_charter_version"),
+    execution_state: oneOf(r, "execution_state", AMENDMENT_EXECUTION_STATES),
+    contract_verified: bool(r, "contract_verified"),
+  };
+}
+
+export function decodeGovernanceStatus(raw: unknown): GovernanceStatus {
+  const r = asRecord(raw);
+  return {
+    governance_enabled: bool(r, "governance_enabled"),
+    governance_enabled_at: str(r, "governance_enabled_at"),
+    charter_version: int(r, "charter_version"),
+    owner: str(r, "owner"),
+    amendment_count: int(r, "amendment_count"),
+  };
+}
+
+export function decodeExecutionReport(raw: unknown): ExecutionReport {
+  const r = asRecord(raw);
+  return {
+    report_number: int(r, "report_number"),
+    proposal_id: int(r, "proposal_id"),
+    outcome: oneOf(r, "outcome", EXECUTION_OUTCOMES),
+    note: str(r, "note"),
+    reporter: str(r, "reporter"),
+    reported_at: str(r, "reported_at"),
+    charter_version: int(r, "charter_version"),
+    review_id: int(r, "review_id"),
+    appeal_id: int(r, "appeal_id"),
+    ruling_hash: str(r, "ruling_hash"),
+    verified: bool(r, "verified"),
+  };
+}
+
+export function decodeProposalAccountability(raw: unknown): ProposalAccountability {
+  const r = asRecord(raw);
+  const verdict = str(r, "effective_verdict");
+  const state = str(r, "execution_state");
+  if (state !== "NOT_APPROVED" && state !== "APPROVED_NOT_REPORTED" && !(EXECUTION_OUTCOMES as readonly string[]).includes(state)) {
+    throw new Error(`Contract field "execution_state" has unknown value "${state}"`);
+  }
+  return {
+    proposal_id: int(r, "proposal_id"),
+    review_id: int(r, "review_id"),
+    appeal_id: int(r, "appeal_id"),
+    effective_verdict: verdict === "" ? "" : oneOf(r, "effective_verdict", REVIEW_VERDICTS),
+    ruling_hash: str(r, "ruling_hash"),
+    charter_version: int(r, "charter_version"),
+    approved: bool(r, "approved"),
+    execution_state: state as ProposalAccountability["execution_state"],
+    reports: listOf(r, "reports").map(decodeExecutionReport),
+    verified: bool(r, "verified"),
+  };
+}
+
+export function decodePrecedentRule(raw: unknown): PrecedentRule {
+  const r = asRecord(raw);
+  const ids = listOf(r, "newest_review_ids");
+  if (ids.some((i) => typeof i !== "number" && typeof i !== "bigint")) throw new Error('Contract field "newest_review_ids" is not a list of integers');
+  return {
+    section_id: str(r, "section_id"),
+    title: str(r, "title"),
+    rule: str(r, "rule"),
+    review_count: int(r, "review_count"),
+    newest_review_ids: ids.map((i) => Number(i)),
+  };
+}
+
 function asList(raw: unknown): unknown[] {
   if (!Array.isArray(raw)) throw new Error("Expected a list from the contract");
   return raw;
@@ -846,6 +1071,22 @@ export const getAppealRecord = async (appealId: number) => decodeAppealRecord(aw
 /** What currently controls a proposal, in one read. */
 export const getEffectiveRuling = async (proposalId: number) => decodeEffectiveRuling(await view("get_effective_ruling", [proposalId]));
 
+/** Charter governance: whether direct owner edits are closed, the current charter version and the amendment count. One read. */
+export const getGovernanceStatus = async () => decodeGovernanceStatus(await view("get_governance_status"));
+
+export const getAmendmentsPage = async (offset = 0, limit: number = LIMITS.pageSize) =>
+  asList(await view("get_amendments_page", [offset, limit])).map(decodeAmendment);
+
+/** One amendment with its whole lifecycle and what the contract can establish about its execution. One read. */
+export const getAmendmentAccountability = async (amendmentId: number) =>
+  decodeAmendmentAccountability(await view("get_amendment_accountability", [amendmentId]));
+
+/** What decided a proposal and what its proposer reported about executing it (self-reported, never verified). One read. */
+export const getProposalAccountability = async (proposalId: number) => decodeProposalAccountability(await view("get_proposal_accountability", [proposalId]));
+
+/** For every active rule of the current charter: how many reviews interpreted it. One read. */
+export const getPrecedentOverview = async () => asList(await view("get_precedent_overview")).map(decodePrecedentRule);
+
 export const getReviewAppealStatus = async (reviewId: number) => decodeReviewAppealStatus(await view("get_review_appeal_status", [reviewId]));
 
 /** One prior section-level ruling in full, in a single read. */
@@ -920,3 +1161,41 @@ export const requestAppeal = (c: ChainClient, reviewId: number, ground: AppealGr
 
 /** Proposer only. Asks for a non-controlling, AI-generated alternative reading of an appeal's closed record. */
 export const requestReasonedDissent = (c: ChainClient, appealId: number, on: OnState) => write(c, "request_reasoned_dissent", [appealId], on);
+
+/** Owner only, one way. Afterwards the charter changes only through an approved, applied amendment. */
+export const enableAmendmentGovernance = (c: ChainClient, on: OnState) => write(c, "enable_amendment_governance", [], on);
+
+/**
+ * Anyone may propose. The charter version is the one the proposer read: if the charter has moved on by the time the contract runs,
+ * the amendment is refused as stale rather than being written against a charter nobody saw.
+ */
+export const proposeAmendment = (
+  c: ChainClient,
+  action: AmendmentAction,
+  sectionId: string,
+  title: string,
+  body: string,
+  baseVersion: number,
+  rationale: string,
+  sourceProposalId: number,
+  on: OnState,
+) => write(c, "propose_amendment", [action, sectionId, title, body, baseVersion, rationale, sourceProposalId], on);
+
+/** Proposer or owner. A model advises whether the change is compatible with the rest of the charter. It approves nothing. */
+export const requestAmendmentEvaluation = (c: ChainClient, amendmentId: number, on: OnState) => write(c, "request_amendment_evaluation", [amendmentId], on);
+
+/** Owner only, and only for a COMPATIBLE evaluation of an amendment that is not stale. */
+export const approveAmendment = (c: ChainClient, amendmentId: number, on: OnState) => write(c, "approve_amendment", [amendmentId], on);
+
+/** The owner rejects, or the proposer withdraws, an open amendment. */
+export const rejectAmendment = (c: ChainClient, amendmentId: number, on: OnState) => write(c, "reject_amendment", [amendmentId], on);
+
+/** Proposer or owner. Applies an approved amendment through the charter versioning, only to the exact version it was written against. */
+export const applyAmendment = (c: ChainClient, amendmentId: number, on: OnState) => write(c, "apply_amendment", [amendmentId], on);
+
+/** Proposer or owner. Records that an open amendment can no longer apply because the charter moved on. */
+export const closeStaleAmendment = (c: ChainClient, amendmentId: number, on: OnState) => write(c, "close_stale_amendment", [amendmentId], on);
+
+/** Proposer only. A self-reported, append-only note about executing an approved proposal. The contract cannot verify it. */
+export const reportExecution = (c: ChainClient, proposalId: number, outcome: ExecutionOutcome, note: string, on: OnState) =>
+  write(c, "report_execution", [proposalId, outcome, note], on);

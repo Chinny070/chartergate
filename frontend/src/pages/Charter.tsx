@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Badge, Button, Docket, Paper } from "../components/primitives";
 import { ChainTime, Field, ReadBoundary } from "../components/common";
 import { sameAddress, shortAddress } from "../lib/format";
@@ -6,8 +7,10 @@ import { TransactionTimeline } from "../components/TransactionTimeline";
 import {
   addCharterSection,
   deactivateCharterSection,
+  getCharterSectionsAtVersionPage,
   getCharterSectionsPage,
   getDaoMetadata,
+  getGovernanceStatus,
   LIMITS,
   SECTION_ID_PATTERN,
   updateCharterSection,
@@ -20,8 +23,12 @@ export function CharterPage() {
   const wallet = useWallet();
   const meta = useRead(getDaoMetadata);
   const sections = useRead(() => getCharterSectionsPage(0, LIMITS.pageSize));
+  const gov = useRead(getGovernanceStatus);
   const { tx, busy, run, reset } = useTx();
   const isOwner = sameAddress(wallet.address, meta.data?.owner);
+  // Once amendment governance is on, the contract refuses direct owner edits, so the forms are not offered.
+  const governed = gov.data?.governance_enabled === true;
+  const canEdit = isOwner && gov.data !== null && !governed;
 
   const refresh = () => {
     meta.reload();
@@ -55,11 +62,17 @@ export function CharterPage() {
         )}
       </ReadBoundary>
 
-      {isOwner && (
+      {governed && (
+        <Docket label="Amendment governance is on">
+          <p>The charter now changes only through an approved, applied amendment, and direct owner edits are closed.</p>
+          <Link to="/constitution/amend">Propose or follow an amendment</Link>
+        </Docket>
+      )}
+      {canEdit && (
         <AddSection busy={busy} onAdd={(id, t, b) => mutate((c, on) => addCharterSection(c, id, t, b, on))} />
       )}
       {wallet.connection === "ready" && meta.data && !isOwner && (
-        <p className="label">Read-only: only the contract owner can change the charter.</p>
+        <p className="label">Read-only: only the contract owner can change the charter directly. Anyone can <Link to="/constitution/amend">propose an amendment</Link>.</p>
       )}
       {tx.phase !== "ready" && (
         <Docket label="Transaction">
@@ -72,6 +85,8 @@ export function CharterPage() {
         </Docket>
       )}
 
+      {meta.data && meta.data.charter_version > 1 && <VersionHistory current={meta.data.charter_version} />}
+
       <ReadBoundary read={sections}>
         {(list) =>
           list.length === 0 ? (
@@ -82,7 +97,7 @@ export function CharterPage() {
                 <SectionCard
                   key={s.section_id}
                   section={s}
-                  canEdit={isOwner}
+                  canEdit={canEdit}
                   busy={busy}
                   onSave={(t, b) => mutate((c, on) => updateCharterSection(c, s.section_id, t, b, on))}
                   onDeactivate={() => mutate((c, on) => deactivateCharterSection(c, s.section_id, on))}
@@ -190,5 +205,51 @@ function SectionCard(props: {
         </div>
       )}
     </Paper>
+  );
+}
+
+/** Every charter version: the sections exactly as they read when that version was produced. One read per version viewed. */
+function VersionHistory({ current }: { current: number }) {
+  const [version, setVersion] = useState(current);
+  const read = useRead(() => getCharterSectionsAtVersionPage(version, 0, LIMITS.pageSize), [version]);
+  return (
+    <Docket label="Charter history">
+      <div className="stack">
+        <label className="field">
+          <span className="label">Version</span>
+          <select value={version} onChange={(e) => setVersion(Number(e.target.value))}>
+            {Array.from({ length: current }, (_, i) => current - i).map((v) => (
+              <option key={v} value={v}>
+                v{v}
+                {v === current ? " (current)" : ""}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="muted">A proposal is always judged under the version in force when it was submitted. Earlier versions are never altered.</p>
+        <ReadBoundary read={read}>
+          {(list) =>
+            list.length === 0 ? (
+              <p>This version has no sections.</p>
+            ) : (
+              <div className="stack">
+                {list.map((s) => (
+                  <div key={s.section_id}>
+                    <strong>
+                      §{s.section_id} {s.title}
+                    </strong>{" "}
+                    <Badge tone={s.active ? "eligible" : "ineligible"}>{s.active ? "Active" : "Deactivated"}</Badge>
+                    <p className="muted" style={{ whiteSpace: "pre-wrap" }}>
+                      {s.body}
+                    </p>
+                    <span className="label">section revision {s.charter_version}</span>
+                  </div>
+                ))}
+              </div>
+            )
+          }
+        </ReadBoundary>
+      </div>
+    </Docket>
   );
 }
