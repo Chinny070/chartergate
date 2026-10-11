@@ -2437,6 +2437,84 @@
           "stranger authorization and the ELIGIBLE-review refusal"
         ]
       }
+    },
+    "stages_7_11_release_candidate": {
+      "status": "VERIFICATION_DEPLOYMENT",
+      "note": "Release-candidate deployment (Stages 7-11, 72 methods). Not canonical. The amendment-governance switch has NOT been activated on it.",
+      "address": "0xC97b91Bd8ede96533B17EFf86D98cDff6c700736",
+      "deployTx": "0x959d4bd3dd68f846bc50b76bae742297c57a64ed67bb4594e01d7026038ba1b3",
+      "deployer": "0xaffe15eec45b68835cc9e5b4ab85dd5deae8e70b",
+      "deployedAt": "2026-10-11T09:59:23Z",
+      "gitCommit": "ef260796f96ada4a0206e5194510d1438b1f2433",
+      "sourceHash": "ccca5e4d6f00161a401b3e3505f65db4b26ebf50c87948ffb94e076cf4c11a28",
+      "methodCount": 72,
+      "verified": {
+        "finality": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "sourceHashMatchesDeployed": true,
+        "schemaIdenticalToLocal": true
+      },
+      "frontend": "https://chartergate.vercel.app (built with VITE_CHARTERGATE_ADDRESS set to this address; production bundle contains only this address)",
+      "liveFixtures": {
+        "charterVersions": "v1 s1, v2 s3 (owner direct adds), v4 via amendment 1, v5 via amendment 2",
+        "amendments": {
+          "1": "ADD s4 Timeline: evaluated COMPATIBLE, approved, applied (charter v4)",
+          "2": "UPDATE s3 Budget: evaluated COMPATIBLE, approved, applied (charter v5)",
+          "3": "ADD s5 Reporting: evaluated COMPATIBLE, approved, apply refused as stale, closed SUPERSEDED",
+          "4": "UPDATE s1 Mission (closed-source scope): evaluated CONFLICTING, approval refused, rejected"
+        },
+        "refusalsObserved": [
+          "double apply of amendment 1",
+          "approve of an unevaluated amendment",
+          "approve of a CONFLICTING amendment",
+          "apply of a stale amendment",
+          "execution report after REPORTED_COMPLETE"
+        ],
+        "proposals": {
+          "1": "ELIGIBLE review; execution reports ATTEMPTED then REPORTED_COMPLETE, both verified=false",
+          "2": "REPAIRABLE review; appeal 1 AFFIRMED; reasoned dissent 1 stored (disagrees on s1)"
+        }
+      },
+      "transactions": {
+        "charter_s1": "0x54678079549905cf4ade285909805db365bc1ef2fc184331dbb5f1bfeea53b3e",
+        "charter_s3": "0x97d60e4a4820814d6271baf10604174dc0aa393d8ecc3ce176799ea00dc84187",
+        "a1_propose": "0xad4a4c6e586bbc2208e46bfe17bfe704969d83ae83a4304e51fc3a5ef4c0b4cb",
+        "a1_evaluate": "0x3e8d9643b6afabc7d5a80a811014e6cf2d0554ed646bcd299dbf453517431c48",
+        "a1_approve": "0xb3f9b3c8bdcd5d9a3a3311d824d9e106feda9a486134ba82cf8c437519802250",
+        "a1_apply": "0xd850bc84d757bf080e8bab5fb2b7e96d34aa0fd05bf783eb6b24571883b66938",
+        "a1_double_apply_refused": "0x5752fc524e914700f9f37cb2ab3e78ff591e335d8d19baee081e4453e095dade",
+        "a2_propose": "0x77c2e12608d9e9c042b00d416708a6388b0f79a0196369f2dcd89bfc2ced4318",
+        "a2_evaluate": "0xc93c110c095c36fcd5e3351b13fe29505f3633bf68428de2831b9691ce5370e7",
+        "a2_approve": "0x11b3800c5fa09fe28791b2c1286512c02d246210e0ff42f0f52a8057ea7155f4",
+        "a2_apply": "0xf78a70f30f3c7d2d391e2c8132647dfa63a0a44a5a2bf909e1f209cc6f967970",
+        "a3_propose": "0x251a6397acade27086b688cc529db0890c37885bd281d79239fb987e4ca169b1",
+        "a3_evaluate": "0xed5974d73aa470c79c780a9b7f81b69ae934a453731dcab66475ba882a5ff560",
+        "a3_approve": "0xea638d60a4db2aea957cbcc95e0ee45422e5b34c53c8b36a8072e1dc8c82a85b",
+        "a3_apply_stale_refused": "0x05d01427bbae2e8659a685b9f5515038f552ab92ed855ea6a7d542bbcc392c56",
+        "a3_close_stale": "0x8829bf89776ec45ca6752bfd87686fed8fce52c491c78385b2c40a182ead1dcc",
+        "a4_propose": "0x81d3c8c19811e24a3f2d6b8f37682379988ee4b893f5f9f072c023606a04008c",
+        "a4_approve_unevaluated_refused": "0x713d93957e3d85c765fcb575311ea37261ded0483cdd1705655d024a57b57516",
+        "a4_evaluate": "0xa2f7e635be660a3036c9039435d925ebabd42653653146706d8aab9751150432",
+        "a4_approve_conflicting_refused": "0x22b57bcff79e05b7364f29b70af018995097d521c16afc9e77d3da5ea7711cf4",
+        "a4_reject": "0x6ec78e0d6c27c1c802ae10faaa3b825d2c8780c437c73962ad2faf8f8f11a67c",
+        "p1_submit": "0xefdc0a4c143a5203c9b3f7e7af1502ded13be96032fd1ef688bdd80e16e2bf93",
+        "p1_review": "0x7a4128cec1b28cf9767ac024e22b2805b13612eb76bbc6ccf4c0bbeb7ba37f71",
+        "p1_exec_attempted": "0x792be375e1c5a69fd6df275cd5bdc40cc801cb5bb3a2cc395698e00b1760a6b1",
+        "p1_exec_complete": "0x027ecda493c762180b83b86bbf156b81caacef0d1be48a602aed1e552afad458",
+        "p1_exec_after_close_refused": "0x63631be7b9f57e1c9757677ec06dc16dc6564b1dad1c4da0d471ae80bfcf04ea",
+        "p2_submit": "0xd02061c1eb93c4c4618519934e6c37b104ac473302c934929516a5135a227bcf",
+        "p2_review": "0xef95672dd53f39de3f0b2c603ff472f26786c6a604fefa0553503899432c64c3",
+        "p2_appeal": "0xf12540357d69fe14592630943caed4bf5c87df8b5f9b9253db4e2180b038c42f",
+        "p2_dissent_wrong_id_refused": "0x572db4f5d3fd36ed659b3dd928b09c4a8d265b01233eab52fbaeba7b577cbb84",
+        "p2_dissent": "0xec4694118e4489527cac7b508885ff8e7beb891213b69548fa2553ecf6fc6e70"
+      },
+      "notObserved": [
+        "MODIFIED or REVERSED appellate decision",
+        "repair after a reversal",
+        "validator disagreement and retry on a Stage 7-9 transaction (every transaction finalized MAJORITY_AGREE in 1 round; one CLI submission failed before sending and was retried)",
+        "a non-owner account calling any method (single signer; covered by direct tests only)",
+        "enable_amendment_governance (deliberately not activated)"
+      ]
     }
   }
 }

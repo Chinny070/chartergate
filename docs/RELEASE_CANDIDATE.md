@@ -1,7 +1,6 @@
 # Release candidate: Stages 7 to 11
 
-Status: **locally verified, awaiting manual StudioNet deployment.** Nothing in this document is live evidence. No contract containing Stages 7 to 11 has been deployed,
-no wallet signature was requested and nothing was pushed.
+Status: **deployed to StudioNet and exercised live (see section 6).** Sections 1 to 5 are the original local-verification record.
 
 ## 1. What this candidate adds to the Stage 6 contract
 
@@ -69,3 +68,12 @@ Use a fresh deployment. Step 7 is **irreversible** for that deployment.
 * Carried over from earlier stages: reviews and appeals can still end `MAJORITY_DISAGREE` on StudioNet; a stored reasoned dissent, `MODIFIED`/`REVERSED` appellate decisions and repair after a reversal were
   never observed live (`docs/STAGE_6_EQUIVALENCE.md`, section 10); the case page loads slowly because of StudioNet's read limit.
 * No independent professional security audit has been performed. The review in this repository is an internal one.
+
+## 6. Live deployment (2026-10-11)
+
+* Contract `0xC97b91Bd8ede96533B17EFf86D98cDff6c700736`, deploy tx `0x959d4bd3dd68f846bc50b76bae742297c57a64ed67bb4594e01d7026038ba1b3`, FINALIZED, `MAJORITY_AGREE`. Deployed source hash and schema match the local ones (72 methods).
+* Frontend: https://chartergate.vercel.app, built with `VITE_CHARTERGATE_ADDRESS` set to that address; the production page reads live amendment data from it.
+* Observed live with the owner signer: amendment propose, real-model evaluation (COMPATIBLE and CONFLICTING), approve, apply (charter v3 to v4 to v5), a competing amendment refused as stale and closed as SUPERSEDED, approval of a CONFLICTING
+  amendment refused, proposal execution reports (always unverified), an AFFIRMED appeal and a stored reasoned dissent. Every transaction and refusal is listed in `deployments/studionet.json`.
+* **Not observed:** the governance switch (deliberately not activated; it is irreversible), MODIFIED or REVERSED appeals, repair after a reversal, validator disagreement on these transactions, any non-owner account.
+* `canonicalDeployment` stays `null`.
