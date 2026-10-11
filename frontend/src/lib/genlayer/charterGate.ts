@@ -972,6 +972,22 @@ export const READ_SPACING_MS = import.meta.env.MODE === "test" ? 0 : 1500;
 const inflight = new Map<string, Promise<CalldataEncodable>>();
 let nextReadSlot = 0;
 
+// The rate-limit error is transient: retry a network-level failure a couple of times with a growing pause before showing an error.
+const READ_RETRY_DELAYS_MS = import.meta.env.MODE === "test" ? [] : [4000, 9000];
+const isTransientReadError = (e: unknown) => /failed to fetch|networkerror|rate limit|too many requests/i.test(e instanceof Error ? e.message : String(e));
+
+async function readWithRetry(name: ViewName, args: CalldataEncodable[]): Promise<CalldataEncodable> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await readView(name, args);
+    } catch (e) {
+      const delay = READ_RETRY_DELAYS_MS[attempt];
+      if (delay === undefined || !isTransientReadError(e)) throw e;
+      await new Promise<void>((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
 const view = (name: ViewName, args: CalldataEncodable[] = []): Promise<CalldataEncodable> => {
   const key = name + JSON.stringify(args, (_k, v) => (typeof v === "bigint" ? v.toString() + "n" : v));
   const shared = inflight.get(key);
@@ -981,7 +997,7 @@ const view = (name: ViewName, args: CalldataEncodable[] = []): Promise<CalldataE
   nextReadSlot = start + READ_SPACING_MS;
   const wait = start - now;
   const begin = wait > 0 ? new Promise<void>((resolve) => setTimeout(resolve, wait)) : Promise.resolve();
-  const request = begin.then(() => readView(name, args)).finally(() => inflight.delete(key));
+  const request = begin.then(() => readWithRetry(name, args)).finally(() => inflight.delete(key));
   inflight.set(key, request);
   return request;
 };
