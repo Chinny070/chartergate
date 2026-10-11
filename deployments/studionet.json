@@ -2514,7 +2514,8 @@
         "validator disagreement and retry on a Stage 7-9 transaction (every transaction finalized MAJORITY_AGREE in 1 round; one CLI submission failed before sending and was retried)",
         "a non-owner account calling any method (single signer; covered by direct tests only)",
         "enable_amendment_governance (deliberately not activated)"
-      ]
+      ],
+      "olderSourceNote": "2026-10-11 audit: the working tree adds one validator tightening (amendment evaluation now also requires the same conflicting-section list; source hash differs). This deployment runs the older source recorded above; it is still the contract the live frontend reads. The change is live only after a redeploy."
     },
     "throwaway_governance_test": {
       "status": "THROWAWAY",

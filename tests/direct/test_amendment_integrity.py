@@ -216,10 +216,33 @@ def test_a_validator_accepts_the_same_verdict(conflicting, direct_vm):
     assert replay(direct_vm) is True
 
 
-def test_the_advisory_conflict_list_is_not_compared(conflicting, direct_vm):
+def test_the_same_conflict_list_is_accepted_whatever_its_order(conflicting, direct_vm):
     world, aid = conflicting
     lead(world, direct_vm, aid, conflicts=("1", "2"))
-    assert replay(direct_vm, conflicts=()) is True  # same verdict, a different list
+    assert replay(direct_vm, conflicts=("2", "1")) is True  # the validator normalises (unique, sorted) before comparing
+
+
+@pytest.mark.parametrize(
+    "leader_list, validator_list",
+    [
+        (("2",), ("1",)),  # substituted: the leader names the wrong section
+        ((), ("1", "2")),  # omitted: the leader hides the conflicts
+        (("1", "2"), ("1",)),  # added: the leader invents a conflict
+        (("1",), ()),  # the validator found only a purpose-level conflict
+    ],
+    ids=["substituted", "omitted", "added", "validator-found-none"],
+)
+def test_a_leader_cannot_substitute_the_conflict_list_even_with_the_right_verdict(conflicting, direct_vm, leader_list, validator_list):
+    world, aid = conflicting
+    lead(world, direct_vm, aid, conflicts=leader_list)
+    assert replay(direct_vm, conflicts=validator_list) is False
+
+
+def test_a_duplicated_conflict_in_the_leaders_result_is_rejected(conflicting, direct_vm):
+    world, aid = conflicting
+    stored = lead(world, direct_vm, aid, conflicts=("1",))
+    stored["conflicting"] = ["1", "1"]
+    assert replay(direct_vm, conflicts=("1",), leader_result=stored) is False
 
 
 def test_a_different_verdict_is_rejected(conflicting, direct_vm):

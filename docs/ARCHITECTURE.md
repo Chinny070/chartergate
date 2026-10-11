@@ -1,5 +1,8 @@
 # Architecture notes
 
+> **Reading note (2026-10-11):** the per-stage sections below are historical notes written when each stage was built. Statements such as "not deployed" or "not implemented" describe that stage's
+> own time. For the current state and evidence see `README.md`, `docs/RELEASE_CANDIDATE.md` section 6, `docs/GOVERNANCE_VERIFICATION.md` and `docs/TRUST_MODEL.md`.
+
 ## Verified in Stage 0 (frontend and SDK)
 
 Source: the installed `genlayer-js@1.1.8` type definitions and bundle (`node_modules/genlayer-js/dist`),

@@ -38,7 +38,7 @@ After deploying: wait for `FINALIZED` with execution `SUCCESS`, check the deploy
 | Frontend against the Stage 6 deployment (browser) | the charter version history reads live data and renders; the new pages show a clean read error because that deployment lacks the new methods |
 | Mobile width (375 px) | no horizontal overflow on the accountability page |
 
-## 3. Not verified (needs the new deployment)
+## 3. Not verified at the time of writing (historical; section 6 records what was later observed live)
 
 * Every new method on StudioNet: proposing, the model evaluation, approval, applying, the governance switch, execution reports, and every new read.
 * How a real model judges amendment compatibility, how often validators agree, and whether evaluations rotate leaders.

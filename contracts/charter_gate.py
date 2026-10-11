@@ -1960,7 +1960,7 @@ def _amendment_context_hash(amendment_hash: str, base_version: int, sections: li
 
 
 def _amendment_eval_hash(amendment_hash: str, context_hash: str, verdict: str) -> str:
-    # The advisory verdict only. The list of conflicting sections and any wording are not hashed (the validators do not compare them).
+    # The verdict only. The list of conflicting sections is validator-agreed and stored but not hashed (adding it would need a new hash version).
     return _keccak_hex("\n".join([AMENDMENT_EVAL_HASH_VERSION, "amendment_hash=" + amendment_hash, "context_hash=" + context_hash, "verdict=" + verdict]))
 
 
@@ -2047,17 +2047,20 @@ def _amendment_result_is_well_formed(result, ctx: dict) -> bool:
 
 
 def _amendment_validator_accepts(leader_result, ctx: dict) -> bool:
-    """Accept the leader's compatibility verdict only if this validator rebuilt the same context and reaches the same verdict.
-    The advisory list of conflicting sections is validated structurally but is not compared."""
+    """Accept the leader's compatibility verdict only if this validator rebuilt the same context and reaches the same verdict AND
+    names the same conflicting sections. The list is stored and shown to the owner, so a leader must not be able to substitute,
+    drop or add a section identity. Section ids are identities, not prose: both lists are normalised (unique, sorted) before the
+    comparison, so wording never matters."""
     if not isinstance(leader_result, gl.vm.Return):
         return False
     leader = leader_result.calldata
     if not _amendment_result_is_well_formed(leader, ctx):
         return False
     try:
-        return _amendment_pipeline(ctx)["compatible"] == leader["compatible"]
+        mine = _amendment_pipeline(ctx)
     except gl.vm.UserError:
         return False
+    return mine["compatible"] == leader["compatible"] and mine["conflicting"] == leader["conflicting"]
 
 
 @allow_storage

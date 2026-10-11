@@ -1,179 +1,95 @@
 # CharterGate
 
-A constitutional review layer for DAOs, built on [GenLayer](https://www.genlayer.com).
+A DAO stores a natural-language constitution. Proposals are judged against it, using public web evidence and prior rulings, by a GenLayer Intelligent Contract whose result is settled by validator
+consensus. Every decision is meant to be inspectable: the clause applied, the evidence used, the timestamp and the validator outcome.
 
-A DAO stores a natural-language constitution. Proposals are judged against it, using live web
-evidence and prior rulings, by an Intelligent Contract whose result is settled by GenLayer's
-AI-validator consensus. The goal is for every decision to be inspectable: the clause applied,
-the evidence used, the timestamp, the validator outcome.
+There is **no application backend and no database**: a React frontend talks to the contract through `genlayer-js` and an injected wallet.
 
-> **Status: release candidate for Stages 7 to 11 (amendments, guardrails, accountability, product UI), verified locally only.** The contract stores a DAO charter with immutable history, accepts proposals and **public web
-> evidence** verified through validator consensus, records an immutable **constitutional review** of each proposal against the charter in force when it was
-> submitted, lets a `REPAIRABLE` proposal be repaired as an immutable revision with a full re-review, and now gives reviews **constitutional memory**: a bounded set
-> of earlier rulings under the exact same charter rule, cited as followed or distinguished. Precedent is advisory and never replaces the charter or current evidence: the findings are produced by a model call that never sees precedent (Stage 5.1).
-> Stage 6 adds **appeals**: the proposer can challenge an adverse ruling on the closed record it judged (appeal is not repair), which creates an immutable appellate decision above the original review, and an
-> optional, truthfully labelled, non-controlling **reasoned dissent** (GenVM exposes no validator minority opinion, so it is an AI-generated alternative, not a vote).
-> **There is no voting or treasury execution: ratification is the owner, and execution reports are self-reported.** The Stage 7 to 11 contract is not deployed; the Stage 1 to 5 verification deployments are recorded in
-> `deployments/studionet.json` (`canonicalDeployment` is still `null`). See `docs/PRECEDENT_MEMORY_MODEL.md`, `docs/STAGE_5_EQUIVALENCE.md` and `docs/STAGE_5_1_AUTHORITY_BOUNDARY.md`, `docs/APPEAL_MODEL.md`, `docs/STAGE_6_EQUIVALENCE.md` and `docs/AMENDMENT_MODEL.md`.
+## What is implemented
 
-## Architecture
+* **Charter** with immutable version history and owner access control (Stage 1).
+* **Evidence vault**: validator-agreed structured evidence from public web pages (Stage 2).
+* **Constitutional review** against the charter in force at submission (Stage 3), **repair** of repairable proposals (Stage 4), advisory **precedent** under an authority boundary (Stage 5).
+* **Appeals** with a non-controlling reasoned dissent. GenVM exposes no validator minority opinion, so a dissent is an AI-generated alternative reading, never a vote (Stage 6).
+* **Amendments** (propose, model compatibility advice, owner approval, apply, supersede), a one-way **governance switch**, and **execution accountability** (Stages 7 to 9).
+* **Product UI** (Stage 10) and a **release audit** (Stage 11).
 
-```
-frontend (React + TypeScript + Vite)
-   -> genlayer-js 1.1.8
-   -> injected wallet (window.ethereum)
-   -> GenLayer (StudioNet, chain id 61999)
-   -> Intelligent Contract (Python, GenVM)
-```
+There is no voting or treasury execution. Ratification is the owner. Execution reports are self-reported and always `verified: false`. Details: `docs/ARCHITECTURE.md`, `docs/AMENDMENT_MODEL.md`,
+`docs/APPEAL_MODEL.md`, `docs/PRECEDENT_MEMORY_MODEL.md`, and what validators do and do not verify: `docs/TRUST_MODEL.md`.
 
-There is **no application backend and no database**. No Supabase, Firebase, Postgres, API
-server or indexer. Persistent protocol state belongs in the contract; the frontend only reads
-and writes through `genlayer-js`. Browser storage may only hold harmless UI preferences.
+## Evidence status (read this before relying on any claim)
+
+| Claim | Status |
+| --- | --- |
+| Contract tests, mocked LLM and web (`tests/direct`) | 1551 passed, 0 failed, 0 skipped (these prove contract logic, **not** real model behavior) |
+| GLSim integration (`tests/integration`, 6 files) | 26 passed, 9 skipped (the skipped cases need real LLM validators) |
+| Frontend (vitest) | 349 passed, 8 skipped; typecheck, lint and production build clean |
+| Release-candidate contract on StudioNet | `0xC97b91Bd8ede96533B17EFf86D98cDff6c700736`, deploy tx `0x959d4bd3dd68f846bc50b76bae742297c57a64ed67bb4594e01d7026038ba1b3`, finalized; deployed source hash `ccca5e4d6f00161a401b3e3505f65db4b26ebf50c87948ffb94e076cf4c11a28`, 72 methods |
+| Live behavior observed on that contract | amendments proposed, model-evaluated (COMPATIBLE and CONFLICTING), approved, applied, refused as stale or unauthorized; execution reports; an AFFIRMED appeal and a stored dissent. Transaction hashes: `deployments/studionet.json` |
+| Live frontend | https://chartergate.vercel.app, built for the contract above |
+| **Newer than the deployed contract** | the working tree adds one validator tightening (amendment evaluation also compares the conflicting-section list; source hash `e1041e62…`). It is **not deployed**. The deployed contract runs the older source. |
+| Governance switch | **OFF** on the live contract (irreversible; deliberately not activated). Tested on a separate throwaway deployment: `docs/GOVERNANCE_VERIFICATION.md` |
+| Not observed live | `MODIFIED` or `REVERSED` appeals, repair after a reversal, validator disagreement on amendment transactions, any account other than the owner on the release contract |
+| Canonical deployment | **none** (`canonicalDeployment` is `null`). Every deployment is a verification deployment. |
+
+No independent professional security audit has been performed.
 
 ## Repository layout
 
 | Path | Purpose |
 | --- | --- |
-| `contracts/` | `charter_gate.py`: the charter, proposal and evidence-vault contract. |
-| `frontend/` | React app: shell, design tokens, wallet/network layer, transaction state, charter, proposal and evidence-vault pages. |
-| `tests/direct/` | Fast contract tests (genlayer-test direct mode, web and LLM mocked): access control, validation, versioning, evidence, validator equivalence. |
-| `tests/integration/` | Real-network evidence tests (GLSim and StudioNet). See `docs/ARCHITECTURE.md` for what GLSim can and cannot run. |
-| `deployments/` | Manual deployment records. `studionet.json` holds the Stage 1.1 and Stage 1.2 verification deployments (neither is canonical). |
-| `docs/` | `ARCHITECTURE.md` (verified APIs, per-stage notes), `STAGE_2_EQUIVALENCE.md` (how validators agree on web evidence), `EVIDENCE_MODEL.md` (record, statuses, hash, limits) and `charter_gate.schema.json` (generated schema). |
+| `contracts/charter_gate.py` | The Intelligent Contract. |
+| `frontend/` | React app (Vite, React 19, genlayer-js 1.1.8). |
+| `tests/direct/` | Contract tests in genlayer-test direct mode (web and LLM mocked). |
+| `tests/integration/` | GLSim tests; real-LLM cases are skipped unless `CHARTERGATE_REAL_GENVM=1` on StudioNet. |
+| `deployments/studionet.json` | Manual deployment records (historical records are kept, never rewritten). |
+| `docs/` | Architecture, per-stage models and equivalence notes, trust model, release candidate, governance verification, generated schema. |
 
 ## Target network
 
-- StudioNet, chain id **61999**, gasless (a 0 GEN balance is normal).
-- Contract address is supplied via `VITE_CHARTERGATE_ADDRESS` (see `frontend/.env.example`).
-  Unset means "not deployed"; the UI says so. After you deploy manually, put the address in `frontend/.env`.
+StudioNet, chain id **61999**, RPC `https://studio.genlayer.com/api`, gasless. The contract address is baked into the frontend build from `VITE_CHARTERGATE_ADDRESS` (see `frontend/.env.example`);
+unset means "not deployed" and the UI says so. Writes are blocked unless the wallet is on chain 61999. StudioNet limits reads to about 30 a minute; the app spaces reads and retries transient failures.
 
-## Setup
+## Setup (verified versions)
 
-Requirements: Node 20+, Python 3.12+.
+Python 3.12.10, Node 24.14.0 (npm 11.9.0), `genlayer` CLI 0.39.2. Python tooling is pinned in `requirements-dev.txt`; the frontend is pinned by `frontend/package-lock.json`.
 
 ```bash
-# tooling (one-time)
+pip install -r requirements-dev.txt
 npm install -g genlayer
-pip install genvm-linter genlayer-test
-
-# frontend
-cd frontend
-npm install
-cp .env.example .env   # optional until a contract is deployed
+cd frontend && npm ci && cp .env.example .env   # set VITE_CHARTERGATE_ADDRESS after a deployment
 ```
+
+On Windows set `PYTHONIOENCODING=utf-8` before `genvm-lint check` (its success mark crashes a legacy code page).
 
 ## Commands
 
-Frontend (from `frontend/`):
-
 ```bash
-npm run dev         # local dev server
-npm run build       # typecheck + production build
-npm run typecheck
-npm run lint
-npm test            # vitest (transaction layer, decoders, evidence components)
-```
+# frontend (from frontend/)
+npm run typecheck && npm run lint && npm test && npm run build
 
-Contract (from repo root):
+# contract (from the repo root)
+genvm-lint check contracts/charter_gate.py
+genvm-lint schema contracts/charter_gate.py --json -o docs/charter_gate.schema.json
+python -m pytest tests/direct -q                 # about 10 minutes
 
-```bash
-genvm-lint check contracts/charter_gate.py --json   # lint
-genvm-lint schema contracts/charter_gate.py --json -o docs/charter_gate.schema.json   # local schema
-python -m pytest tests/direct/ -v                    # direct tests
-
-# integration: start a FRESH local simulator first (a second deploy in one GLSim process fails)
+# integration: use a FRESH simulator for each test file (a second deploy in one GLSim process fails)
 glsim --port 4000 --validators 5 --no-browser
-gltest tests/integration/ -v -s                      # real web.get tests; real-GenVM cases are skipped
-CHARTERGATE_REAL_GENVM=1 gltest tests/integration/ -v -s --network studionet   # LLM + render smoke cases
+gltest tests/integration/test_governance_live.py -q
 ```
 
 ## Deployment
 
-Deployment is **manual and deliberate**. Nothing in this repo deploys automatically, and CI must
-not. When a stage is ready, you deploy with the GenLayer CLI, then record the address, tx hash,
-commit and source hash in `deployments/studionet.json`.
+Deployment is manual and deliberate; nothing here deploys automatically. After `genlayer deploy --contract contracts/charter_gate.py --args "<name>" "<description>"`, record the address, transaction,
+commit and source hash in `deployments/studionet.json`, then rebuild the frontend with the new `VITE_CHARTERGATE_ADDRESS`. Enabling amendment governance is a separate, one-way, owner decision.
 
-## Roadmap
-
-| Stage | Scope | State |
-| --- | --- | --- |
-| 0 | Foundation: structure, design system, wallet and transaction architecture, tooling | done |
-| 1 | Deterministic contract: charter sections, versioning, immutable history, proposals, owner access control | frozen (verification deployments only) |
-| 2 | Evidence vault: validator-agreed structured evidence from the public web | frozen |
-| 3 | Constitutional review of proposals | frozen |
-| 4 | Proposal repair and revision lineage | frozen |
-| 5 | Precedent memory (advisory) and the authority boundary | frozen |
-| 6 | Appeals and non-controlling reasoned dissent | conditionally accepted, with documented coverage gaps (Stage 6 verification deployment) |
-| 7 | Constitutional amendments | implemented and tested locally; **not deployed** |
-| 8 | Governance and execution guardrails | implemented and tested locally; **not deployed** |
-| 9 | Post-execution accountability | implemented and tested locally; **not deployed** |
-| 10 | Product UI | implemented and tested locally |
-| 11 | Release audit | local audit complete; **no StudioNet verification of Stages 7 to 11 yet** |
-
-See `docs/ARCHITECTURE.md` for what GLSim can and cannot run. |
-| `deployments/` | Manual deployment records. `studionet.json` holds the Stage 1.1 and Stage 1.2 verification deployments (neither is canonical). |
-| `docs/` | `ARCHITECTURE.md` (verified APIs, per-stage notes), `STAGE_2_EQUIVALENCE.md` (how validators agree on web evidence), `EVIDENCE_MODEL.md` (record, statuses, hash, limits) and `charter_gate.schema.json` (generated schema). |
-
-## Target network
-
-- StudioNet, chain id **61999**, gasless (a 0 GEN balance is normal).
-- Contract address is supplied via `VITE_CHARTERGATE_ADDRESS` (see `frontend/.env.example`).
-  Unset means "not deployed"; the UI says so. After you deploy manually, put the address in `frontend/.env`.
-
-## Setup
-
-Requirements: Node 20+, Python 3.12+.
-
-```bash
-# tooling (one-time)
-npm install -g genlayer
-pip install genvm-linter genlayer-test
-
-# frontend
-cd frontend
-npm install
-cp .env.example .env   # optional until a contract is deployed
-```
-
-## Commands
-
-Frontend (from `frontend/`):
-
-```bash
-npm run dev         # local dev server
-npm run build       # typecheck + production build
-npm run typecheck
-npm run lint
-npm test            # vitest (transaction layer, decoders, evidence components)
-```
-
-Contract (from repo root):
-
-```bash
-genvm-lint check contracts/charter_gate.py --json   # lint
-genvm-lint schema contracts/charter_gate.py --json -o docs/charter_gate.schema.json   # local schema
-python -m pytest tests/direct/ -v                    # direct tests
-
-# integration: start a FRESH local simulator first (a second deploy in one GLSim process fails)
-glsim --port 4000 --validators 5 --no-browser
-gltest tests/integration/ -v -s                      # real web.get tests; real-GenVM cases are skipped
-CHARTERGATE_REAL_GENVM=1 gltest tests/integration/ -v -s --network studionet   # LLM + render smoke cases
-```
-
-## Deployment
-
-Deployment is **manual and deliberate**. Nothing in this repo deploys automatically, and CI must
-not. When a stage is ready, you deploy with the GenLayer CLI, then record the address, tx hash,
-commit and source hash in `deployments/studionet.json`.
-
-## Roadmap
+## Roadmap and state
 
 | Stage | Scope | State |
 | --- | --- | --- |
-| 0 | Foundation: structure, design system, wallet/tx architecture, tooling | done |
-| 1 | Deterministic contract: charter sections, versioning, immutable history, proposals, owner access control, argument validation | done (verification deployments only; no canonical deployment) |
-| 2 | Evidence vault: `web.get` / `web.render`, validator-agreed structured evidence, protocol timestamps, normalised-evidence hash | done locally (not deployed; live StudioNet validation pending) |
-| 3 | Constitutional review of proposals | planned |
-| later | Proposal repair, precedent, appeals, amendment governance, voting, execution, accountability | planned |
-
-See `docs/ARCHITECTURE.md` for what has and has not been verified against the GenLayer SDK.
+| 0 | Foundation, design system, wallet and transaction architecture | done |
+| 1 to 5 | Charter, evidence, review, repair, precedent | frozen; deployed as verification deployments |
+| 6 | Appeals and reasoned dissent | conditionally accepted (coverage gaps in `docs/STAGE_6_EQUIVALENCE.md`, section 10) |
+| 7 to 9 | Amendments, governance guardrails, accountability | implemented; exercised live on the release-candidate verification deployment (see the evidence table) |
+| 10 | Product UI | live at https://chartergate.vercel.app |
+| 11 | Release audit | audit remediation in progress: one validator fix is local and awaits a redeploy |
