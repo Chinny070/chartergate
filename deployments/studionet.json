@@ -2337,9 +2337,16 @@
             "tx": "0x97e63b0486e2259157c395df11aef046c411411ab37418ee5c6fe817fac38e3a",
             "result": "rolled back EXPECTED:NO_MATERIAL_DISSENT, nothing stored",
             "rounds": 1
+          },
+          {
+            "appealId": 4,
+            "tx": "0xae196db603f8e1830a83508e4f30eaf1e39cb9103e864fd65f8ecd018d391a81",
+            "viaBrowserWallet": true,
+            "result": "rolled back EXPECTED:NO_MATERIAL_DISSENT, nothing stored; consensus MAJORITY_AGREE, 0 rotations; leader result material=false with the appeal context and decision hashes of appeal 4",
+            "uiShown": "lifecycle Failed, the expected code, and the message that no materially different reading was found so no dissent was stored"
           }
         ],
-        "note": "The real model found no materially different reading in all attempts. A positive (stored) dissent was NOT observed live; it is proven by the direct tests only. A reasoned dissent is an AI-generated non-controlling alternative, never an authenticated validator minority."
+        "note": "The real model found no materially different reading in all five attempts (four via CLI, one via the browser). A stored dissent was NOT observed live; it is proven by the direct tests only."
       },
       "repairInteractions": {
         "repairAfterAffirmedAppeal": {
@@ -2415,9 +2422,10 @@
         "observedByUser": "workspace screens, then the Appeal, Appellate decision (AFFIRMED, original/appellate/effective all REPAIRABLE), Precedent Memory (FOLLOWED x3), Closed appellate record and Reasoned dissent panels",
         "notes": [
           "The user did not report the individual transaction-lifecycle phases (signature requested, submitted, pending consensus); only the final screens.",
-          "REQUEST REASONED DISSENT was not clicked in the browser, so no browser dissent result exists.",
-          "The appeal was affirmed, so a reversal or modification was not exercised in the browser."
-        ]
+          "The appeal was affirmed, so a reversal or modification was not exercised in the browser.",
+          "The browser dissent request produced the no-dissent rollback, not a stored dissent."
+        ],
+        "dissentRequestedInBrowser": "requested on appeal 4: rolled back NO_MATERIAL_DISSENT and the UI reported it correctly (tx 0xae196db6...)"
       }
     }
   }
