@@ -33,6 +33,42 @@
       "ret": "null",
       "payable": false
     },
+    "apply_amendment": {
+      "params": [
+        [
+          "amendment_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "approve_amendment": {
+      "params": [
+        [
+          "amendment_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "close_stale_amendment": {
+      "params": [
+        [
+          "amendment_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
     "deactivate_charter_section": {
       "params": [
         [
@@ -44,6 +80,60 @@
       "readonly": false,
       "ret": "null",
       "payable": false
+    },
+    "enable_amendment_governance": {
+      "params": [],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "get_amendment": {
+      "params": [
+        [
+          "amendment_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_amendment_accountability": {
+      "params": [
+        [
+          "amendment_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_amendment_count": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "int"
+    },
+    "get_amendments_page": {
+      "params": [
+        [
+          "offset",
+          "int"
+        ],
+        [
+          "limit",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "dict"
+        }
+      ]
     },
     "get_appeal": {
       "params": [
@@ -314,6 +404,12 @@
         }
       ]
     },
+    "get_governance_status": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
     "get_precedent_case": {
       "params": [
         [
@@ -329,7 +425,28 @@
       "readonly": true,
       "ret": "dict"
     },
+    "get_precedent_overview": {
+      "params": [],
+      "kwparams": {},
+      "readonly": true,
+      "ret": [
+        {
+          "$rep": "dict"
+        }
+      ]
+    },
     "get_proposal": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": true,
+      "ret": "dict"
+    },
+    "get_proposal_accountability": {
       "params": [
         [
           "proposal_id",
@@ -678,6 +795,86 @@
           "$rep": "int"
         }
       ]
+    },
+    "propose_amendment": {
+      "params": [
+        [
+          "action",
+          "string"
+        ],
+        [
+          "section_id",
+          "string"
+        ],
+        [
+          "title",
+          "string"
+        ],
+        [
+          "body",
+          "string"
+        ],
+        [
+          "base_version",
+          "int"
+        ],
+        [
+          "rationale",
+          "string"
+        ],
+        [
+          "source_proposal_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "reject_amendment": {
+      "params": [
+        [
+          "amendment_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "report_execution": {
+      "params": [
+        [
+          "proposal_id",
+          "int"
+        ],
+        [
+          "outcome",
+          "string"
+        ],
+        [
+          "note",
+          "string"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
+    },
+    "request_amendment_evaluation": {
+      "params": [
+        [
+          "amendment_id",
+          "int"
+        ]
+      ],
+      "kwparams": {},
+      "readonly": false,
+      "ret": "null",
+      "payable": false
     },
     "request_appeal": {
       "params": [

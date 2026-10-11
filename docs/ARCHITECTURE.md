@@ -575,3 +575,19 @@ Full model: `docs/APPEAL_MODEL.md`. Validator rule: `docs/STAGE_6_EQUIVALENCE.md
 * **Hashes.** `chartergate.appeal.v1`, `chartergate.appealcontext.v1`, `chartergate.appellate.v1`, `chartergate.dissent.v1`. Stage 3 to 5 formats are unchanged.
 * **Frontend.** An Appeal decision entry separate from Repair, an appeal workspace with the frozen-record note, an ORIGINAL REVIEW, APPEAL, APPELLATE DECISION history with the original, appellate and effective verdicts, and a truthfully labelled REASONED DISSENT.
 * **Not in Stage 6:** amendment governance, voting, ratification, treasury execution, accountability, appeal of an appeal.
+
+# Stages 7 to 9: amendments, governance guardrails and accountability
+
+Full model: `docs/AMENDMENT_MODEL.md`.
+
+* **Amendments.** A charter change is an immutable record written against one exact charter version: proposed (anyone), evaluated for compatibility (a model advises; validators must agree on the verdict),
+  approved (owner only, never past a `CONFLICTING` verdict), then applied through the same internal code path the owner methods use. An amendment can never apply to a newer charter than the one it was written
+  against; a competing one is closed as `SUPERSEDED`. Earlier charter versions, reviews, appeals and precedent snapshots are never altered.
+* **Guardrails.** `enable_amendment_governance` is a one-way, owner-only switch: afterwards the direct owner edits are refused. Authorization is enforced at the contract boundary and the whole write surface is classified
+  by `tests/direct/test_governance_guardrails.py`; a new write method that is not classified fails that suite.
+* **Accountability.** An amendment's execution is a change the contract itself makes, so its record is contract-verified. A proposal's execution reports are the proposer's own, append-only and always `verified: false`:
+  the contract cannot see an outside payment, so no external action is ever presented as confirmed.
+* **Frontend.** Amendments (propose, evaluate, approve, apply, close, history), a charter version history, accountability, a precedent overview, and an execution panel on each approved case. Every transaction shows its real
+  lifecycle, and `Finalized` appears only when the network finalized it and the contract executed it successfully.
+* **No backend.** Everything is the frontend plus the contract. There is no server, database or indexer.
+* **Known limits:** ratification is the owner (no voting system was invented); anyone can propose and spam is not rate-limited; the compatibility evaluation can be wrong; execution reports are unverifiable by nature.
