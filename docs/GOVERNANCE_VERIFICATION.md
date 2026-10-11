@@ -1,6 +1,6 @@
 # Governance switch: safety verification and demo guide
 
-Date: 2026-10-11. The live release contract `0xC97b91Bd8ede96533B17EFf86D98cDff6c700736` was only **read** during this work; its governance switch is **OFF** (verified by `get_governance_status` after all tests: `governance_enabled: false`, charter v5, 4 amendments).
+Date: 2026-10-11. Written when `0xC97b…0736` was the live contract; the submission release is now `0xc942901dbB024CDb922f9D71B91024ea919a9F94` (same governance code, switch also OFF). The contract `0xC97b91Bd8ede96533B17EFf86D98cDff6c700736` was only **read** during this work; its governance switch is **OFF** (verified by `get_governance_status` after all tests: `governance_enabled: false`, charter v5, 4 amendments).
 
 ## 1. What activation does (from `contracts/charter_gate.py`)
 

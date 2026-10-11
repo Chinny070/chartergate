@@ -78,3 +78,7 @@ Use a fresh deployment. Step 7 is **irreversible** for that deployment.
 * **Not observed:** the governance switch (deliberately not activated; it is irreversible), MODIFIED or REVERSED appeals, repair after a reversal, validator disagreement on these transactions, any non-owner account.
 * `canonicalDeployment` stays `null`.
 * Governance switch safety verification on a throwaway deployment, lock-out analysis and the demo script: `docs/GOVERNANCE_VERIFICATION.md`. The live switch is still OFF.
+
+## 7. Superseded by the submission release
+
+The contract above is kept as history. The intended submission release is `0xc942901dbB024CDb922f9D71B91024ea919a9F94` (source hash `e1041e62…`, adds the amendment conflict-list validator check); its evidence is in `deployments/studionet.json` (`submission_release_a486010`) and the README.

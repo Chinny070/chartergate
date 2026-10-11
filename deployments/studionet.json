@@ -2515,7 +2515,8 @@
         "a non-owner account calling any method (single signer; covered by direct tests only)",
         "enable_amendment_governance (deliberately not activated)"
       ],
-      "olderSourceNote": "2026-10-11 audit: the working tree adds one validator tightening (amendment evaluation now also requires the same conflicting-section list; source hash differs). This deployment runs the older source recorded above; it is still the contract the live frontend reads. The change is live only after a redeploy."
+      "olderSourceNote": "2026-10-11 audit: the working tree adds one validator tightening (amendment evaluation now also requires the same conflicting-section list; source hash differs). This deployment runs the older source recorded above; it is still the contract the live frontend reads. The change is live only after a redeploy.",
+      "supersededBy": "submission_release_a486010"
     },
     "throwaway_governance_test": {
       "status": "THROWAWAY",
@@ -2551,6 +2552,265 @@
         "DEACTIVATE amendment live (CLI 0.39.1 cannot send an empty-string argument; covered by direct tests)"
       ],
       "details": "docs/GOVERNANCE_VERIFICATION.md"
+    },
+    "submission_release_a486010": {
+      "status": "VERIFICATION_DEPLOYMENT",
+      "intendedSubmissionRelease": true,
+      "note": "Intended submission release. Not canonical (canonicalDeployment stays null). Amendment governance is OFF and was not activated. Supersedes stages_7_11_release_candidate, which stays recorded unchanged.",
+      "address": "0xc942901dbB024CDb922f9D71B91024ea919a9F94",
+      "deployTx": "0x90181a7c05c41d0adbb9af4072461a23ce9f755dec1081e3a3adf42d858d219a",
+      "deployer": "0xaffe15eec45b68835cc9e5b4ab85dd5deae8e70b",
+      "gitCommit": "a486010 (contracts/charter_gate.py at this commit is the deployed source)",
+      "sourceHash": "e1041e625bccf8316f979d247d425e29036ec398b299a9321e0737b39ecbd64e",
+      "methodCount": 72,
+      "explorer": "https://explorer-studio.genlayer.com/address/0xc942901dbB024CDb922f9D71B91024ea919a9F94",
+      "verified": {
+        "finality": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "deployReceipt": "4 SUCCESS and 2 ERROR (idle validator) entries, as on the earlier deployments",
+        "sourceHashMatchesDeployed": true,
+        "schemaIdenticalToLocal": true,
+        "amendmentHashesRecomputedIndependently": "amendments 1 to 3: amendment hash and evaluation hash match (keccak-256, independent script)"
+      },
+      "change": "Amendment evaluation validators now require the same conflicting-section list as well as the same verdict (docs/TRUST_MODEL.md).",
+      "frontend": "https://chartergate.vercel.app, built with VITE_CHARTERGATE_ADDRESS set to this address; the production bundle contains no other contract address.",
+      "liveFixtures": {
+        "charter": "v1 to v3 by owner adds (s1, s3); v4 via amendment 1 (s4 Timeline)",
+        "amendments": {
+          "1": "ADD s4: COMPATIBLE, approved, applied (v4)",
+          "2": "ADD s5 (no budget disclosure): CONFLICTING with [s3], approval refused (AMENDMENT_CONFLICTING), rejected",
+          "3": "ADD s6: COMPATIBLE, approved, apply refused as stale (AMENDMENT_STALE), closed SUPERSEDED"
+        },
+        "proposals": {
+          "1": "ELIGIBLE; execution ATTEMPTED then REPORTED_COMPLETE (verified=false)",
+          "2": "REPAIRABLE; appeal 1 AFFIRMED"
+        }
+      },
+      "transactions": {
+        "charter s1": {
+          "tx": "0xab1cfec0583716d89c7f98d29cb53f8d6e12eb83a7864e174e3c65ee69a14dee",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "charter s3": {
+          "tx": "0x0e5f2114b27b91e68a88633b151c488211f35a94a515307f4012ec0f126d0ac9",
+          "leader_exec": "SUCCESS",
+          "outcome": "contract_error:idle",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A1 propose ADD s4 Timeline (base 3)": {
+          "tx": "0x6c4f8219cbd6a0b7e2e8d2e149989133bf4513dd1d48f279c36711e6dfd8cd05",
+          "leader_exec": "SUCCESS",
+          "outcome": "contract_error:idle",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A2 propose ADD s5 no-budget rule (base 3, should conflict with s3)": {
+          "tx": "0x642cc37295c8a52a496e26e38ae75edddd97168abfeb9927164ba064e0a1cdc7",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A3 propose ADD s6 Reporting (base 3, will become stale)": {
+          "tx": "0xb73587fb30dd5e2e1a2b6cc6a52c31bd06dd831e6602516de61ff43329c23841",
+          "leader_exec": "SUCCESS",
+          "outcome": "contract_error:idle",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A1 evaluate": {
+          "tx": "0x89f014044c37125defa70793fe7700be59bf602a96c6b9d0512634e2483e6087",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A2 evaluate (live CONFLICTING check of the corrected validator)": {
+          "tx": "0x193cb47367d057c6ab809200338e5de91f99628fd82571b8e8fcc83c2d8ee9dd",
+          "leader_exec": "SUCCESS",
+          "outcome": "contract_error:idle",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A3 evaluate": {
+          "tx": "0xe550f96325e5f820556e703e633cd0e22b5779b7d37146e122868fe2725dce1f",
+          "leader_exec": "SUCCESS",
+          "outcome": "contract_error:idle",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A2 approve CONFLICTING (expect refusal)": {
+          "tx": "0x8bfe4d940205b413515d4e82688b1ec545df67f45f08484c5e4a22ea2faf51be",
+          "leader_exec": "ERROR",
+          "outcome": "contract_error:idle",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A1 approve": {
+          "tx": "0x16ad0c6b94602be043d1283a60aacea2ce6745a3c3c65fd2ec7021dbdbe735f9",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A3 approve": {
+          "tx": "0xa4158dbaead30e104646c9e9719aebe1085ceca2281c5c77f61b1daff2f22c36",
+          "leader_exec": "SUCCESS",
+          "outcome": "contract_error:idle",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A1 apply (charter v4)": {
+          "tx": "0x3a9c4cf9e4f9051b60c1826666c9199ccb62d5b82d4f9762cbd9118bef8dcfab",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A1 apply again (expect refusal)": {
+          "tx": "0x21f6951728d800488775017998077fe74fd845f8317e695a41d065cf217214b2",
+          "leader_exec": "ERROR",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A3 apply on newer charter (expect AMENDMENT_STALE)": {
+          "tx": "0x46eec96412120d601e984cf2dca8948fb6718c3e6c869fe1c88ed74ef37cf7c8",
+          "leader_exec": "ERROR",
+          "outcome": "rollback:EXPECTED:AMENDMENT_STALE",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A3 close stale": {
+          "tx": "0xba068fe144d4645409e8d39173865508afdb2412e64549bd12256280517cfabd",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "A2 reject": {
+          "tx": "0x65333f3bb921e4e640ecbe05bc1f7557e3ceefe69b0faaa5bdfc2c777e7e5824",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "PROPOSAL 1 submit (itemized, dated)": {
+          "tx": "0x44c2be162dd1d0db6db0b7d04684db61dfd7b584bc11d44ce4ab02166d37d0ed",
+          "leader_exec": "SUCCESS",
+          "outcome": "contract_error:idle",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "PROPOSAL 1 review": {
+          "tx": "0xa0c14dac995c7678b715c0cbdb9c811265bee36f6d11faf00832260a30c1d4ed",
+          "leader_exec": "SUCCESS",
+          "outcome": "contract_error:idle",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "PROPOSAL 2 submit (no budget, no dates)": {
+          "tx": "0x26d129f6c3c39870799614f8d8b698a4d5f2b855cd8713eb9d27281e3dbe491f",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "PROPOSAL 2 review": {
+          "tx": "0x1f06a594f30d54006864376f667e0aabdfc51b410e7fc8b39a594ecc90d1e825",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "EXEC 1 ATTEMPTED": {
+          "tx": "0x5552ed581820e8b8f4a1a2c3fc6e3dd6cd216d505adcd7a52195dbdffcd58ada",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "EXEC 1 REPORTED_COMPLETE": {
+          "tx": "0x4ff7a110ab6e518fb262e631b3305e12900ec564a0ced6392d5ee0eafb2021a2",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "EXEC 1 after close (expect refusal)": {
+          "tx": "0x16e3280389adc295f87e56b5a9bd6140fd72b2bfa983a13e7892cf50b8bf061e",
+          "leader_exec": "ERROR",
+          "outcome": "contract_error:idle",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "APPEAL review 2": {
+          "tx": "0x3ab3fe1221eb1597c29f58f23ae93f2285db69766def90d57b168b5630e7f9bb",
+          "leader_exec": "SUCCESS",
+          "outcome": "return",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "DISSENT appeal 1": {
+          "tx": "0xb8ac99891f2aadcc6a44cfd1619e006ba3156e114fdfa94d962979208dd8dfab",
+          "leader_exec": "ERROR",
+          "outcome": "rollback:EXPECTED:NO_MATERIAL_DISSENT",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        },
+        "DISSENT appeal 1 (second attempt)": {
+          "tx": "0x299d63edc2b9ca8d5511c5fed7c7b86a84bc394a2b60e815fee6fdbc0d0cbcd4",
+          "leader_exec": "ERROR",
+          "outcome": "rollback:EXPECTED:NO_MATERIAL_DISSENT",
+          "consensus": "MAJORITY_AGREE",
+          "finalized": true,
+          "rounds": 1
+        }
+      },
+      "retriesAndFailures": [
+        "No transaction needed a retry and none rotated leaders: every transaction finalized MAJORITY_AGREE in 1 round.",
+        "Two reasoned-dissent requests on appeal 1 were refused NO_MATERIAL_DISSENT (the model found no material dissent); no dissent is stored on this deployment.",
+        "Refusals that were intended are listed as leader_exec ERROR above."
+      ],
+      "notObserved": [
+        "a stored reasoned dissent on this deployment (one was observed on stages_7_11_release_candidate)",
+        "MODIFIED or REVERSED appellate decision",
+        "repair after a reversal",
+        "validator disagreement or leader rotation on any transaction",
+        "a non-owner account on this deployment (stranger authorization was tested on throwaway_governance_test)",
+        "DEACTIVATE amendment live",
+        "wallet rejection, wrong network and refresh in a real browser wallet",
+        "enable_amendment_governance (deliberately not activated)"
+      ]
     }
   }
 }

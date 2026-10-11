@@ -58,7 +58,7 @@ its historical sections, and an appeal and a precedent snapshot still use the fr
 sections, quoted as data), the governance rules, and the proposed change as untrusted, defanged, fenced data. The answer is `{compatible, conflicting_section_ids}`.
 
 * The list of conflicting sections must contain only other active sections, sorted, without duplicates. A compatible verdict carries none.
-* Validators rebuild the same context and re-run the evaluation. They require the **same verdict and the same conflicting-section list** (identities, normalised unique and sorted, so wording never matters). A leader cannot substitute, drop or add a section identity. This tightening is in the working tree but **not in the deployed release-candidate contract** (`0xC97b…0736`, source hash `ccca5e4d…`), whose validators compared the verdict only; it takes effect only after a redeploy.
+* Validators rebuild the same context and re-run the evaluation. They require the **same verdict and the same conflicting-section list** (identities, normalised unique and sorted, so wording never matters). A leader cannot substitute, drop or add a section identity. This tightening is deployed in the submission release (`0xc942…9F94`, source hash `e1041e62…`). The earlier release-candidate contract (`0xC97b…0736`, `ccca5e4d…`) compared the verdict only.
 * The result is **advice**: a `COMPATIBLE` verdict approves nothing, and a `CONFLICTING` verdict blocks approval. Nothing in the model's output can approve, apply or change anything else.
 
 ## 4. The governance switch (Stage 8)

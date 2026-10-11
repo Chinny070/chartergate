@@ -3,7 +3,7 @@
 Every nondeterministic path runs the leader once and each validator independently (`gl.vm.run_nondet(leader_fn, validator_fn)`). A leader's output is accepted only if the checks below pass; a failed
 leader or an unusable validator output is a rejection, which forces a leader rotation (fail closed). Prose is never compared or hashed.
 
-Last audited against the working tree (source hash differs from the deployed contract only by the amendment conflict-list check, see section 3).
+Audited against commit `a486010`, which is the deployed submission release (`0xc942…9F94`, source hash `e1041e62…`).
 
 ## 1. Per path
 
@@ -28,4 +28,4 @@ Last audited against the working tree (source hash differs from the deployed con
 
 Direct tests (`tests/direct/`, mocked LLM) replay the real validator against altered leader output: identity swaps, wrong ids, fabricated verified results, different verdicts and classes, unrelated evidence,
 unsupported citations, tampered dissents, and (added in this audit) a substituted, omitted, added or duplicated amendment conflict list. These prove the validator logic; they are **not** live consensus evidence.
-The amendment conflict-list check was added after the release-candidate deployment, so the deployed contract does not have it until it is redeployed.
+The amendment conflict-list check was also exercised live once: a CONFLICTING evaluation naming `[s3]` finalized in one round on the submission release. One live case is not a statistical claim about validator agreement.

@@ -24,12 +24,12 @@ There is no voting or treasury execution. Ratification is the owner. Execution r
 | Contract tests, mocked LLM and web (`tests/direct`) | 1551 passed, 0 failed, 0 skipped (these prove contract logic, **not** real model behavior) |
 | GLSim integration (`tests/integration`, 6 files) | 26 passed, 9 skipped (the skipped cases need real LLM validators) |
 | Frontend (vitest) | 349 passed, 8 skipped; typecheck, lint and production build clean |
-| Release-candidate contract on StudioNet | `0xC97b91Bd8ede96533B17EFf86D98cDff6c700736`, deploy tx `0x959d4bd3dd68f846bc50b76bae742297c57a64ed67bb4594e01d7026038ba1b3`, finalized; deployed source hash `ccca5e4d6f00161a401b3e3505f65db4b26ebf50c87948ffb94e076cf4c11a28`, 72 methods |
-| Live behavior observed on that contract | amendments proposed, model-evaluated (COMPATIBLE and CONFLICTING), approved, applied, refused as stale or unauthorized; execution reports; an AFFIRMED appeal and a stored dissent. Transaction hashes: `deployments/studionet.json` |
-| Live frontend | https://chartergate.vercel.app, built for the contract above |
-| **Newer than the deployed contract** | the working tree adds one validator tightening (amendment evaluation also compares the conflicting-section list; source hash `e1041e62…`). It is **not deployed**. The deployed contract runs the older source. |
-| Governance switch | **OFF** on the live contract (irreversible; deliberately not activated). Tested on a separate throwaway deployment: `docs/GOVERNANCE_VERIFICATION.md` |
-| Not observed live | `MODIFIED` or `REVERSED` appeals, repair after a reversal, validator disagreement on amendment transactions, any account other than the owner on the release contract |
+| **Submission release (intended)** | `0xc942901dbB024CDb922f9D71B91024ea919a9F94` on StudioNet, deploy tx `0x90181a7c05c41d0adbb9af4072461a23ce9f755dec1081e3a3adf42d858d219a`, FINALIZED, `MAJORITY_AGREE`. Deployed source = `contracts/charter_gate.py` at commit `a486010`, SHA-256 `e1041e625bccf8316f979d247d425e29036ec398b299a9321e0737b39ecbd64e`, 72 methods, schema identical to `docs/charter_gate.schema.json`. Explorer: https://explorer-studio.genlayer.com/address/0xc942901dbB024CDb922f9D71B91024ea919a9F94 |
+| Live behavior observed on that contract | an amendment evaluated COMPATIBLE, approved and applied (charter v4); an amendment evaluated **CONFLICTING with `[s3]`** (validators agreed on the list in one round), approval refused, rejected; a competing amendment refused as stale and closed; a second apply refused; a proposal reviewed ELIGIBLE with execution reports (unverified); a REPAIRABLE review with an AFFIRMED appeal. Every transaction finalized in 1 round with no retries. Hashes: `deployments/studionet.json` |
+| Live frontend | https://chartergate.vercel.app, built for the contract above only |
+| Earlier release-candidate contract | `0xC97b91Bd8ede96533B17EFf86D98cDff6c700736` (source `ccca5e4d…`, before the conflict-list check). Kept unchanged as history and superseded by the row above. |
+| Governance switch | **OFF** on the submission release (irreversible; deliberately not activated). Tested on a separate throwaway deployment: `docs/GOVERNANCE_VERIFICATION.md` |
+| Not observed live | a stored reasoned dissent on the submission release (two attempts returned `NO_MATERIAL_DISSENT`; one was stored on the earlier contract), `MODIFIED` or `REVERSED` appeals, repair after a reversal, any validator disagreement or leader rotation, a non-owner account on the submission release (tested on a throwaway), a DEACTIVATE amendment, and wallet rejection, wrong network and refresh in a real wallet |
 | Canonical deployment | **none** (`canonicalDeployment` is `null`). Every deployment is a verification deployment. |
 
 No independent professional security audit has been performed.
@@ -92,4 +92,4 @@ commit and source hash in `deployments/studionet.json`, then rebuild the fronten
 | 6 | Appeals and reasoned dissent | conditionally accepted (coverage gaps in `docs/STAGE_6_EQUIVALENCE.md`, section 10) |
 | 7 to 9 | Amendments, governance guardrails, accountability | implemented; exercised live on the release-candidate verification deployment (see the evidence table) |
 | 10 | Product UI | live at https://chartergate.vercel.app |
-| 11 | Release audit | audit remediation in progress: one validator fix is local and awaits a redeploy |
+| 11 | Release audit | complete: one validator fix deployed as the submission release; remaining gaps listed above |
