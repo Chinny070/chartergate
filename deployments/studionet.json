@@ -2180,12 +2180,13 @@
       "knownDesignLimitation": "Appellate decisions are not yet indexed as precedent; a modified or reversed original review is excluded from future automatic precedent.",
       "liveValidation": {
         "status": "PARTIAL",
-        "browserE2E": "WAITING_FOR_USER",
-        "browserE2ECandidate": {
-          "proposalId": 8,
-          "reviewId": 6,
-          "note": "REPAIRABLE and unappealed"
-        }
+        "browserE2E": "PASS_WITH_NOTES (see browserE2E)",
+        "notObservedLive": [
+          "a stored reasoned dissent",
+          "a MODIFIED or REVERSED appellate decision",
+          "repair after a reversal",
+          "a stranger or an ELIGIBLE-review refusal (direct tests only)"
+        ]
       },
       "liveCharter": {
         "v2": "s1 Mission",
@@ -2293,6 +2294,22 @@
           "appealHash": "0xf11deec4a51b2d85645669fa754cf8388a825bdc65891028b80f5355beb61cd9",
           "appealContextHash": "0x200b11a24591aa36a82570d6cd364fd754675b4e56586524ceb4bf2a94f65667",
           "decisionHash": "0x94d07a2ff7aef7e6de250f6780fe1583201b9f079d663b68eeec376b9de0fe54"
+        },
+        {
+          "appealId": 4,
+          "reviewId": 6,
+          "proposalId": 8,
+          "ground": "CHARTER_MISINTERPRETATION",
+          "decisionKind": "AFFIRMED",
+          "verdict": "REPAIRABLE",
+          "rounds": 1,
+          "tx": "0xdffb3fc98d84d9b9fb3a8912c48e12c202228c2a23aa33f72e1476ad9c27b30e",
+          "filedFromBrowserWallet": true,
+          "closedRecord": "charter v5, evidence_count 0, frozen precedent snapshot of 6 prior rulings (reviews 5, 4 and 3 cited FOLLOWED)",
+          "appealHash": "0x6128dbe8ec6f330894869c75caa2267edc987ff547fcde304b59a55756e723e4",
+          "appealContextHash": "0x32b8bd484dea2d7bddc2fe72d5bbedf0d4118e576d5e788b64d73523d4ce8d7e",
+          "decisionHash": "0x2280054d13e0003dbbc5cf2b215b97ecb11c7d6dcf94ecb9f33a5bc088ce547e",
+          "independentlyVerified": "appeal, appeal-context and decision hashes recomputed from the documented formats and equal to the on-chain values"
         }
       ],
       "dissents": {
@@ -2389,7 +2406,19 @@
         "The /precedent route is still a placeholder page.",
         "The case page lists the appellate history of the controlling review only.",
         "Reviews with cited evidence or ambiguous UNCLEAR findings frequently end MAJORITY_DISAGREE (BAD_EVIDENCE_REF, BAD_MISSING_FACT), as in Stages 3 to 5."
-      ]
+      ],
+      "browserE2E": {
+        "status": "PASS_WITH_NOTES",
+        "exercised": "StudioNet wallet in the browser: opened proposal 8, the appeal workspace (frozen record, ground, statement), filed the appeal, signed, and read the finalized appellate decision",
+        "tx": "0xdffb3fc98d84d9b9fb3a8912c48e12c202228c2a23aa33f72e1476ad9c27b30e",
+        "txVerified": "request_appeal(6, CHARTER_MISINTERPRETATION, ...) from the user's wallet to the Stage 6 contract; FINALIZED, MAJORITY_AGREE, 1 round, created 2026-10-11T08:00:57Z",
+        "observedByUser": "workspace screens, then the Appeal, Appellate decision (AFFIRMED, original/appellate/effective all REPAIRABLE), Precedent Memory (FOLLOWED x3), Closed appellate record and Reasoned dissent panels",
+        "notes": [
+          "The user did not report the individual transaction-lifecycle phases (signature requested, submitted, pending consensus); only the final screens.",
+          "REQUEST REASONED DISSENT was not clicked in the browser, so no browser dissent result exists.",
+          "The appeal was affirmed, so a reversal or modification was not exercised in the browser."
+        ]
+      }
     }
   }
 }
