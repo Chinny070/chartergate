@@ -1369,6 +1369,12 @@ def _parse_precedents(raw_cites: list, findings: list, ctx: dict) -> list:
                 rid = int(rid.strip())
             citation = {"section_id": sid, "review_id": rid, "treatment": treatment, "reason": reason}
             problem = _citation_problem(citation, by_section[sid], ctx["precedent_candidates"].get(sid, []))
+            # Precedent is advisory metadata. If the model calls a citation FOLLOWED even though its
+            # fixed finding is incompatible with that historical finding, omit that citation rather
+            # than letting optional precedent prose veto an otherwise valid constitutional review.
+            # Other malformed references remain errors: they must never be stored as citations.
+            if problem == "PRECEDENT_INCOMPATIBLE":
+                continue
             if problem != "":
                 _llm_fail(problem)
             if any(x["section_id"] == sid and x["review_id"] == rid for x in out):

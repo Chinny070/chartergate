@@ -111,7 +111,27 @@
         "charterVersion": 4,
         "sectionCount": 2,
         "proposalCount": 1
-      }
+      },
+      "liveTimestampVerification": {
+        "daoCreatedAt": "2026-10-07T16:57:36.412855Z",
+        "sectionS1CreatedAt": "2026-10-07T17:05:33.854543Z",
+        "sectionS1UpdatedAt": "2026-10-07T17:11:18.720778Z",
+        "sectionS2CreatedAt": "2026-10-07T17:06:19.453671Z",
+        "proposalACreatedAt": "2026-10-07T17:09:37.618795Z",
+        "revisionS1Version4ChangedAt": "2026-10-07T17:11:18.720778Z",
+        "note": "Plausible GenVM UTC transaction timestamps observed in CLI return values."
+      },
+      "returnShapeVerification": {
+        "daoMetadata": "object; counters decoded as numbers",
+        "currentSection": "object; strings and boolean decoded",
+        "proposal": "object; proposal id and submission version decoded as numbers",
+        "historicalSection": "object; revision fields and version decoded",
+        "paginatedHistoricalSections": "array of objects",
+        "contractSchema": "deployed schema identical to local schema (17 methods)",
+        "directGenLayerJs": "not verified: fetch failed with ENOTFOUND studio.genlayer.com",
+        "frontendBrowser": "not run"
+      },
+      "smokeTestResult": "PARTIAL: requested lifecycle and unauthorized rollback verified; used s1/s2 identifiers because CLI coerced bare digit IDs to integers. Direct SDK/network decoding and browser wallet test remain outstanding."
     },
     "stage_1_2_hardened_verification": {
       "status": "VERIFICATION_DEPLOYMENT",
@@ -514,7 +534,7 @@
           "evidenceSetHash": "0xa275a034884fdd73163c662c9224cf3d53fcae55f87b13abd03520c9e5863c39",
           "reviewContextHash": "0x0826e38527906271467402ff6a73defaa01a3b2862cc76d7ed3f9956086944e8",
           "reviewHash": "0x4dacb1f82d3874a3dfc765ff26b47f4678f20ab8a1423da4d9bb55fad4d93e25",
-          "createdAt": "2026-10-09T18:38:26.809030Z",
+          "createdAt": "2026-10-09T18:38:26.80903Z",
           "findings": [
             {
               "evidence_ids": [],
@@ -1073,7 +1093,7 @@
         "evidenceSetHash": "0x970b8ace297e77c51f4fe6035bf9d4a470cf7e2b5ff534d335a25b24c1d0fc00",
         "reviewContextHash": "0x49d3f72db2f9681f6d23897de842c6a07c8dbde94caa06231ff8238ffa0fd653",
         "reviewHash": "0xfbc737ad36ff65e1b4c532670d0f19279175e95ae2b30bf9e3a10a2b4b4c6c15",
-        "createdAt": "2026-10-09T19:12:26.191320Z",
+        "createdAt": "2026-10-09T19:12:26.19132Z",
         "userReported": "timeline showed all 5 phases (Ready, Signature requested, Submitted, Pending consensus, Finalized · Success) and stayed visible; verdict panel rendered separately",
         "notReported": "whether the 'Finalized. That is the transaction' line showed, and the elapsed time"
       },
@@ -1517,7 +1537,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "2",
           "rotations": 1,
-          "created": "2026-10-09T21:30:53.847838+00:00",
+          "created": "2026-10-09T22:30:53.847838+01:00",
           "finalLeader": "SUCCESS/return/[object Object]",
           "roundDetail": [
             {
@@ -1544,7 +1564,7 @@
           "result": "MAJORITY_DISAGREE",
           "rounds": "4",
           "rotations": 3,
-          "created": "2026-10-09T21:32:58.668882+00:00",
+          "created": "2026-10-09T22:32:58.668882+01:00",
           "finalLeader": "SUCCESS/return/[object Object]",
           "roundDetail": [
             {
@@ -1586,7 +1606,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "1",
           "rotations": 0,
-          "created": "2026-10-09T21:36:25.802581+00:00",
+          "created": "2026-10-09T22:36:25.802581+01:00",
           "finalLeader": "SUCCESS/return/[object Object]",
           "roundDetail": [
             {
@@ -1606,7 +1626,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "2",
           "rotations": 1,
-          "created": "2026-10-09T21:37:30.188466+00:00",
+          "created": "2026-10-09T22:37:30.188466+01:00",
           "finalLeader": "SUCCESS/return/[object Object]",
           "roundDetail": [
             {
@@ -1634,7 +1654,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "1",
           "rotations": 0,
-          "created": "2026-10-09T21:45:14.650712+00:00",
+          "created": "2026-10-09T22:45:14.650712+01:00",
           "finalLeader": "ERROR/rollback/EXPECTED:NOT_PROPOSER",
           "roundDetail": [
             {
@@ -1654,7 +1674,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "1",
           "rotations": 0,
-          "created": "2026-10-09T21:46:06.088064+00:00",
+          "created": "2026-10-09T22:46:06.088064+01:00",
           "finalLeader": "SUCCESS/return/[object Object]",
           "roundDetail": [
             {
@@ -1674,7 +1694,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "1",
           "rotations": 0,
-          "created": "2026-10-09T21:47:14.174769+00:00",
+          "created": "2026-10-09T22:47:14.174769+01:00",
           "finalLeader": "ERROR/rollback/EXPECTED:NOT_PROPOSER",
           "roundDetail": [
             {
@@ -1694,7 +1714,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "1",
           "rotations": 0,
-          "created": "2026-10-09T22:08:20.018277+00:00",
+          "created": "2026-10-09T23:08:20.018277+01:00",
           "finalLeader": "SUCCESS/return/[object Object]",
           "roundDetail": [
             {
@@ -1714,7 +1734,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "1",
           "rotations": 0,
-          "created": "2026-10-09T22:09:34.660815+00:00",
+          "created": "2026-10-09T23:09:34.660815+01:00",
           "finalLeader": "ERROR/rollback/EXPECTED:REVIEW_ALREADY_EXISTS",
           "roundDetail": [
             {
@@ -1734,7 +1754,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "1",
           "rotations": 0,
-          "created": "2026-10-09T22:14:30.983723+00:00",
+          "created": "2026-10-09T23:14:30.983723+01:00",
           "finalLeader": "ERROR/rollback/EXPECTED:REPAIR_REJECTED:PURPOSE_CHANGED",
           "roundDetail": [
             {
@@ -1754,7 +1774,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "1",
           "rotations": 0,
-          "created": "2026-10-09T22:16:14.959118+00:00",
+          "created": "2026-10-09T23:16:14.959118+01:00",
           "finalLeader": "SUCCESS/return/[object Object]",
           "roundDetail": [
             {
@@ -1774,7 +1794,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "1",
           "rotations": 0,
-          "created": "2026-10-09T22:17:22.434204+00:00",
+          "created": "2026-10-09T23:17:22.434204+01:00",
           "finalLeader": "ERROR/rollback/EXPECTED:REPAIR_NOT_ALLOWED",
           "roundDetail": [
             {
@@ -1794,7 +1814,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "2",
           "rotations": 1,
-          "created": "2026-10-09T22:18:22.548061+00:00",
+          "created": "2026-10-09T23:18:22.548061+01:00",
           "finalLeader": "SUCCESS/return/[object Object]",
           "roundDetail": [
             {
@@ -1821,7 +1841,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "1",
           "rotations": 0,
-          "created": "2026-10-09T22:20:58.770586+00:00",
+          "created": "2026-10-09T23:20:58.770586+01:00",
           "finalLeader": "SUCCESS/return/[object Object]",
           "roundDetail": [
             {
@@ -1841,7 +1861,7 @@
           "result": "MAJORITY_DISAGREE",
           "rounds": "4",
           "rotations": 3,
-          "created": "2026-10-09T22:22:13.874551+00:00",
+          "created": "2026-10-09T23:22:13.874551+01:00",
           "finalLeader": "ERROR/rollback/LLM_ERROR:BAD_EVIDENCE_REF",
           "roundDetail": [
             {
@@ -1882,7 +1902,7 @@
           "result": "MAJORITY_DISAGREE",
           "rounds": "4",
           "rotations": 3,
-          "created": "2026-10-09T22:24:03.645204+00:00",
+          "created": "2026-10-09T23:24:03.645204+01:00",
           "finalLeader": "ERROR/rollback/LLM_ERROR:BAD_EVIDENCE_REF",
           "roundDetail": [
             {
@@ -1923,7 +1943,7 @@
           "result": "MAJORITY_AGREE",
           "rounds": "3",
           "rotations": 2,
-          "created": "2026-10-09T22:26:19.368797+00:00",
+          "created": "2026-10-09T23:26:19.368797+01:00",
           "finalLeader": "SUCCESS/return/[object Object]",
           "roundDetail": [
             {
@@ -1997,7 +2017,7 @@
             "s3"
           ],
           "revisionHash": "0x7a199cf9f6fa844e0afde82f4dae6699e5899cdd433ae0484f937df9fe2449fa",
-          "createdAt": "2026-10-09T22:49:23.920430Z",
+          "createdAt": "2026-10-09T22:49:23.92043Z",
           "txHash": null,
           "txHashNote": "not captured: the hash read from the screenshot did not exist on-chain (misread); the revision was verified from contract state and its hash recomputed independently",
           "userObserved": "all five timeline phases to Finalized · Success; 'Repair assessment: admissible' shown separately; revision 2 REVISED awaiting review",
@@ -2556,7 +2576,7 @@
     "submission_release_a486010": {
       "status": "VERIFICATION_DEPLOYMENT",
       "intendedSubmissionRelease": true,
-      "note": "Intended submission release. Not canonical (canonicalDeployment stays null). Amendment governance is OFF and was not activated. Supersedes stages_7_11_release_candidate, which stays recorded unchanged.",
+      "note": "Intended submission release. Not canonical (canonicalDeployment stays null). Amendment governance was enabled on 2026-10-12 by the owner through the injected wallet; activation is irreversible and direct owner charter edits are now blocked.",
       "address": "0xc942901dbB024CDb922f9D71B91024ea919a9F94",
       "deployTx": "0x90181a7c05c41d0adbb9af4072461a23ce9f755dec1081e3a3adf42d858d219a",
       "deployer": "0xaffe15eec45b68835cc9e5b4ab85dd5deae8e70b",
@@ -2574,6 +2594,21 @@
       },
       "change": "Amendment evaluation validators now require the same conflicting-section list as well as the same verdict (docs/TRUST_MODEL.md).",
       "frontend": "https://chartergate.vercel.app, built with VITE_CHARTERGATE_ADDRESS set to this address; the production bundle contains no other contract address.",
+      "frontendReviewVerification": {
+        "readClient": "Pinned genlayer-js 1.1.8, built-in StudioNet chain id 61999, read-only calls against this address.",
+        "snapshotTiming": "Initial read-only UI validation before the later production-browser proposal and evidence writes recorded in frontendProductionDeployment.",
+        "sdkReads": {
+          "get_dao_metadata": "object; dao_name and dao_description strings, owner string, timestamps strings, counters decoded as numbers; Atlas DAO, charter v4, 3 sections, 2 proposals, 0 evidence.",
+        "get_governance_status": "object; governance_enabled boolean true after owner activation, governance_enabled_at string, charter_version and amendment_count numbers.",
+          "get_charter_version": "number 4.",
+          "get_proposals_page": "array of 2 proposal objects; numeric ids and charter versions, strings and statuses decoded.",
+          "get_evidence_page": "empty array (no evidence records on this deployment).",
+          "get_amendments_page": "array of 3 amendment objects; numeric fields, string fields, booleans and conflicting-section arrays decoded."
+        },
+        "localFrontend": "Local Vite app against the deployed address rendered DAO metadata, charter sections/history, proposal list/detail, empty evidence, proposal 1 ELIGIBLE review, proposal 2 REPAIRABLE review with all three findings, precedent citations, and AFFIRMED appeal 1; governance is ON after owner activation. The accountability label now says Constitutionally eligible proposals and distinguishes voting/ratification/execution.",
+        "hostedFrontend": "Production redeployed with VITE_CHARTERGATE_ADDRESS explicitly set to this submission-release address (Vercel deployment dpl_7Tw7Wkz5ssPaUy7RfZMoxGdrK436; READY and aliased). In-app browser verified Atlas DAO, charter v4, 3 sections, charter history v1-v4, 3 amendments, live proposal list, and updated wording distinguishing constitutional eligibility from voting, ratification and execution approval.",
+        "wallet": "The initial CLI MetaMask bridge probe stopped at the unsafe-site warning. The owner later connected through the production frontend and signed the proposal/evidence writes recorded in frontendProductionDeployment."
+      },
       "liveFixtures": {
         "charter": "v1 to v3 by owner adds (s1, s3); v4 via amendment 1 (s4 Timeline)",
         "amendments": {
@@ -2809,8 +2844,296 @@
         "a non-owner account on this deployment (stranger authorization was tested on throwaway_governance_test)",
         "DEACTIVATE amendment live",
         "wallet rejection, wrong network and refresh in a real browser wallet",
-        "enable_amendment_governance (deliberately not activated)"
-      ]
+        "direct owner update after activation was rejected with EXPECTED:AMENDMENT_GOVERNANCE_REQUIRED; charter version and §1 text/timestamps remained unchanged"
+      ],
+      "governanceActivationAttempts": {
+        "method": "enable_amendment_governance",
+        "signer": {
+          "cliAccountName": "my-studionet-wallet",
+          "address": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b"
+        },
+        "network": "studionet",
+        "chainId": 61999,
+        "attempts": [
+          {
+            "hash": "0xb5bcc4fe9cbb1747515f5db65ddef782c138b84f1e10054bb340e47db5d593ac",
+            "finalStatus": "FINALIZED",
+            "result": "NO_MAJORITY",
+            "numOfRounds": 0,
+            "votesCommitted": 0,
+            "votesRevealed": 0,
+            "timestamp": "2026-10-12T01:58:00.012839+00:00"
+          },
+          {
+            "hash": "0x636dc2a94a1e7b66826f53395e719ac4100a91e0b7ddaf6f91d73d03e5b1a791",
+            "finalStatus": "FINALIZED",
+            "result": "NO_MAJORITY",
+            "numOfRounds": 0,
+            "votesCommitted": 0,
+            "votesRevealed": 0,
+            "timestamp": "2026-10-12T01:59:20.248688+00:00"
+          },
+          {
+            "hash": "0x962f51d7aadd256d66f8bf5e675f5929622dafa78a11b861fced531400d831cd",
+            "finalStatus": "FINALIZED",
+            "result": "NO_MAJORITY",
+            "numOfRounds": 0,
+            "votesCommitted": 0,
+            "votesRevealed": 0,
+            "timestamp": "2026-10-12T01:59:44.124171+00:00"
+          },
+          {
+            "hash": "0x242b07042f406a86cfd092e4cbeb1eec992b9d992a304ee2e314b2e7bf609c54",
+            "finalStatus": "FINALIZED",
+            "result": "NO_MAJORITY",
+            "numOfRounds": 0,
+            "votesCommitted": 0,
+            "votesRevealed": 0,
+            "timestamp": "2026-10-12T02:15:05.534744+00:00"
+          },
+          {
+            "hash": "0x438cef08db88edcd7170e08442cb990253977f7457cfff033f262ba25d140870",
+            "finalStatus": "FINALIZED",
+            "result": "NO_MAJORITY",
+            "numOfRounds": 0,
+            "votesCommitted": 0,
+            "votesRevealed": 0
+          }
+        ],
+        "liveStatusAfterAttempts": {
+          "governance_enabled": true,
+          "governance_enabled_at": "2026-10-12T02:41:08.461235Z",
+          "charter_version": 4,
+          "amendment_count": 3
+        },
+      "activationSuccessful": true,
+      "successfulTransaction": {
+        "hash": "0xa20696724c4b39bf04e5162a840766a5274970e2135ec56a0a298c3f384c9272",
+        "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+        "finalStatus": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "numOfRounds": 1,
+        "validatorVotes": ["AGREE", "AGREE", "AGREE", "AGREE", "AGREE"],
+        "governanceEnabledAt": "2026-10-12T02:41:08.461235Z"
+      },
+      "liveStatusAfterActivation": {
+        "governance_enabled": true,
+        "governance_enabled_at": "2026-10-12T02:41:08.461235Z",
+        "charter_version": 4,
+        "amendment_count": 3
+      },
+      "directEditRestrictionCheck": {
+        "hash": "0xf50cc5a16cf2d22c0404fa288dcff5d3ea0f10334181bd43d7734fd693f4a83f",
+        "signer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+        "method": "update_charter_section",
+        "arguments": [
+          "s1",
+          "Mission",
+          "Every funding proposal must serve open-source infrastructure used by the DAO."
+        ],
+        "finalStatus": "FINALIZED",
+        "consensus": "MAJORITY_AGREE",
+        "executionResult": "ERROR",
+        "contractError": "EXPECTED:AMENDMENT_GOVERNANCE_REQUIRED",
+        "validators": 5,
+        "stateAfter": {
+          "charterVersion": 4,
+          "sectionId": "s1",
+          "title": "Mission",
+          "body": "Every funding proposal must serve open-source infrastructure used by the DAO.",
+          "active": true,
+          "createdAt": "2026-10-11T13:59:27.068826Z",
+          "updatedAt": "2026-10-11T13:59:27.068826Z"
+        },
+        "note": "Consensus finalized the attempted call while contract execution rolled back with the expected restriction. Direct reads confirmed the charter did not change."
+      },
+      "note": "The five earlier CLI-signed attempts finalized NO_MAJORITY with zero rounds/votes. A direct injected-wallet GenLayerJS 1.1.8 write to the deployed contract finalized MAJORITY_AGREE; a direct StudioNet read confirmed the switch is enabled. CLI attempts used a legacy submission route; the browser SDK call reached the correct contract method."
+      },
+      "frontendProductionDeployment": {
+        "date": "2026-10-12",
+        "vercelDeploymentId": "dpl_7Tw7Wkz5ssPaUy7RfZMoxGdrK436",
+        "deploymentUrl": "https://chartergate-p4yplw3em-chinny070s-projects.vercel.app",
+        "productionAlias": "https://chartergate.vercel.app",
+        "readyState": "READY",
+        "environment": "VITE_CHARTERGATE_ADDRESS is configured for Production as this contract address.",
+        "browserReadback": "In-app browser verified DAO Atlas DAO, charter v4, 3 sections, owner address suffix E70B, timestamps, charter history v1-v4; Accountability rendered 3 amendments and the proposal list. Updated eligibility copy was visible.",
+    "wallet": "MetaMask connected owner 0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b on StudioNet. Frontend proposal write finalized MAJORITY_AGREE; proposal 3 is readable as SUBMITTED under charter v4. Governance activation was separately signed through injected GenLayerJS and finalized MAJORITY_AGREE.",
+        "browserProposalSmoke": {
+          "transactionHash": "0x9ff9db956ea754195476c23a6237186bedbfc595d14590d4f6c37088151ef257",
+          "finalStatus": "FINALIZED",
+          "result": "MAJORITY_AGREE",
+          "executionResult": "SUCCESS",
+          "proposalId": 3,
+          "title": "Steward browser verification test",
+          "status": "SUBMITTED",
+          "charterVersionAtSubmission": 4,
+          "proposer": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+          "createdAt": "2026-10-12T02:26:22.212153Z",
+          "cliReceipt": "genlayer receipt returned stdout and stderr as undefined; genlayer-js getTransaction confirmed FINALIZED, MAJORITY_AGREE, SUCCESS, 5 validator agrees, and zero stderr."
+        },
+        "browserEvidenceSmoke": {
+          "proposalId": 3,
+          "evidenceId": 1,
+          "transactionHash": "0xc8235405191a4955514b31296491b26b28ac87a648927bb93f490cd1fad58f6c",
+          "finalStatus": "FINALIZED",
+          "consensusResult": "MAJORITY_AGREE",
+          "executionResult": "SUCCESS",
+          "sourceUrl": "https://github.com/Chinny070/chartergate",
+          "factKey": "project_repository_exists",
+          "verifiedValue": "public",
+          "evidenceStatus": "VERIFIED",
+          "createdAt": "2026-10-12T03:21:39.861972Z",
+          "browserReadback": "Production frontend rendered evidence #001 as VERIFIED with its source, claim, normalized fact/value and content hash."
+        },
+        "browserReviewAttempt": {
+          "proposalId": 3,
+          "transactionHash": "0x8d4e6af40a4f0991ba4f6668a626cf022f7ede7e183c9b878d9f7a3260e1fb7e",
+          "finalStatus": "FINALIZED",
+          "consensusResult": "MAJORITY_DISAGREE",
+          "leaderExecutionResult": "ERROR",
+          "leaderPayload": "LLM_ERROR:BAD_MISSING_FACT",
+          "reviewIdForProposal": 0,
+          "reviewCountAfter": 2,
+          "proposalStatusUnchanged": "SUBMITTED",
+          "createdAt": "2026-10-12T03:26:08Z",
+          "diagnosis": "The proposal is explicitly a no-funding verification case, while all active charter sections govern funding proposals; the failed attempt stored no review. The contract also rejects malformed validator findings deterministically."
+        },
+        "browserReadback": {
+          "proposal1Review": "Frontend rendered review #001 as ELIGIBLE under charter v4 with three SATISFIED findings and execution reports clearly labeled self-reported and unverified.",
+          "proposal2Appeal": "Frontend rendered review #002 as REPAIRABLE and appeal #001 as AFFIRMED, preserving the original and appellate judgments.",
+          "amendment1": "Frontend rendered amendment #001 evaluation COMPATIBLE, owner approval, application APPLIED, and resulting charter v4.",
+          "networkAndWallet": "Frontend header showed the owner account suffix E70B on StudioNet chain 61999."
+        }
+      },
+      "stewardFollowupReadOnlyBrowser": {
+        "date": "2026-10-12",
+        "environment": "Codex in-app browser; read-only because this browser has no injected wallet.",
+        "contractAddress": "0xc942901dbB024CDb922f9D71B91024ea919a9F94",
+        "network": "StudioNet",
+        "chainId": 61999,
+        "constitutionPage": "Production UI read DAO metadata, charter v4, 3 active sections (s1 Mission, s3 Budget, s4 Timeline), versions v1-v4, and governance ON; UI says direct owner edits are closed.",
+        "proposalsPage": "Production UI listed proposals 1-4; proposal 4 is SUBMITTED under charter v4.",
+        "proposal4Detail": "Readback showed title Fund Atlas Protocol, status SUBMITTED, charter v4, and no review record. The proposal explicitly says no budget or milestones were specified, which conflicts with the active funding rules.",
+        "proposal4ReviewAttempt": {
+          "transactionHash": "0xa79b6901ff3557d87631edd391efee999b52b57b9383962d8d7182ec6d17a1f6",
+          "finalStatus": "FINALIZED",
+          "consensusResult": "MAJORITY_DISAGREE",
+          "rounds": 4,
+          "validatorVotes": ["DISAGREE", "DISAGREE", "DISAGREE", "AGREE", "IDLE"],
+          "earlierLeaderError": "LLM_ERROR:PRECEDENT_INCOMPATIBLE",
+          "storedReview": false,
+          "proposalStatusAfter": "SUBMITTED",
+          "note": "Failure stored no review and left proposal 4 unchanged. The local fix to omit incompatible optional FOLLOWED citations is not deployed on this contract."
+        },
+        "amendmentsPage": "Production UI read charter v4, governance ON, and amendments 001 APPLIED, 002 REJECTED, 003 SUPERSEDED.",
+        "accountabilityPage": "UI explicitly states ELIGIBLE is not a DAO vote, ratification or execution approval; outside execution reports are self-reported and unverified.",
+        "writesAttempted": false,
+        "walletWriteGap": "This browser reports NO WALLET FOUND. No review, appeal or amendment-evaluation write was attempted in this read-only pass."
+      },
+      "stewardFollowupWalletE2E": {
+        "date": "2026-10-12",
+        "environment": "Chrome production frontend with Rabby owner wallet on StudioNet",
+        "contractAddress": "0xc942901dbB024CDb922f9D71B91024ea919a9F94",
+        "network": "StudioNet",
+        "chainId": 61999,
+        "account": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+        "proposal5": {
+          "transactionHash": "0x9bf7938f2e7635fecb4346cf307f5048e8e3c38a52be39b052dfd0d0d42765d2",
+          "finalStatus": "FINALIZED",
+          "consensusResult": "MAJORITY_AGREE",
+          "executionResult": "SUCCESS",
+          "proposalId": 5,
+          "title": "Steward verification test — appeal flow (non-binding)",
+          "status": "SUBMITTED",
+          "charterVersionAtSubmission": 4,
+          "createdAt": "2026-10-12T05:31:26.491665Z"
+        },
+        "evidence2": {
+          "transactionHash": "0x9dd8471d8d62a8b38a318c894aff27039a130aa9518cca76b91ebda4355c9f4a",
+          "finalStatus": "FINALIZED",
+          "consensusResult": "MAJORITY_AGREE",
+          "executionResult": "SUCCESS",
+          "proposalId": 5,
+          "evidenceId": 2,
+          "sourceUrl": "https://www.salesforce.com/service/cloud/",
+          "factKey": "salesforce_case_management",
+          "evidenceStatus": "VERIFIED",
+          "retrievedAt": "2026-10-12T05:45:30.169307Z",
+          "contentHash": "0x12c7b2ab…f01833"
+        },
+        "review3": {
+          "transactionHash": "0x0e087673d61b0852789f9f56edd9ed7cf360e558136041c291778d7a7eb248f3",
+          "finalStatus": "FINALIZED",
+          "consensusResult": "MAJORITY_AGREE",
+          "executionResult": "SUCCESS",
+          "reviewId": 3,
+          "proposalId": 5,
+          "verdict": "INELIGIBLE",
+          "charterVersionApplied": 4,
+          "reviewedAt": "2026-10-12T05:50:48.858815Z"
+        },
+        "appeal1": {
+          "transactionHash": "0x79e3301584b5a68a70fb27d677db6d0a261c56f7ceb407ea9ae82f7d91c4ced5",
+          "finalStatus": "FINALIZED",
+          "consensusResult": "MAJORITY_AGREE",
+          "executionResult": "SUCCESS",
+          "appealHash": "0x4ca2a4782d1d34bdaa21a5a1e25985b8520632dd34dc5813ddc60f82692a9942",
+          "disposition": "AFFIRMED",
+          "effectiveVerdict": "INELIGIBLE",
+          "filedAt": "2026-10-12T06:00:43.638833Z",
+          "appealContextHash": "0xfde634380098eeea0d68b5871b6c144684813fb4353179b2ce9ecbdd036c1e5e",
+          "decisionHash": "0x0d4838693acaeb9e55f34d4e9d4a1897de7e3ceaa8e152d1125e9da0e8551f2b"
+        },
+        "amendmentEvaluation": {
+          "proposalTransactionHash": "0xac32e2a29e7df4f01123de044c95218ec405d6d9c5efa9d32d630781862fc24d",
+          "proposalFinalStatus": "FINALIZED",
+          "proposalConsensusResult": "MAJORITY_AGREE",
+          "proposalExecutionResult": "SUCCESS",
+          "proposalMethod": "propose_amendment",
+          "proposalContractAddress": "0xc942901dbB024CDb922f9D71B91024ea919a9F94",
+          "proposalBaseCharterVersion": 4,
+          "proposalSectionId": "s7",
+          "amendmentEvaluationAttempt": {
+            "transactionHash": "0xf5fe2e8d8fec79cc282334d935bbe75fc6cbd881a90be725b497734883788ce8",
+            "finalStatus": "FINALIZED",
+            "consensusResult": "NO_MAJORITY",
+            "rounds": 0,
+            "validatorVotes": 0,
+            "leaderExecution": "UNKNOWN",
+            "stderr": "",
+            "traceResult": "unavailable: RPC method gen_dbg_traceTransaction is not exposed",
+            "evaluationState": "not evaluated; no leader execution or validators ran"
+          },
+          "evaluationTransaction": {
+            "transactionHash": "0x6ed388b8170346d115ea1cccc791d54c19f7f45b7442e791465f0fa5c9b099d4",
+            "finalStatus": "FINALIZED",
+            "consensusResult": "MAJORITY_AGREE",
+            "executionResult": "SUCCESS",
+            "createdAt": "2026-10-12T06:44:52.171618Z",
+            "method": "request_amendment_evaluation",
+            "amendmentId": 4,
+            "evaluation": "COMPATIBLE",
+            "conflictingSectionIds": [],
+            "contextHash": "0x0346a78cdec754a2821752ae110ae4285abd8d9415ef5e6821a9d036050a724c"
+          },
+          "amendmentReadback": {
+            "status": "EVALUATED",
+            "evaluationVerdict": "COMPATIBLE",
+            "evaluatedAt": "2026-10-12T06:44:52.171618Z",
+            "appliedAt": "",
+            "appliedVersion": 0,
+            "amendmentCount": 4
+          },
+          "stateReadback": {
+            "charterVersion": 4,
+            "governanceEnabled": true,
+            "activeSections": ["s1", "s3", "s4"],
+            "s7Applied": false
+          },
+          "note": "Proposal and evaluation were submitted through the owner wallet on the production GenLayerJS frontend. The earlier CLI attempt finalized NO_MAJORITY with zero rounds; it is recorded separately and is not an evaluation result. The successful frontend evaluation was read back from finalized contract state. The test amendment remains unapplied by design.",
+          "charterStateChanged": false
+        }
+      }
     }
   }
 }

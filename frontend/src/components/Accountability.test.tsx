@@ -142,7 +142,8 @@ describe("ProposalAccountabilityView", () => {
 
   it("shows the decision the reports answer to", () => {
     const html = render(<ProposalAccountabilityView acc={proposal("APPROVED_NOT_REPORTED")} />);
-    expect(html).toContain("ELIGIBLE");
+    expect(html).toContain("constitutional review passed");
+    expect(html).toContain("not a DAO vote, ratification or execution approval");
     expect(html).toContain("review #006");
     expect(html).toContain("charter v5");
     expect(html).toContain("Ruling hash");

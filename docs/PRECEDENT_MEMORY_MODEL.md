@@ -114,7 +114,7 @@ characters, and at most 2 historical evidence records of 100 characters per fiel
 ## 9. Cost and consensus
 
 Stage 5.1: the base adjudication is unchanged. When candidates exist the leader makes **one** extra bounded precedent-consistency call over the fixed findings;
-its citations are strict (an invalid citation is an `LLM_ERROR`, which rotates, and nothing is stored). A validator does not run that pass: it re-runs the base
+incompatible optional `FOLLOWED` citations are omitted deterministically, while malformed references or treatments remain errors. A validator does not run that pass: it re-runs the base
 adjudication and makes one bounded semantic check per citation the leader chose (at most 2 per section). With no candidates there is no extra call. See
 `docs/STAGE_5_EQUIVALENCE.md` and `docs/STAGE_5_1_AUTHORITY_BOUNDARY.md`.
 

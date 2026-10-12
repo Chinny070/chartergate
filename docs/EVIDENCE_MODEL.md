@@ -125,11 +125,17 @@ A proposal is bound to `charter_version_at_submission`. When evidence names a ch
 | claim | 500 |
 | fact / value / excerpt / reason | 64 / 200 / 300 / 64 |
 | fetched body | 2,000,000 bytes (larger is `INVALID_SOURCE`, `TOO_LARGE`) |
-| text sent to the LLM | 30,000 characters (longer pages are truncated deterministically; later facts are not visible) |
+| text assessed by the evidence extraction pass | first 30,000 characters of the decoded, normalized page text (longer pages are truncated deterministically; later facts are not visible to that pass) |
 | evidence per proposal | 25 |
 | page size for views | 50 |
 
 Evidence is stored as small structured records. Full pages are never stored in contract state.
+
+### Assessment boundary and limitation
+
+The 30,000-character cap applies **per evidence assessment**, after retrieval and text normalization and before the leader's extraction prompt. Validators independently fetch and normalize the page, then apply the same prefix cap before their own extraction and grounding checks. This is not a claim that the entire source page was assessed. A decision-critical fact after character 30,000 is outside the assessment and cannot support a `VERIFIED` record for that assessment. The current pipeline does not search later chunks or prove that the omitted tail contains no contradictory facts. Pages with important material after the boundary should be split into precise public sources/URLs or submitted as separate evidence; the UI and reviewer should treat a truncated source as incomplete context.
+
+An adversarial direct test places a decision-critical 99% allocation after the boundary, makes the mocked extractor claim it found that fact, and asserts the tail is absent from the prompt and the result remains `UNVERIFIABLE:NOT_GROUNDED`. This proves the boundary behavior, not the truth or completeness of any live web source.
 
 ## URL screening (best effort)
 

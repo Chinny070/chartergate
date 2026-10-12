@@ -125,8 +125,11 @@ LLM call.
 | `DYNAMIC_WEB` | `RENDER_TEXT` | `web.render(url, mode='text', wait_after_loaded='1000ms')`, whitespace collapsed |
 
 Bounds: URL 500 chars, claim 500, response body 2,000,000 bytes (larger is `INVALID_SOURCE`, reason `TOO_LARGE`),
-text sent to the LLM 30,000 chars (longer text is truncated deterministically, so facts beyond that point are not
-visible; this is a documented limit), at most 25 evidence records per proposal.
+and at most 25 evidence records per proposal. For each source, an extraction pass sees only the first 30,000
+characters of decoded and normalized page text. Validators apply the same prefix limit. Text after that boundary
+does not support or contradict the extracted facts in that assessment; the pipeline does not scan the remaining
+text or prove that the assessed prefix contains the whole page. Treat a source exceeding the limit as incomplete
+for decision-critical facts and provide a precise URL or separate evidence for material content beyond the prefix.
 
 ## 7. Validator acceptance rules
 
@@ -241,7 +244,8 @@ validators agreed they read. Every input is a stored field, so any record's hash
   verify that the claim is about the declared fact. A submitter who declares a misleading pairing only mislabels their own evidence.
 - A page that is ambiguous in a way a human could not resolve will fail to reach `VERIFIED` (or fail consensus) rather than guess.
 - Prompt injection inside a page is mitigated by delimiting page text as data and by the deterministic checks, not eliminated.
-- Truncation at 30,000 characters can hide facts that appear later in a long page.
+- The 30,000-character per-source prefix can omit decision-critical support or contradictions later in a page.
+  The pipeline does not inspect the remainder, so a successful assessment applies only to the visible prefix.
 - Pages that serve different content to different regions or bots can cause validators to disagree. That fails the round and rotates the
   leader; it is never recorded as `VERIFIED`.
 

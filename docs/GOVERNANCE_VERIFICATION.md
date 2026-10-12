@@ -1,8 +1,10 @@
 # Governance switch: safety verification and demo guide
 
-Date: 2026-10-11. Written when `0xC97b…0736` was the live contract; the submission release is now `0xc942901dbB024CDb922f9D71B91024ea919a9F94` (same governance code, switch also OFF). The contract `0xC97b91Bd8ede96533B17EFf86D98cDff6c700736` was only **read** during this work; its governance switch is **OFF** (verified by `get_governance_status` after all tests: `governance_enabled: false`, charter v5, 4 amendments).
+Updated 2026-10-12. The submission release is `0xc942901dbB024CDb922f9D71B91024ea919a9F94`. Its governance switch is **ON**. The owner-signed GenLayerJS 1.1.8 transaction `0xa20696724c4b39bf04e5162a840766a5274970e2135ec56a0a298c3f384c9272` finalized `MAJORITY_AGREE` with five validator agrees; a direct StudioNet read returned `governance_enabled: true`, activation timestamp `2026-10-12T02:41:08.461235Z`, charter v4, 3 amendments. Five earlier CLI submissions finalized `NO_MAJORITY` with no validator rounds or votes. The earlier contract `0xC97b91Bd8ede96533B17EFf86D98cDff6c700736` was only **read** and remains OFF there. The signed same-text `update_charter_section` check finalized `MAJORITY_AGREE` at the consensus layer but the contract execution rolled back with `EXPECTED:AMENDMENT_GOVERNANCE_REQUIRED`. Post-transaction reads confirmed charter version 4 and §1 title/body/active state/timestamps unchanged.
 
 ## 1. What activation does (from `contracts/charter_gate.py`)
+
+Owner-controlled charter mutation is a bootstrap mechanism only. The intended normal policy path is amendment governance; after activation, direct owner edits are disabled permanently.
 
 * `enable_amendment_governance()` is owner-only (`_require_owner`), sets `governance_enabled = True` and records `governance_enabled_at`. A second call fails with `GOVERNANCE_ALREADY_ENABLED`.
 * **Irreversible.** No method sets the flag back to false and no upgrade or ownership-transfer path exists. The owner is permanent.
@@ -50,21 +52,41 @@ Transaction hashes: `deployments/studionet.json`, entry `throwaway_governance_te
 
 Not verified live: a DEACTIVATE amendment. The `genlayer` CLI 0.39.1 turns an empty-string argument into a non-string (`INVALID_TYPE:title`), so a DEACTIVATE proposal cannot be sent from the CLI. The browser encoder (`genlayer-js`) sends `""` as a string (checked by encoding and decoding the calldata), and DEACTIVATE is covered by the direct tests. Verify it once in the browser if you want to demo it.
 
-## 4. Local checks (this session)
+## 4. Current submission-release verification
 
-* Direct tests (governance guardrails, amendment lifecycle and integrity, accountability): 144 passed. Full direct suite earlier today at the release candidate: 1546 passed.
-* Frontend: typecheck clean, lint clean, vitest 349 passed and 8 skipped, production build succeeded.
-* Live frontend (https://chartergate.vercel.app) read the live contract: constitution (v5, sections s1, s3, s4, history v1 to v5), amendments (4, with the right statuses), accountability (amendments plus case 1 ELIGIBLE), precedent (s1@2, s3@5, s4@4 with 2 reviews each).
+The intended submission release is the verification deployment at `0xc942901dbB024CDb922f9D71B91024ea919a9F94` (StudioNet 61999), source commit `a486010`. It is not a canonical/production contract deployment. Its governance state and direct-edit restriction are verified in the opening record above and in `deployments/studionet.json` (`submission_release_a486010`).
 
-## 5. Demo script (live contract; keep the switch OFF unless you decide otherwise)
+The owner activation transaction `0xa20696724c4b39bf04e5162a840766a5274970e2135ec56a0a298c3f384c9272` finalized `MAJORITY_AGREE`; the subsequent direct `update_charter_section` call `0xf50cc5a16cf2d22c0404fa288dcff5d3ea0f10334181bd43d7734fd693f4a83f` finalized at consensus but reverted in contract execution with `EXPECTED:AMENDMENT_GOVERNANCE_REQUIRED`. Direct reads confirmed charter version 4 and the section unchanged. Five earlier CLI submissions finalized `NO_MAJORITY` with no rounds or votes; those are historical failed attempts, not the final state.
 
-1. https://chartergate.vercel.app, connect the owner wallet on StudioNet.
-2. `/constitution`: charter v5, three sections, version history.
-3. `/constitution/amend`: the four recorded amendments (applied, applied, superseded, rejected). Propose a new one, request evaluation (about a minute), approve, apply.
-4. `/accountability`: amendments marked contract-verified; open case 1 to see its execution reports, all labelled unverified.
-5. `/precedent`: rules and review counts.
-6. To show the lock, use a fresh deployment, not the live contract.
+The deployment was later tested through the production frontend with the owner wallet on StudioNet:
 
-## 6. Decision needed before activating on the live contract
+| Frontend operation | Result |
+| --- | --- |
+| Connect wallet and read live state | Owner `0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b`; StudioNet 61999; metadata, charter history, proposals and amendments decoded from the deployed contract. |
+| Submit proposal #3 | `0x9ff9db956ea754195476c23a6237186bedbfc595d14590d4f6c37088151ef257`, `FINALIZED`, `MAJORITY_AGREE`, execution `SUCCESS`; readback shows `SUBMITTED`, charter version 4. |
+| Verify evidence #1 for proposal #3 | `0xc8235405191a4955514b31296491b26b28ac87a648927bb93f490cd1fad58f6c`, `FINALIZED`, `MAJORITY_AGREE`, execution `SUCCESS`; readback shows `VERIFIED`. |
+| Request constitutional review for proposal #3 | `0x8d4e6af40a4f0991ba4f6668a626cf022f7ede7e183c9b878d9f7a3260e1fb7e`, `FINALIZED`, `MAJORITY_DISAGREE`; leader returned `LLM_ERROR:BAD_MISSING_FACT`; no review was stored and proposal remained `SUBMITTED`. This was a no-funding test proposal, which did not fit the active funding rules. |
+| Read existing review, appeal and amendment records | Production UI rendered review #001 (`ELIGIBLE`), review #002 (`REPAIRABLE`), appeal #001 (`AFFIRMED`), and amendment #001's `COMPATIBLE` evaluation and applied state. These records were read back; this is not evidence that those writes were initiated by the frontend. |
 
-Activation is irreversible and makes the model evaluation mandatory for every future charter change. The tests above show it behaves as designed. Say explicitly if and when to activate; it is not done.
+The frontend refuses to show transaction success from consensus finality alone. It requires `FINALIZED` plus a successful contract execution; rollbacks and contract errors are presented as failures. The focused frontend tests are in `frontend/src/lib/genlayer/txOutcome.test.ts` and `frontend/src/lib/genlayer/live.test.ts`.
+
+The later owner-wallet session also demonstrated these frontend writes on StudioNet:
+
+| Frontend operation | Result |
+| --- | --- |
+| Submit proposal #5 for steward appeal-flow verification | `0x9bf7938f2e7635fecb4346cf307f5048e8e3c38a52be39b052dfd0d0d42765d2`, `FINALIZED`, `MAJORITY_AGREE`, execution `SUCCESS`; readback `SUBMITTED` at charter v4. Explicitly non-binding, with no payment or execution request. |
+| Verify Salesforce evidence #2 for proposal #5 | `0x9dd8471d8d62a8b38a318c894aff27039a130aa9518cca76b91ebda4355c9f4a`, `FINALIZED`, `MAJORITY_AGREE`, execution `SUCCESS`; readback `VERIFIED`, retrieval time `2026-10-12T05:45:30.169307Z`, content hash `0x12c7b2ab…f01833`. |
+| Request review #3 for proposal #5 | `0x0e087673d61b0852789f9f56edd9ed7cf360e558136041c291778d7a7eb248f3`, `FINALIZED`, `MAJORITY_AGREE`, execution `SUCCESS`; readback `INELIGIBLE` at charter v4. §s1 was nonrepairable; §s3 and §s4 were repairable. |
+| File appeal #1 against review #3 | `0x79e3301584b5a68a70fb27d677db6d0a261c56f7ceb407ea9ae82f7d91c4ced5`, `FINALIZED`, `MAJORITY_AGREE`, execution `SUCCESS`; readback `AFFIRMED`, so the effective verdict remains `INELIGIBLE`. |
+| Submit test amendment `s7` from the frontend | `0xac32e2a29e7df4f01123de044c95218ec405d6d9c5efa9d32d630781862fc24d`, `FINALIZED`, `MAJORITY_AGREE`, execution `SUCCESS`; receipt calldata identifies `propose_amendment` to the CharterGate contract at v4. Rabby's preview showed misleading `Send Token` wording, but the finalized receipt confirms the actual contract target and method. |
+| Request evaluation for amendment #4, first CLI attempt | `0xf5fe2e8d8fec79cc282334d935bbe75fc6cbd881a90be725b497734883788ce8`, `FINALIZED`, `NO_MAJORITY`, **zero rounds and zero validator votes**. Receipt showed leader execution `UNKNOWN`; stdout/stderr were empty. This is not an evaluation verdict. The CLI trace API returned `Method not found: gen_dbg_traceTransaction`; fee estimation returned `Method not found: sim_getFeeConfig`. |
+| Request evaluation for amendment #4 through the production frontend | `0x6ed388b8170346d115ea1cccc791d54c19f7f45b7442e791465f0fa5c9b099d4`, `FINALIZED`, `MAJORITY_AGREE`, GenVM execution `SUCCESS`; returned `compatible: true`, no conflicting sections, context hash `0x0346a78cdec754a2821752ae110ae4285abd8d9415ef5e6821a9d036050a724c`. |
+| Read back amendment #4 and current charter | GenLayerJS 1.1.8 `LATEST_FINAL` reads returned amendment status `EVALUATED`, verdict `COMPATIBLE`, `applied_at: ""`, `applied_version: 0`; governance remains ON, amendment count 4, charter version 4, active sections remain s1/s3/s4. The test amendment was deliberately not approved or applied. |
+
+**Steward-requested frontend write-through is complete for the verified test lifecycle:** wallet connection, proposal, evidence, review, appeal, amendment proposal, amendment evaluation, and authoritative state readback all have finalized receipts or read results recorded above and in `deployments/studionet.json`. The failed CLI evaluation attempt is documented separately from the successful frontend transaction. Approval and application were intentionally omitted because this is a non-operative smoke-test amendment and applying it would change the charter.
+
+## 5. Historical activation attempts and wallet connection
+
+On 2026-10-12, five CLI attempts to call `enable_amendment_governance` finalized `NO_MAJORITY` with zero validator rounds and votes. The final successful activation was a separate injected-wallet GenLayerJS 1.1.8 transaction, hash `0xa20696724c4b39bf04e5162a840766a5274970e2135ec56a0a298c3f384c9272`, signed by `my-studionet-wallet`. The live `get_governance_status` read returned `governance_enabled: true` and activation timestamp `2026-10-12T02:41:08.461235Z`.
+
+An earlier attempt to connect through the CLI browser-wallet bridge stopped at MetaMask's unsafe-site warning. That was not the final browser test: the production frontend was subsequently connected to the owner wallet, and the proposal/evidence transactions above were signed and finalized. The Codex in-app browser used for the current review is a separate walletless browser and cannot sign those writes.

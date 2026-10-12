@@ -19,6 +19,7 @@ export function ProposalAccountabilityView({ acc }: { acc: ProposalAccountabilit
         <Badge tone="warning">NOT VERIFIED BY THE CONTRACT</Badge>
       </div>
       <p className="muted">{info.explain}</p>
+      <p className="muted">An ELIGIBLE result means constitutional review passed. It is not a DAO vote, ratification or execution approval.</p>
       <p className="muted">{UNVERIFIED_NOTE}</p>
       {acc.review_id > 0 && (
         <div className="stack">

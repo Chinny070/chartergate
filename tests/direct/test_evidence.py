@@ -303,6 +303,34 @@ def test_long_excerpt_is_truncated_and_a_truncated_quote_can_still_be_grounded(a
     assert len(r["excerpt"]) <= 300
 
 
+def test_decision_critical_fact_after_30000_character_boundary_is_not_assessed(atlas, direct_vm, monkeypatch):
+    """The evidence pipeline must not claim to have checked a fact beyond its prompt window."""
+    max_prompt_chars = 30_000
+    tail = "DECISION_CRITICAL: team allocation is 99%."
+    text = ("x" * max_prompt_chars) + tail
+    mock_page(direct_vm, body=text)
+    mock_answer(direct_vm, supported=True, value="99%", excerpt=tail)
+
+    prompts = []
+    from genlayer import gl
+
+    original = gl.nondet.exec_prompt
+
+    def inspect_prompt(prompt, **kwargs):
+        prompts.append(prompt)
+        return original(prompt, **kwargs)
+
+    monkeypatch.setattr(gl.nondet, "exec_prompt", inspect_prompt)
+    submit(atlas)
+
+    record = only_record(atlas)
+    assert (record["status"], record["status_reason"]) == ("UNVERIFIABLE", "NOT_GROUNDED")
+    assert prompts
+    visible_blocks = [p.split("PAGE TEXT (between the markers):\n<<<PAGE\n", 1)[1].split("\nPAGE>>>", 1)[0] for p in prompts]
+    assert all(len(visible) == max_prompt_chars for visible in visible_blocks)
+    assert all(tail not in prompt for prompt in prompts)
+
+
 # ---- canonical value and hash ------------------------------------------------
 
 

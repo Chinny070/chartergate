@@ -41,8 +41,8 @@ export function AccountabilityPage() {
         }
       </ReadBoundary>
 
-      <h2 style={{ fontSize: "1.8rem" }}>Approved proposals</h2>
-      <p className="muted">A proposal whose controlling ruling is ELIGIBLE can have its execution reported on its case page.</p>
+      <h2 style={{ fontSize: "1.8rem" }}>Constitutionally eligible proposals</h2>
+      <p className="muted">ELIGIBLE means the proposal passed constitutional review. It is not a DAO vote, ratification or execution approval. This app does not implement proposal voting.</p>
       <ReadBoundary read={proposals}>
         {(list) => {
           const approved = list.filter((p) => p.status === "ELIGIBLE");

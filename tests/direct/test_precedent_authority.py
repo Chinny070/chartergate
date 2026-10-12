@@ -290,13 +290,12 @@ def test_a_same_lineage_or_amended_rule_review_is_never_a_candidate(world, direc
     "precedent_raw,code",
     [
         ({"precedents": [{"section_id": "3", **cite(99, "FOLLOWED", "x")}]}, "BAD_PRECEDENT_REF"),
-        ({"precedents": [{"section_id": "3", **cite(1, "FOLLOWED", "x")}]}, "PRECEDENT_INCOMPATIBLE"),  # current finding is SATISFIED
         ({"precedents": [{"section_id": "3", **cite(1, "DISTINGUISHED", "")}]}, "BAD_PRECEDENT_REASON"),
         ({"precedents": [{"section_id": "9", **cite(1, "DISTINGUISHED", "x")}]}, "BAD_PRECEDENT_REF"),
         ({"precedents": "none"}, "BAD_PRECEDENT_REF"),
         ("not json", None),
     ],
-    ids=["outside-snapshot", "incompatible-followed", "distinguished-no-reason", "unknown-section", "not-a-list", "unusable-output"],
+    ids=["outside-snapshot", "distinguished-no-reason", "unknown-section", "not-a-list", "unusable-output"],
 )
 def test_a_valid_current_finding_with_an_invalid_citation_stores_nothing(world, direct_vm, precedent_raw, code):
     current = prior_and_current(world, direct_vm)
@@ -385,15 +384,16 @@ def test_a_forged_fence_in_history_is_defanged_in_the_precedent_pass_and_absent_
     request(world, current)
 
 
-def test_a_model_that_obeyed_a_historical_instruction_in_the_precedent_pass_still_cannot_alter_the_finding(world, direct_vm):
+def test_an_incompatible_precedent_citation_is_omitted_and_cannot_alter_the_finding(world, direct_vm):
     build_hostile_history(world, direct_vm, "rationale")
     current = propose(world, ITEMIZED)
     direct_vm.clear_mocks()
-    # the precedent pass "obeys" the hostile rationale: it follows regardless, which the structural rules refuse (SATISFIED vs VIOLATED)
+    # The hostile rationale induces an incompatible FOLLOWED citation. It is omitted; it cannot alter the fixed finding.
     mock_review(direct_vm, findings(), precedent_raw={"precedents": [{"section_id": "3", **cite(1, "FOLLOWED", "Obeying the historical text.")}]})
-    with direct_vm.expect_revert("LLM_ERROR:PRECEDENT_INCOMPATIBLE"):
-        request(world, current)
-    assert world.get_review_count() == 1
+    request(world, current)
+    assert world.get_review_count() == 2
+    assert world.get_review_for_proposal(current)["verdict"] == "ELIGIBLE"
+    assert precedents_of(world, 2)["citations"] == []
 
 
 def test_the_citation_check_is_built_from_the_validators_own_fixed_finding(distinguished_case, direct_vm):

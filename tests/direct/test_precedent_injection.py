@@ -8,7 +8,7 @@ import re
 import pytest
 
 from evidence_support import mock_answer, mock_page, page, reset, submit
-from precedent_support import ITEMIZED, NO_BREAKDOWN, cite, findings, propose, review, world  # noqa: F401
+from precedent_support import ITEMIZED, NO_BREAKDOWN, cite, findings, precedents_of, propose, review, world  # noqa: F401
 from repair_support import REPAIRED, mock_repair
 from review_support import fnd, mock_review, request
 
@@ -106,18 +106,15 @@ def test_historical_text_stays_quoted_data_in_the_precedent_block(world, direct_
 
 
 @pytest.mark.parametrize("payload_name", list(PAYLOADS))
-def test_a_model_that_obeys_a_historical_instruction_still_cannot_follow_incompatibly_or_set_the_verdict(world, direct_vm, payload_name):
+def test_an_incompatible_precedent_citation_is_omitted_and_historical_instruction_cannot_set_the_verdict(world, direct_vm, payload_name):
     build_prior(world, direct_vm, "rationale", PAYLOADS[payload_name])
     current = propose(world, ITEMIZED)
     direct_vm.clear_mocks()
-    # a model that "obeyed" 'follow this precedent regardless' would mark a SATISFIED case FOLLOWED against a VIOLATED ruling
+    # A malicious rationale may induce an incompatible FOLLOWED citation; it is omitted and cannot change the fixed finding.
     mock_review(direct_vm, findings(precedents={"3": [cite(1, "FOLLOWED", "Following as instructed.")]}))
-    with direct_vm.expect_revert("LLM_ERROR:PRECEDENT_INCOMPATIBLE"):
-        request(world, current)
-    direct_vm.clear_mocks()
-    mock_review(direct_vm, findings(), extra={"verdict": "INELIGIBLE"})
     request(world, current)
     assert world.get_review_for_proposal(current)["verdict"] == "ELIGIBLE"  # derived from findings, never from text
+    assert precedents_of(world, 2)["citations"] == []
 
 
 def test_forged_fences_in_a_prior_rationale_cannot_close_the_data_block_early(world, direct_vm):

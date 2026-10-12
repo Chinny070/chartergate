@@ -14,7 +14,7 @@ There is **no application backend and no database**: a React frontend talks to t
 * **Amendments** (propose, model compatibility advice, owner approval, apply, supersede), a one-way **governance switch**, and **execution accountability** (Stages 7 to 9).
 * **Product UI** (Stage 10) and a **release audit** (Stage 11).
 
-There is no voting or treasury execution. Ratification is the owner. Execution reports are self-reported and always `verified: false`. Details: `docs/ARCHITECTURE.md`, `docs/AMENDMENT_MODEL.md`,
+An `ELIGIBLE` verdict means only that constitutional review passed. It is not a DAO vote, proposal ratification, or execution authorization. Proposal voting and treasury execution are not implemented. Execution reports are self-reported and always `verified: false`; the contract cannot verify that an outside payment, transfer, or deliverable happened. Amendment ratification is owner approval, not DAO voting. Details: `docs/ARCHITECTURE.md`, `docs/AMENDMENT_MODEL.md`,
 `docs/APPEAL_MODEL.md`, `docs/PRECEDENT_MEMORY_MODEL.md`, and what validators do and do not verify: `docs/TRUST_MODEL.md`.
 
 ## Evidence status (read this before relying on any claim)
@@ -25,14 +25,17 @@ There is no voting or treasury execution. Ratification is the owner. Execution r
 | GLSim integration (`tests/integration`, 6 files) | 26 passed, 9 skipped (the skipped cases need real LLM validators) |
 | Frontend (vitest) | 349 passed, 8 skipped; typecheck, lint and production build clean |
 | **Submission release (intended)** | `0xc942901dbB024CDb922f9D71B91024ea919a9F94` on StudioNet, deploy tx `0x90181a7c05c41d0adbb9af4072461a23ce9f755dec1081e3a3adf42d858d219a`, FINALIZED, `MAJORITY_AGREE`. Deployed source = `contracts/charter_gate.py` at commit `a486010`, SHA-256 `e1041e625bccf8316f979d247d425e29036ec398b299a9321e0737b39ecbd64e`, 72 methods, schema identical to `docs/charter_gate.schema.json`. Explorer: https://explorer-studio.genlayer.com/address/0xc942901dbB024CDb922f9D71B91024ea919a9F94 |
-| Live behavior observed on that contract | an amendment evaluated COMPATIBLE, approved and applied (charter v4); an amendment evaluated **CONFLICTING with `[s3]`** (validators agreed on the list in one round), approval refused, rejected; a competing amendment refused as stale and closed; a second apply refused; a proposal reviewed ELIGIBLE with execution reports (unverified); a REPAIRABLE review with an AFFIRMED appeal. Every transaction finalized in 1 round with no retries. Hashes: `deployments/studionet.json` |
+| Live behavior observed on that contract | Amendment #001 was evaluated COMPATIBLE, owner-approved and applied (charter v3→v4); #002 was evaluated CONFLICTING with `[s3]` and rejected; #003 was superseded. Reviews #001 (ELIGIBLE) and #002 (REPAIRABLE), and appeal #001 (AFFIRMED), are readable in the production frontend. The browser wallet also submitted proposal #003 and verified evidence #001 successfully. A subsequent review request for that explicitly no-funding test proposal finalized MAJORITY_DISAGREE and rolled back with `LLM_ERROR:BAD_MISSING_FACT`; no review record was written. Hashes and exact outcomes: `deployments/studionet.json`. |
+| Frontend write-through coverage | Wallet connection, proposal submission (#3 and #5), evidence verification (#1 and #2), review (#3), appeal (#1), test amendment proposal (#4), and amendment evaluation (#4) were signed through the production frontend and finalized successfully. Appeal #1 was AFFIRMED; amendment #4 evaluated `COMPATIBLE` and remains unapplied. The separate CLI evaluation attempt finalized `NO_MAJORITY` with zero rounds and is not counted as successful. Another review attempt rolled back without storing state. See `docs/GOVERNANCE_VERIFICATION.md` and `deployments/studionet.json` for hashes and outcomes. |
 | Live frontend | https://chartergate.vercel.app, built for the contract above only |
 | Earlier release-candidate contract | `0xC97b91Bd8ede96533B17EFf86D98cDff6c700736` (source `ccca5e4d…`, before the conflict-list check). Kept unchanged as history and superseded by the row above. |
-| Governance switch | **OFF** on the submission release (irreversible; deliberately not activated). Tested on a separate throwaway deployment: `docs/GOVERNANCE_VERIFICATION.md` |
-| Not observed live | a stored reasoned dissent on the submission release (two attempts returned `NO_MATERIAL_DISSENT`; one was stored on the earlier contract), `MODIFIED` or `REVERSED` appeals, repair after a reversal, any validator disagreement or leader rotation, a non-owner account on the submission release (tested on a throwaway), a DEACTIVATE amendment, and wallet rejection, wrong network and refresh in a real wallet |
+| Governance switch | **ON** on the submission release. Owner activation `0xa20696724c4b39bf04e5162a840766a5274970e2135ec56a0a298c3f384c9272` finalized `MAJORITY_AGREE`; the live read returns `governance_enabled: true`. A signed same-text direct edit `0xf50cc5a16cf2d22c0404fa288dcff5d3ea0f10334181bd43d7734fd693f4a83f` rolled back with `EXPECTED:AMENDMENT_GOVERNANCE_REQUIRED`; charter v4 and §1 stayed unchanged. Owner-controlled charter mutation is bootstrap governance only. See `docs/GOVERNANCE_VERIFICATION.md` for details. |
+| Not observed live | a stored reasoned dissent on the submission release (two attempts returned `NO_MATERIAL_DISSENT`; one was stored on the earlier contract), `MODIFIED` or `REVERSED` appeals, repair after a reversal, a DEACTIVATE amendment, and wallet rejection or wrong-network handling in a real wallet. Validator disagreement and leader rotation have now been observed; the browser no-funding review attempt is recorded above. |
 | Canonical deployment | **none** (`canonicalDeployment` is `null`). Every deployment is a verification deployment. |
 
 No independent professional security audit has been performed.
+
+Evidence assessment has a deterministic **30,000-character text cap per evidence item** after retrieval and normalization. The assessor and validators see the same prefix; text after that boundary is not examined and cannot substantiate a verified fact. A direct adversarial test places a decision-critical claim only after the boundary and confirms it remains `UNVERIFIABLE:NOT_GROUNDED`. This does not establish that the unexamined tail contains no contradictory information. See `docs/EVIDENCE_MODEL.md` and `tests/direct/test_evidence.py`.
 
 ## Repository layout
 
@@ -80,8 +83,7 @@ gltest tests/integration/test_governance_live.py -q
 
 ## Deployment
 
-Deployment is manual and deliberate; nothing here deploys automatically. After `genlayer deploy --contract contracts/charter_gate.py --args "<name>" "<description>"`, record the address, transaction,
-commit and source hash in `deployments/studionet.json`, then rebuild the frontend with the new `VITE_CHARTERGATE_ADDRESS`. Enabling amendment governance is a separate, one-way, owner decision.
+Deployment is manual and deliberate; nothing here deploys automatically. After `genlayer deploy --contract contracts/charter_gate.py --args "<name>" "<description>"`, record the address, transaction, commit and source hash in `deployments/studionet.json`, then rebuild the frontend with the new `VITE_CHARTERGATE_ADDRESS`. The submission release is a verification deployment with amendment governance ON. Five earlier CLI activation attempts finalized `NO_MAJORITY`; the injected-wallet GenLayerJS call succeeded. Activation is irreversible. The live status and direct-edit rejection were verified on-chain. Owner-controlled charter mutation is bootstrap governance only; the intended normal policy path is amendment-enforced.
 
 ## Roadmap and state
 
@@ -90,6 +92,6 @@ commit and source hash in `deployments/studionet.json`, then rebuild the fronten
 | 0 | Foundation, design system, wallet and transaction architecture | done |
 | 1 to 5 | Charter, evidence, review, repair, precedent | frozen; deployed as verification deployments |
 | 6 | Appeals and reasoned dissent | conditionally accepted (coverage gaps in `docs/STAGE_6_EQUIVALENCE.md`, section 10) |
-| 7 to 9 | Amendments, governance guardrails, accountability | implemented; exercised live on the release-candidate verification deployment (see the evidence table) |
+| 7 to 9 | Amendments, governance guardrails, accountability | implemented and exercised live on the submission-release verification deployment; amendment governance is ON and direct owner edits are blocked (see the evidence table and deployment record) |
 | 10 | Product UI | live at https://chartergate.vercel.app |
 | 11 | Release audit | complete: one validator fix deployed as the submission release; remaining gaps listed above |

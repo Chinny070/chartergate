@@ -26,7 +26,7 @@ Every citation in the leader's result is checked against this validator's own sn
 | shape | missing or extra keys, a non-integer id, a non-list `precedents`, an unknown treatment, an oversized or non-string reason |
 | order | unsorted or duplicate citations, more than 2 per section |
 | `DISTINGUISHED` | an empty reason |
-| `FOLLOWED` compatibility | a current finding whose class differs from the cited finding, or a `VIOLATED` finding whose repairability differs |
+| `FOLLOWED` compatibility | incompatible citations produced by the leader are omitted before the result is returned; a tampered leader result containing one is still rejected |
 | precedent is not evidence | a `SATISFIED` finding that followed an evidence-backed ruling but cites no current evidence |
 
 Citing a prior case's evidence id as current evidence is rejected by the existing Stage 3 rule that an id must belong to the current snapshot.
@@ -50,14 +50,12 @@ classes and the same verdict. Precedent explains consistency; it cannot rescue a
 
 ## 6. Failure paths
 
-A review that fails (malformed output, an invalid or failing precedent pass, an invalid citation from the leader, validators disagreeing until the transaction fails) writes nothing: no review id, no
+A review that fails (malformed output, an invalid reference or treatment, a failing semantic citation check, validators disagreeing until the transaction fails) writes nothing: no review id, no
 index slot, no snapshot, no citation. The index is appended only after the review is stored.
 
 ## 7. Liveness
 
-The leader is strict about its precedent pass, so a model that cites a non-candidate or follows incompatibly produces an `LLM_ERROR` and a rotation, and a validator may
-refuse a citation it finds semantically unsupported. Stage 3 and 4 live testing already showed rotations and retries for re-reviews; the extra passes could make that slightly worse. This is an operational
-observation to measure on StudioNet, not a relaxation of any rule.
+An incompatible `FOLLOWED` citation is now omitted deterministically: it cannot veto the fixed constitutional findings. Other malformed citations and references still fail closed, and validators may still reject a citation they find semantically unsupported. This reduces one specific source of leader rotation; it does not guarantee validator agreement on live LLM judgments.
 
 ## 8. What is not proven locally
 

@@ -108,11 +108,12 @@ def test_at_most_two_citations_and_no_duplicates(world, direct_vm):
     ],
     ids=["satisfied", "unclear", "not-applicable", "violated-not-repairable"],
 )
-def test_followed_must_be_compatible_with_the_precedents_finding(prior, direct_vm, current, kw):
+def test_incompatible_optional_followed_citation_is_omitted(prior, direct_vm, current, kw):
     fs = findings(s3=current, s3_kw=kw, precedents={"3": [cite(1, "FOLLOWED", "x")]})
-    with direct_vm.expect_revert("LLM_ERROR:PRECEDENT_INCOMPATIBLE"):
-        attempt(prior, direct_vm, fs)
-    assert prior.get_review_count() == 1
+    attempt(prior, direct_vm, fs)
+    assert prior.get_review_count() == 2
+    assert precedents_of(prior, 2)["citations"] == []
+    assert findings_of(prior, 2)[2]["finding"] == current
 
 
 def test_a_violated_precedent_may_be_distinguished_by_a_satisfied_current_finding(prior, direct_vm):
