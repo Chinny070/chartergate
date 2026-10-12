@@ -3116,22 +3116,52 @@
             "conflictingSectionIds": [],
             "contextHash": "0x0346a78cdec754a2821752ae110ae4285abd8d9415ef5e6821a9d036050a724c"
           },
+          "approvalTransaction": {
+            "transactionHash": "0x19f28164ba7443148051b2186eaa8639202c88b42724cd7622f5aa5cf038310a",
+            "finalStatus": "FINALIZED",
+            "consensusResult": "ACCEPTED",
+            "executionResult": "SUCCESS",
+            "method": "approve_amendment",
+            "amendmentId": 4,
+            "approvedAt": "2026-10-12T08:58:09.698792Z",
+            "approvedBy": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b"
+          },
+          "applicationTransaction": {
+            "transactionHash": "0x615a75a621df5939b466829ab95bcc316121db2240ab960d7fb603d989c5c951",
+            "finalStatus": "FINALIZED",
+            "consensusResult": "ACCEPTED",
+            "executionResult": "SUCCESS",
+            "method": "apply_amendment",
+            "amendmentId": 4,
+            "appliedAt": "2026-10-12T09:10:25.480529Z",
+            "appliedVersion": 5
+          },
           "amendmentReadback": {
-            "status": "EVALUATED",
+            "status": "APPLIED",
             "evaluationVerdict": "COMPATIBLE",
             "evaluatedAt": "2026-10-12T06:44:52.171618Z",
-            "appliedAt": "",
-            "appliedVersion": 0,
+            "approvedBy": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+            "approvedAt": "2026-10-12T08:58:09.698792Z",
+            "appliedAt": "2026-10-12T09:10:25.480529Z",
+            "appliedBy": "0xaffE15eEc45b68835cc9E5B4Ab85dD5deaE8e70b",
+            "appliedVersion": 5,
             "amendmentCount": 4
           },
           "stateReadback": {
-            "charterVersion": 4,
+            "charterVersion": 5,
             "governanceEnabled": true,
-            "activeSections": ["s1", "s3", "s4"],
-            "s7Applied": false
+            "activeSections": ["s1", "s3", "s4", "s7"],
+            "s7Applied": true,
+            "s7": {
+              "active": true,
+              "title": "Steward verification",
+              "body": "This non-binding section records a Steward-requested StudioNet amendment-evaluation test only. It grants no funding authority and authorizes no payment or external execution.",
+              "createdAt": "2026-10-12T09:10:25.480529Z",
+              "updatedAt": "2026-10-12T09:10:25.480529Z"
+            }
           },
-          "note": "Proposal and evaluation were submitted through the owner wallet on the production GenLayerJS frontend. The earlier CLI attempt finalized NO_MAJORITY with zero rounds; it is recorded separately and is not an evaluation result. The successful frontend evaluation was read back from finalized contract state. The test amendment remains unapplied by design.",
-          "charterStateChanged": false
+          "note": "Amendment #4 was proposed and evaluated through the production frontend. The owner then approved and applied it through the frontend. All three writes finalized with successful GenVM execution; SDK latest-final reads confirm status APPLIED, charter version 5, and active section s7. The section text is explicitly non-binding and grants no funding or execution authority.",
+          "charterStateChanged": true
         }
       }
     }
